@@ -287,8 +287,8 @@
         function selectUserName(name) {
             localStorage.setItem('active_player', name);
             sessionStorage.setItem('isLoggedIn', 'true');
-            // Kullanıcı seçildiği an tüm sistemi tazelemek ve Firebase/Efektleri sıfırdan uyandırmak için yeniliyoruz
-            location.reload();
+            // Hard refresh - Cache buster ile tüm sistemi sıfırdan ve hatasız uyandırır
+            window.location.href = window.location.pathname + "?login=done&t=" + Date.now();
         }
 
         function showMainDashboardSafe() {
@@ -318,7 +318,10 @@
                 startDayColors();
                 startAmbientRomance();
                 initClickWish();
-                setTimeout(startScratchCard, 200); // Layout oturduğunda çizilmesi için bekle
+                // Layout'un tam oturduğundan emin olup öyle çizelim
+                requestAnimationFrame(function() {
+                    setTimeout(startScratchCard, 300);
+                });
             }
         }
 
