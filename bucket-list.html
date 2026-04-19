@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bizim Hayal Listemiz ✨</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
+        rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+    <style>
+        :root {
+            --primary: #ff4b72;
+            --secondary: #a18cd1;
+            --bg: #0a0208;
+            --surface: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #fce4ec;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #stars-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle var(--dur) ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 80px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px var(--primary);
+        }
+
+        .header p {
+            opacity: 0.7;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 40px;
+            background: var(--surface);
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .input-group input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #fff;
+            padding: 15px;
+            font-size: 1.1rem;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .add-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 0 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .add-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .bucket-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .bucket-item {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 20px 25px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .bucket-item.completed {
+            border-color: #48c78e;
+            background: rgba(72, 199, 142, 0.05);
+        }
+
+        .bucket-item:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .check-circle {
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            flex-shrink: 0;
+        }
+
+        .completed .check-circle {
+            background: #48c78e;
+            border-color: #48c78e;
+        }
+
+        .check-circle::after {
+            content: '✓';
+            color: #fff;
+            display: none;
+            font-weight: bold;
+        }
+
+        .completed .check-circle::after {
+            display: block;
+        }
+
+        .item-text {
+            flex: 1;
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+
+        .completed .item-text {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        .photo-btn {
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+            opacity: 0.4;
+            filter: grayscale(1);
+        }
+
+        .has-photo .photo-btn {
+            opacity: 1;
+            filter: grayscale(0);
+        }
+
+        .photo-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .delete-btn {
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: 0.3s;
+            margin-left: 10px;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+            transform: scale(1.2);
+            color: #ff4b72;
+        }
+
+        /* Modal / Fotoğraf Alanı */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 25px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .photo-preview {
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            max-height: 300px;
+            object-fit: cover;
+            display: none;
+        }
+
+        .photo-url-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #000;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-group button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-save {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-close {
+            background: #444;
+            color: #fff;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 75, 114, 0.15);
+            border-color: rgba(255, 75, 114, 0.4);
+            color: #fff;
+            transform: translateX(-3px);
+        }
+
+        .sync-status {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2.1rem;
+            }
+
+            .container {
+                padding: 40px 15px;
+            }
+
+            .input-group {
+                flex-direction: column;
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid var(--border);
+                padding: 15px;
+                border-radius: 15px;
+            }
+
+            .input-group input {
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 10px;
+                margin-bottom: 10px;
+                border: 1px solid var(--border);
+                width: 100%;
+                font-size: 1rem;
+            }
+
+            .add-btn {
+                padding: 14px;
+                width: 100%;
+                border-radius: 10px;
+                font-size: 1rem;
+            }
+
+            .bucket-item {
+                padding: 15px;
+                gap: 12px;
+                border-radius: 15px;
+            }
+
+            .item-text {
+                font-size: 1rem;
+            }
+
+            .modal-content {
+                padding: 20px;
+                width: 90%;
+            }
+
+            .photo-preview {
+                max-height: 220px;
+            }
+
+            .back-btn {
+                top: 15px;
+                left: 15px;
+                padding: 8px 15px;
+                font-size: 0.85rem;
+            }
+
+            .check-circle {
+                width: 26px;
+                height: 26px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="stars-bg"></div>
+    <a href="index.html" class="back-btn">← Ana Sayfaya Dön</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>Bizim Hayallerimiz ✨</h1>
+            <p>Birlikte yapacağımız çok şey var sevgilim...</p>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="bucket-input" placeholder="Bir hayal yaz... (Örn: Paris'te el ele yürümek)">
+            <button class="add-btn" id="add-btn">Ekle 💖</button>
+        </div>
+
+        <div class="bucket-list" id="bucket-list">
+            <!-- Hayaller buraya gelecek -->
+            <p style="text-align: center; opacity: 0.5;">Yükleniyor...</p>
+        </div>
+    </div>
+
+    <!-- Fotoğraf Ekleme/Görüntüleme Modalı -->
+    <div id="photo-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title" style="margin-bottom: 15px;">Hayal Hatırası 🖼️</h2>
+            <div id="loading-spinner" style="display:none; margin: 20px 0;">
+                <div class="sync-dot" style="width:40px; height:40px; margin: 0 auto; background: var(--primary);">
+                </div>
+                <p style="margin-top:10px;">Anı buluta gönderiliyor... ☁️</p>
+            </div>
+            <img id="modal-img-preview" class="photo-preview">
+            <div id="add-photo-section">
+                <p style="margin-bottom: 15px; opacity: 0.8;">Bu güzel anı ölümsüzleştirmek için galerinden bir fotoğraf
+                    seç sevgilim: 📸</p>
+                <label for="file-input"
+                    style="padding: 15px; background: rgba(255,255,255,0.1); border: 2px dashed var(--primary); border-radius: 15px; display: block; cursor: pointer; transition: 0.3s;"
+                    id="upload-label">
+                    <span>Fotoğraf Seç ☁️</span>
+                    <input type="file" id="file-input" style="display: none;" accept="image/*">
+                </label>
+            </div>
+            <div class="btn-group" style="margin-top: 20px;">
+                <button class="btn-close" onclick="closeModal()">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sync-status" id="sync-status">Buluta bağlanılıyor...</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import {
+            getFirestore, enableIndexedDbPersistence, collection, addDoc, updateDoc, deleteDoc, doc,
+            onSnapshot, query, orderBy, serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+            authDomain: "ayseye-surpriz.firebaseapp.com",
+            projectId: "ayseye-surpriz",
+            storageBucket: "ayseye-surpriz.firebasestorage.app",
+            messagingSenderId: "531177459988",
+            appId: "1:531177459988:web:09060a95bea0b06f197201",
+            measurementId: "G-2LBSDG1KDB"
+        };
+
+        // KENDİ IMGBB API ANAHTARINI BURAYA YAZ SEVGİLİM (https://api.imgbb.com/)
+        const IMGBB_API_KEY = "7916dd11376f59a547ed252799f1328a"; 
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        enableIndexedDbPersistence(db).catch(err => console.log('Offline DB:', err.code));
+        const bucketRef = collection(db, 'bucket_list');
+
+        let currentItemId = null;
+        // ... (Yıldızlar kodu aynı kalacak)
+        (function () {
+            const container = document.getElementById('stars-bg');
+            for (let i = 0; i < 80; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2 + 1;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.setProperty('--dur', (Math.random() * 3 + 2) + 's');
+                star.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(star);
+            }
+        })();
+
+        const q = query(bucketRef, orderBy('createdAt', 'desc'));
+        onSnapshot(q, (snapshot) => {
+            const listEl = document.getElementById('bucket-list');
+            listEl.innerHTML = '';
+            document.getElementById('sync-status').innerText = 'Buluta bağlı (Yazılar: Firebase, Resimler: ImgBB) ✨';
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const item = document.createElement('div');
+                item.className = `bucket-item ${data.isDone ? 'completed' : ''} ${data.photo ? 'has-photo' : ''}`;
+                item.innerHTML = `
+                    <div class="check-circle" onclick="toggleComplete('${doc.id}', ${data.isDone})"></div>
+                    <div class="item-text">${data.text}</div>
+                    <div class="photo-btn" onclick="openPhotoModal('${doc.id}', '${data.photo || ''}')">🖼️</div>
+                    <div class="delete-btn" onclick="deleteItem('${doc.id}')">🗑️</div>
+                `;
+                listEl.appendChild(item);
+            });
+        });
+
+        document.getElementById('add-btn').onclick = async () => {
+            const input = document.getElementById('bucket-input');
+            const text = input.value.trim();
+            if (!text) return;
+            await addDoc(bucketRef, { text, isDone: false, photo: '', createdAt: serverTimestamp() });
+            input.value = '';
+        };
+
+        window.toggleComplete = async (id, currentStatus) => {
+            await updateDoc(doc(db, 'bucket_list', id), { isDone: !currentStatus });
+        };
+
+        window.deleteItem = async (id) => {
+            if (confirm("Bu hayali silmek istediğine emin misin sevgilim? 🥺")) {
+                await deleteDoc(doc(db, 'bucket_list', id));
+            }
+        };
+
+        window.openPhotoModal = (id, photoUrl) => {
+            currentItemId = id;
+            const modal = document.getElementById('photo-modal');
+            const preview = document.getElementById('modal-img-preview');
+            const inputSection = document.getElementById('add-photo-section');
+
+            if (photoUrl) {
+                preview.src = photoUrl;
+                preview.style.display = 'block';
+                inputSection.style.display = 'none';
+            } else {
+                preview.style.display = 'none';
+                inputSection.style.display = 'block';
+            }
+            modal.classList.add('show');
+        };
+
+        window.closeModal = () => {
+            document.getElementById('photo-modal').classList.remove('show');
+        };
+
+        // ========== OFFLİNE FOTOĞRAF KUYRUĞU (Bucket List) ==========
+        const PENDING_STORE = 'pendingBucketPhotos';
+
+        function openPendingDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open('ourstory_bucket_offline', 1);
+                req.onupgradeneeded = e => e.target.result.createObjectStore(PENDING_STORE, { keyPath: 'id', autoIncrement: true });
+                req.onsuccess = e => resolve(e.target.result);
+                req.onerror = e => reject(e);
+            });
+        }
+
+        async function savePendingPhoto(itemId, base64) {
+            const idb = await openPendingDB();
+            return new Promise((resolve, reject) => {
+                const tx = idb.transaction(PENDING_STORE, 'readwrite');
+                tx.objectStore(PENDING_STORE).add({ itemId, base64 });
+                tx.oncomplete = resolve;
+                tx.onerror = reject;
+            });
+        }
+
+        async function getPendingPhotos() {
+            const idb = await openPendingDB();
+            return new Promise((resolve, reject) => {
+                const tx = idb.transaction(PENDING_STORE, 'readonly');
+                const req = tx.objectStore(PENDING_STORE).getAll();
+                req.onsuccess = e => resolve(e.target.result);
+                req.onerror = reject;
+            });
+        }
+
+        async function deletePendingPhoto(id) {
+            const idb = await openPendingDB();
+            return new Promise((resolve, reject) => {
+                const tx = idb.transaction(PENDING_STORE, 'readwrite');
+                tx.objectStore(PENDING_STORE).delete(id);
+                tx.oncomplete = resolve;
+                tx.onerror = reject;
+            });
+        }
+
+        async function processPendingPhotos() {
+            const pending = await getPendingPhotos();
+            if (!pending.length) return;
+            const statusEl = document.getElementById('sync-status');
+            if (statusEl) statusEl.innerText = `⏳ ${pending.length} bekleyen fotoğraf yükleniyor...`;
+            for (const item of pending) {
+                try {
+                    const blob = await fetch(item.base64).then(r => r.blob());
+                    const formData = new FormData();
+                    formData.append('image', blob);
+                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+                    const json = await res.json();
+                    if (json.success) {
+                        await updateDoc(doc(db, 'bucket_list', item.itemId), { photo: json.data.url });
+                        await deletePendingPhoto(item.id);
+                        if (statusEl) statusEl.innerText = '📸 Fotoğraf buluta yüklendi! ✨';
+                    }
+                } catch (e) {
+                    console.error('Bekleyen fotoğraf yüklenemedi:', e);
+                }
+            }
+        }
+
+        window.addEventListener('online', processPendingPhotos);
+        if (navigator.onLine) processPendingPhotos();
+        // ================================================
+
+        // YENİ NESİL HIZLI RESİM YÜKLEME (ImgBB)
+        document.getElementById('file-input').onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file || !currentItemId) return;
+
+            const spinner = document.getElementById('loading-spinner');
+            const inputSection = document.getElementById('add-photo-section');
+
+            spinner.style.display = 'block';
+            inputSection.style.display = 'none';
+
+            // Çevrimdışı mı?
+            if (!navigator.onLine) {
+                const reader = new FileReader();
+                reader.onload = async ev => {
+                    await savePendingPhoto(currentItemId, ev.target.result);
+                    spinner.style.display = 'none';
+                    inputSection.style.display = 'block';
+                    document.getElementById('sync-status').innerText = '📄 İnternetsiz! Fotoğraf bağlanınca otomatik yüklenecek. 📴';
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+
+            try {
+                // ImgBB API'ye yükle
+                const formData = new FormData();
+                formData.append('image', file);
+
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const downloadURL = result.data.url;
+
+                    // URL'yi yine Firebase Firestore'da saklıyoruz (yazılarla birlikte)
+                    await updateDoc(doc(db, 'bucket_list', currentItemId), { photo: downloadURL });
+
+                    openPhotoModal(currentItemId, downloadURL);
+                    spinner.style.display = 'none';
+                } else {
+                    throw new Error("Yükleme başarısız.");
+                }
+            } catch (err) {
+                console.error("Yükleme hatası:", err);
+                alert("Fotoğraf yüklenemedi sevgilim. Lütfen API anahtarını kontrol et veya daha küçük bir dosya dene! 🥺");
+                spinner.style.display = 'none';
+                inputSection.style.display = 'block';
+            }
+        };
+    </script>
+</body>
+
+</html>

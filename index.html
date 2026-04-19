@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonsuz Aşkım Bebeğim</title>
+    <!-- Müzik çalar ikonu için FontAwesome ve Romantik Fontlar için Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
+        rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❤️</text></svg>">
+
+    <!-- PWA Kurulum & App Ayarları -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+
+    <link rel="stylesheet" href="style.css?v=2">
+</head>
+
+<body>
+
+    <!-- Arkaplan Görselleri -->
+    <div id="background-container"></div>
+    <div class="overlay"></div>
+
+    <!-- Müzik (Dropbox - Duman Elleri Ellerime) -->
+    <audio id="bg-music" loop preload="auto">
+        <source
+            src="https://dl.dropboxusercontent.com/scl/fi/nss9u0crdkdbf53v3v70r/Duman-Elleri-Ellerime.mp3?rlkey=w8vw5fouqmpxuee01hcknk5sh&st=bqndw7jz&dl=1"
+            type="audio/mpeg">
+        <source src="elleri-ellerime.mp4" type="audio/mp4">
+    </audio>
+
+    <!-- İlk Ekran (Sinematik Intro) -->
+    <div id="intro-screen" onclick="startExperience()" style="cursor:pointer;">
+        <div class="heart-pulse-container">
+            <div class="cinematic-heart">❤️</div>
+            <div class="cinematic-text" id="intro-text">Seninle tanıştığım günden beri kalbim böyle atıyor... <br><span
+                    style="font-size:0.6em; opacity:0.7;">(Hissetmek için dokun)</span></div>
+        </div>
+    </div>
+
+    <!-- Şifre Ekranı -->
+    <div id="password-screen" style="display: none;">
+        <div class="password-container" id="password-step">
+            <div class="lock-icon">🔒</div>
+            <h2>Sadece O İsen Girebilirsin...</h2>
+
+            <p>Sevgili olduğumuz o büyülü tarihi gir bebeğim (GG.AA.YYYY):</p>
+            <input type="text" id="love-password" placeholder="Örn: 01.01.2025" autocomplete="off">
+            <button onclick="checkPassword()" class="btn-unlock">Kilidi Aç ✨</button>
+            <div id="password-error"
+                style="color: #ff4b72; margin-top: 15px; font-weight: bold; opacity: 0; transition: 0.3s;">Şifre yanlış
+                meleğim, lütfen tekrar dene 🥺</div>
+        </div>
+
+        <div class="password-container" id="name-selection-step" style="display: none;">
+            <div class="lock-icon">💖</div>
+            <h2>Şifre Doğru Meleğim!</h2>
+            <p style="margin-bottom: 25px;">Oyuna başlamadan önce lütfen kim olduğunu seç:</p>
+            <div style="display: flex; justify-content: center; gap: 15px;">
+                <button onclick="selectUserName('Ayşe')" class="btn-unlock" style="flex: 1;">Ben Ayşe ✨</button>
+                <button onclick="selectUserName('Mert')" class="btn-unlock" style="flex: 1;">Ben Mert 😎</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div class="hero">
+            <h1>Bebeğim, Seni Çok Seviyorum</h1>
+            <p>Seninle geçen her an, hayatımın en güzel melodisi. Dünyamı güzelleştirdiğin için teşekkür ederim
+                sevgilim...</p>
+        </div>
+
+
+
+        <div class="gallery">
+            <div class="polaroid">
+                <!-- Gözlüklü Selfie -->
+                <img src="resim1.jpg" alt="Bebeğim 1">
+                <div class="caption">
+                    En çok sevdiğim...<br>
+                    <span style="font-size: 1.2rem; opacity: 0.8;">🌸🤍✨</span>
+                </div>
+            </div>
+
+            <div class="polaroid">
+                <!-- Kedili Fotoğraf -->
+                <img src="resim2.jpg" alt="Bebeğim 2">
+                <div class="caption">
+                    Gülüşün ✨<br>
+                    <span style="font-size: 1.2rem; opacity: 0.8;">🌹💖💫</span>
+                </div>
+            </div>
+
+            <div class="polaroid">
+                <!-- Yatakta Forma -->
+                <img src="resim3.jpg" alt="Bebeğim 3">
+                <div class="caption">
+                    Seninle her şey güzel<br>
+                    <span style="font-size: 1.2rem; opacity: 0.8;">🦋💕✨</span>
+                </div>
+            </div>
+
+            <div class="polaroid">
+                <!-- Dışarda Kıvırcık -->
+                <img src="resim4.jpg" alt="Bebeğim 4">
+                <div class="caption">
+                    Sonsuza dek 🤍<br>
+                    <span style="font-size: 1.2rem; opacity: 0.8;">🌷🤍🧸</span>
+                </div>
+            </div>
+
+            <div class="polaroid">
+                <!-- Cam Kenarı Forma -->
+                <img src="resim5.jpg" alt="Bebeğim 5">
+                <div class="caption">
+                    Her halin ayrı güzel sevgilim<br>
+                    <span style="font-size: 1.2rem; opacity: 0.8;">🍓❤️🔐</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kazı Kazan Kartı (Orijinal) -->
+        <div class="scratch-card-container">
+            <div class="scratch-content" id="scratch-secret">
+                Ellerini tuttuğumda kalbim sanki ilk kez atıyor gibi hissettiriyor bana sevgilim.
+                Seni her şeyden çok seviyorum. 🦋🥺
+            </div>
+            <canvas id="scratch-canvas"></canvas>
+        </div>
+
+        <!-- Kaçan Buton -->
+        <div class="runaway-container">
+            <h2>Beni çok seviyorsun değil mi? 🥺</h2>
+            <div class="runaway-buttons" style="position:relative; min-height:100px; display:flex; align-items:center; justify-content:center; gap:25px;">
+                <button class="btn-yes" onclick="alert('BİLİYORDUM! Ben de seniii çoook seviyorummm 😍❤️')">Evett!!</button>
+                <button class="btn-no" id="btn-no">Iyk Hayır</button>
+            </div>
+        </div>
+
+        <!-- Sakın Basma Butonu (Gün Rengi Değişken) -->
+        <div class="danger-btn-container">
+            <button class="btn-do-not-press" id="danger-btn" onclick="triggerLoveStorm()">SAKIN BASMA ⚠️</button>
+        </div>
+
+        <!-- 100 Dilde Seni Seviyorum (Animasyonlu) -->
+        <div class="neon-languages">
+            <h2 id="lang-text" style="transition: opacity 0.5s ease; opacity: 1;">Seni Seviyorum</h2>
+        </div>
+    </div>
+
+    <!-- Sihirli Menü Butonu (Kalp) -->
+    <div class="magic-menu-btn" id="magic-heart" onclick="toggleHub()">💖</div>
+
+    <!-- Özellikler Paneli (Hub Overlay) -->
+    <div class="feature-hub-overlay" id="feature-hub">
+        <div class="hub-container">
+            <!-- Mood Tracker Section -->
+            <div class="mood-section">
+                <div class="mood-title">Şu an nasılsın sevgilim? ✨</div>
+                <div class="mood-options">
+                    <div class="mood-item" onclick="setMood('happy', '😊')">😊</div>
+                    <div class="mood-item" onclick="setMood('loving', '😍')">😍</div>
+                    <div class="mood-item" onclick="setMood('sad', '😔')">😔</div>
+                    <div class="mood-item" onclick="setMood('angry', '😡')">😡</div>
+                    <div class="mood-item" onclick="setMood('sleepy', '😴')">😴</div>
+                </div>
+                <div id="partner-mood-display" style="margin-top:15px; font-size: 0.9rem; opacity: 0.8;">
+                    <!-- Partnerin modu buraya gelecek -->
+                </div>
+            </div>
+
+            <!-- Feature Grid -->
+            <div class="hub-grid">
+                <!-- 1. Sıra -->
+                <div class="hub-card" onclick="window.location.href='chat.html'">
+                    <div class="hub-icon">💬</div>
+                    <div class="hub-name">Sana Özel</div>
+                </div>
+                <div class="hub-card" onclick="window.location.href='special-days.html'">
+                    <div class="hub-icon">📅</div>
+                    <div class="hub-name">Hatıralar</div>
+                </div>
+                <div class="hub-card" onclick="window.location.href='music.html'">
+                    <div class="hub-icon">🎵</div>
+                    <div class="hub-name">Müziklerimiz</div>
+                </div>
+
+                <!-- 2. Sıra -->
+                <div class="hub-card" onclick="window.location.href='diary.html'">
+                    <div class="hub-icon">📓</div>
+                    <div class="hub-name">Günlüğümüz</div>
+                </div>
+                <div class="hub-card" onclick="window.location.href='bucket-list.html'">
+                    <div class="hub-icon">📔</div>
+                    <div class="hub-name">Hayallerimiz</div>
+                </div>
+                <div class="hub-card" onclick="window.location.href='lists.html'">
+                    <div class="hub-icon">📜</div>
+                    <div class="hub-name">Listelerimiz</div>
+                </div>
+
+                <!-- 3. Sıra -->
+                <div class="hub-card" onclick="window.location.href='envelopes.html'">
+                    <div class="hub-icon">💌</div>
+                    <div class="hub-name">Zaman Kapsülü</div>
+                </div>
+                <div class="hub-card" onclick="window.location.href='confessions.html'">
+                    <div class="hub-icon">🕊️</div>
+                    <div class="hub-name">İtiraflar</div>
+                </div>
+                <div class="hub-card" onclick="window.location.href='games.html'">
+                    <div class="hub-icon">🎮</div>
+                    <div class="hub-name">Oyunlar</div>
+                </div>
+            </div>
+
+            <button class="close-hub" onclick="toggleHub()">Kapat</button>
+        </div>
+    </div>
+
+    <!-- Müzik Çalar ve Kavanoz (Ana Sayfada Kalıyor) -->
+    <div class="music-player" id="toggle-music" style="display: none;" onclick="toggleAudio()">
+        <div class="music-cover"></div>
+        <div class="music-info">
+            <div class="music-title">Elleri Ellerime</div>
+            <div class="music-artist">Duman</div>
+        </div>
+        <div class="music-controls" id="play-pause-icon">⏸</div>
+    </div>
+
+    <div class="memory-jar-container" id="memory-jar" onclick="openJar()" style="display: none;">
+        🏺
+        <div class="jar-tooltip">Günün Sözü ❤️</div>
+    </div>
+
+    <!-- Kavanoz Modalı -->
+    <div id="jar-modal" class="modal" onclick="closeJar()">
+        <div class="jar-modal-content" onclick="event.stopPropagation()">
+            <span class="close-btn" onclick="closeJar()">&times;</span>
+            <div class="jar-note-icon">✨</div>
+            <p id="jar-note-text">Yükleniyor...</p>
+        </div>
+    </div>
+    <!-- Tümüyle Bağımsız Giriş ve Arayüz Scripti (Firebase'i beklemez) -->
+    <script>
+        function startExperience() {
+            var audio = document.getElementById('bg-music');
+            if (audio) {
+                audio.volume = 0.55;
+                audio.muted = false;
+                var p = audio.play();
+                if (p !== undefined) p.catch(function(){});
+            }
+            var intro = document.getElementById('intro-screen');
+            if (intro) {
+                intro.style.opacity = '0';
+                intro.style.pointerEvents = 'none';
+                setTimeout(function() {
+                    intro.style.display = 'none';
+                    var pass = document.getElementById('password-screen');
+                    if (pass) pass.style.display = 'flex';
+                }, 900);
+            }
+        }
+
+        function checkPassword() {
+            var val = document.getElementById('love-password').value.trim();
+            if (['25.02.2026', '25022026', '25/02/2026', '25.02.26'].indexOf(val) !== -1) {
+                document.getElementById('password-step').style.display = 'none';
+                document.getElementById('name-selection-step').style.display = 'block';
+            } else {
+                var err = document.getElementById('password-error');
+                if (err) { err.style.opacity = '1'; setTimeout(function(){ err.style.opacity = '0'; }, 3000); }
+            }
+        }
+
+        function selectUserName(name) {
+            localStorage.setItem('active_player', name);
+            sessionStorage.setItem('isLoggedIn', 'true');
+            var pass = document.getElementById('password-screen');
+            if (pass) {
+                pass.style.opacity = '0';
+                setTimeout(function() {
+                    pass.style.display = 'none';
+                    showMainDashboardSafe();
+                }, 800);
+            }
+        }
+
+        function showMainDashboardSafe() {
+            var main = document.getElementById('main-content');
+            if (main) { main.style.opacity = '1'; main.classList.add('visible'); }
+            ['toggle-music','memory-jar','magic-heart'].forEach(function(id){
+                var el = document.getElementById(id);
+                if(el) el.style.display='flex';
+            });
+            // Modül yüklendiyse veya dışarıdan çağrıldıysa efektleri başlat
+            if (window.initEffects) window.initEffects();
+            
+            // Eğer giriş anındaysak direkt başlat
+            initRelevantEffects();
+        }
+
+        window.initEffects = function() {
+            initRelevantEffects();
+        };
+
+        function initRelevantEffects() {
+            // Sabit Efektler
+            if (!window._localEffectsStarted) {
+                window._localEffectsStarted = true;
+                startRunawayBtn();
+                startLanguages();
+                startDayColors();
+                startAmbientRomance();
+                initClickWish();
+                setTimeout(startScratchCard, 200); // Layout oturduğunda çizilmesi için bekle
+            }
+        }
+
+        // --- ARKA PLAN ROMANTİK EFEKTİ ---
+        function startAmbientRomance() {
+            var container = document.createElement('div');
+            container.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;';
+            document.body.prepend(container);
+
+            var symbols = ['✨', '🤍', '💖', '💫'];
+            setInterval(function() {
+                var p = document.createElement('div');
+                p.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+                var size = Math.random() * 12 + 10;
+                var duration = Math.random() * 10 + 15; // 15-25 saniye arası yavaş çıkış
+                p.style.cssText = 'position:absolute; bottom:-20px; left:' + (Math.random() * 100) + '%; font-size:' + size + 'px; opacity:0; filter:blur(1px); transition: transform ' + duration + 's linear, opacity ' + duration + 's ease-in-out;';
+                container.appendChild(p);
+
+                // Tarayıcı render aldıktan sonra hareket başlat
+                setTimeout(function() {
+                    p.style.opacity = '0.4'; // Hafif belirginleşir
+                    p.style.transform = 'translateY(-120vh) rotate(' + (Math.random() * 360) + 'deg)';
+                }, 50);
+
+                // Süre bitince temizle
+                setTimeout(function() {
+                    p.remove();
+                }, duration * 1000);
+            }, 2500); // Her 2.5 saniyede bir yeni tane ekle
+        }
+
+        // --- RASTGELE TIKLAMA İLE KAYAN YILDIZ VE DİLEK EFEKTİ ---
+        function initClickWish() {
+            document.addEventListener('click', function(e) {
+                // Eğer tıklanan yer bir buton, hub-card veya interaktif bir öğeyse yıldız kaymasın
+                if (e.target.closest('button, .hub-card, .mood-item, .magic-menu-btn, .music-player, .memory-jar-container, .close-btn, canvas, a')) {
+                    return;
+                }
+
+                // Bir dilek tut... yazısını oluştur
+                var wish = document.createElement('div');
+                wish.innerText = 'Bir dilek tut... 💫';
+                wish.style.position = 'fixed';
+                wish.style.left = e.clientX + 'px';
+                wish.style.top = e.clientY + 'px';
+                wish.style.transform = 'translate(-50%, -50%)';
+                wish.style.color = '#fff';
+                wish.style.fontFamily = "'Caveat', cursive";
+                wish.style.fontSize = '1.8rem';
+                wish.style.textShadow = '0 0 15px rgba(255,255,255,0.9), 0 0 30px rgba(255,75,114,0.6)';
+                wish.style.pointerEvents = 'none';
+                wish.style.zIndex = '9999';
+                wish.style.opacity = '1';
+                wish.style.transition = 'all 1.5s ease-out';
+                document.body.appendChild(wish);
+
+                // Kayan yıldızı oluştur (Rastgele yöne)
+                var star = document.createElement('div');
+                star.classList.add('shooting-star-local');
+                // Tıklanan yere göre değil, rastgele yön seçelim ki paralellik hissi artsın
+                if(Math.random() > 0.5) star.classList.add('from-right');
+                
+                star.style.position = 'fixed'; 
+                star.style.left = e.clientX + 'px';
+                star.style.top = e.clientY + 'px';
+                document.body.appendChild(star);
+
+                // Yazı süzülerek kaybolsun
+                setTimeout(function() {
+                    wish.style.transform = 'translate(-50%, -100px)';
+                    wish.style.opacity = '0';
+                }, 50);
+
+                // DOM temizliği
+                setTimeout(function() {
+                    wish.remove();
+                    star.remove();
+                }, 1500);
+            });
+        }
+
+        function startRunawayBtn() {
+            var btn = document.getElementById('btn-no');
+            if (!btn) return;
+            var parent = btn.parentElement;
+            parent.style.position = 'relative';
+            parent.style.minHeight = '120px';
+            btn.style.position = 'absolute';
+            btn.style.zIndex = '10';
+
+            var runaway = function(e) {
+                if(e) e.preventDefault();
+                var pw = parent.offsetWidth || 300, ph = parent.offsetHeight || 120;
+                var bw = btn.offsetWidth || 100, bh = btn.offsetHeight || 40;
+                var maxMoveX = Math.min(pw / 2 - bw, 150);
+                var x = (Math.random() > 0.5 ? 1 : -1) * (Math.random() * maxMoveX + 30);
+                var y = (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 40 + 10);
+                btn.style.transition = 'transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                btn.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+            };
+
+            btn.addEventListener('mouseover', runaway);
+            btn.addEventListener('touchstart', runaway, { passive: false });
+            btn.addEventListener('click', runaway);
+        }
+
+        function startLanguages() {
+            var langs = [
+                'Seni Seviyorum', 'I Love You', 'Je T\'aime', 'Te Amo', 'Ti Amo',
+                'Ich Liebe Dich', 'Aşk Edirəm', 'Σ\'αγαπώ', 'Я тебя люблю', '我爱你',
+                'あなたを爱しています', '사랑해요', 'أحبك', 'Mahal Kita'
+            ];
+            var idx = 0;
+            var textEl = document.getElementById('lang-text');
+            if (!textEl) return;
+
+            setInterval(function() {
+                if (textEl) textEl.style.opacity = '0';
+                setTimeout(function() {
+                    idx = (idx + 1) % langs.length;
+                    if (textEl) textEl.innerText = langs[idx];
+                    if (textEl) textEl.style.opacity = '1';
+                }, 500);
+            }, 4000);
+        }
+
+        function startDayColors() {
+            var dayColors = {
+                0: { color: '#ff8c00', glow: 'rgba(255,140,0,0.7)', emojis: ['🧡'] }, // Pazar - Turuncu
+                1: { color: '#ffffff', glow: 'rgba(255,255,255,0.7)', emojis: ['🤍'] }, // Pazartesi - Beyaz
+                2: { color: '#1ed760', glow: 'rgba(30,215,96,0.7)', emojis: ['💚'] }, // Salı - Yeşil
+                3: { color: '#ffd700', glow: 'rgba(255,215,0,0.7)', emojis: ['💛'] }, // Çarşamba - Sarı
+                4: { color: '#4facfe', glow: 'rgba(79,172,254,0.7)', emojis: ['💙'] }, // Perşembe - Mavi
+                5: { color: '#ff4b72', glow: 'rgba(255,75,114,0.7)', emojis: ['💖'] }, // Cuma - Pembe
+                6: { color: '#b44fff', glow: 'rgba(180,79,255,0.7)', emojis: ['💜'] }  // Cumartesi - Mor
+            };
+            var day = new Date().getDay();
+            var conf = dayColors[day];
+            
+            document.documentElement.style.setProperty('--day-color', conf.color);
+            document.documentElement.style.setProperty('--day-glow', conf.glow);
+            
+            var btn = document.getElementById('danger-btn');
+            if (btn) {
+                btn.style.background = 'linear-gradient(135deg, ' + conf.color + 'cc, ' + conf.color + '88)';
+                btn.style.borderColor = conf.color;
+                btn.style.boxShadow = '0 0 30px ' + conf.glow;
+            }
+            window._stormEmojis = conf.emojis;
+        }
+
+        function startScratchCard() {
+            var canvas = document.getElementById('scratch-canvas');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            var container = canvas.parentElement;
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+
+            // Önce normal çizim modunda olduğumuzdan emin olalım
+            ctx.globalCompositeOperation = 'source-over';
+
+            // Arka gizleyici tabaka pembe gradient rengi
+            var grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, '#ff1493'); // Koyu Pembe
+            grad.addColorStop(0.5, '#ff69b4'); // Normal Pembe
+            grad.addColorStop(1, '#ffb6c1'); // Açık Pembe
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Uyarı metni
+            ctx.fillStyle = 'rgba(255,255,255,0.9)';
+            ctx.font = 'bold 18px Outfit, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('💌 Beni Kazı...', canvas.width / 2, canvas.height / 2);
+
+            var isDrawing = false;
+            // globalCompositeOperation'ı burada değil, kazıma anında set edeceğiz.
+
+            var getPos = function(e) {
+                var rect = canvas.getBoundingClientRect();
+                if (e.touches && e.touches.length > 0) {
+                    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+                }
+                return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+            };
+
+            var scratch = function(e) {
+                if (e.cancelable) e.preventDefault();
+                if (!isDrawing) return;
+                var pos = getPos(e);
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 40, 0, Math.PI * 2); // 40px büyük kalın kazıma fırçası
+                ctx.fill();
+            };
+
+            canvas.addEventListener('mousedown', function(e) { isDrawing = true; scratch(e); });
+            canvas.addEventListener('mousemove', scratch);
+            canvas.addEventListener('mouseup', function() { isDrawing = false; });
+            canvas.addEventListener('mouseleave', function() { isDrawing = false; });
+            
+            canvas.addEventListener('touchstart', function(e) { isDrawing = true; scratch(e); }, { passive: false });
+            canvas.addEventListener('touchmove', scratch, { passive: false });
+            canvas.addEventListener('touchend', function() { isDrawing = false; });
+            canvas.addEventListener('touchcancel', function() { isDrawing = false; });
+        }
+
+        function toggleAudio() {
+            var a = document.getElementById('bg-music');
+            var icon = document.getElementById('play-pause-icon');
+            if (!a) return;
+            if (a.paused) { a.play().catch(function(){}); if(icon) icon.innerText='⏸'; }
+            else { a.pause(); if(icon) icon.innerText='▶'; }
+        }
+
+        function toggleHub() {
+            var hub = document.getElementById('feature-hub');
+            if (!hub) return;
+            if (hub.classList.contains('active')) {
+                hub.style.opacity = '0';
+                setTimeout(function(){ hub.classList.remove('active'); hub.style.display='none'; }, 400);
+            } else {
+                hub.style.display = 'flex'; hub.classList.add('active');
+                setTimeout(function(){ hub.style.opacity='1'; }, 10);
+            }
+        }
+
+        function setMood(m, icon) { alert('Modun: ' + icon + '\\nSenin mutluluğun her şeyim! ❤️'); toggleHub(); }
+
+        function triggerLoveStorm() {
+            var emojis = window._stormEmojis && window._stormEmojis.length > 0 ? window._stormEmojis : ['💖'];
+            for (var i=0; i<60; i++) {
+                (function(i){
+                    setTimeout(function(){
+                        var h = document.createElement('div');
+                        var emojiList = window._stormEmojis && window._stormEmojis.length > 0 ? window._stormEmojis : ['💖'];
+                        h.innerText = emojiList[Math.floor(Math.random()*emojiList.length)];
+                        h.style.cssText = 'position:fixed;top:-60px;left:'+(Math.random()*100)+'vw;font-size:'+(Math.random()*30+15)+'px;transition:4.5s cubic-bezier(0.25, 1, 0.5, 1);z-index:999999;pointer-events:none;';
+                        document.body.appendChild(h);
+                        setTimeout(function(){ h.style.top='115vh'; }, 50);
+                        setTimeout(function(){ h.remove(); }, 4600);
+                    }, i*25); // Çok daha yoğun ve hızlı dökülür
+                })(i);
+            }
+        }
+
+        // Kavanoz (Sözler)
+        function openJar() {
+            var m = document.getElementById('jar-modal');
+            var t = document.getElementById('jar-note-text');
+            if (!m || !t) return;
+            var quotes = [
+                "Sen hayatımda başıma gelen en güzel şeysin Ayşe. ✨",
+                "Gülüşün, kalbimdeki tüm çiçekleri aynı anda açtırıyor meleğim. 🌸",
+                "Ayşe, seninle geçirdiğim her saniye ömrüme ömür katıyor. ⏳",
+                "Dünyadaki en güvenli limanım, sadece senin sıcacık kolların. ⚓",
+                "Gözlerine her baktığımda bütün geleceğimi orada görüyorum sevgilim. 👀",
+                "Kalbinin pamuk gibi güzelliği, o güzel yüzüne öyle bir yansımış ki... 😍",
+                "Seni sevmek nefes almak gibi Ayşe'm, o kadar doğal ve vazgeçilmez... 💨",
+                "Her sabah senin varlığınla uyanmak benim en büyük şükür sebebim. 🙏",
+                "Seninleyken zamanın nasıl aktığını asla anlayamıyorum. 🕰️",
+                "Sen ruhumun eşi, sonsuza dek kalbimin tek sahibisin güzelim. 💍",
+                "Elini ilk tuttuğum gün dünyayı fethedeceğimi anlamıştım sevgilim. 🌍",
+                "Sesin, hayatta duyduğum ve duyabileceğim en güzel melodi. 🎶",
+                "Varlığın bana verilmiş en eşsiz hediye, canım Ayşe'm. 🎁",
+                "Seninle yaşadığım o en sıradan an bile eşsiz bir hatıraya dönüşüyor. 📸",
+                "Aşkın benim damarlarımda akan en can verici enerji... ⚡",
+                "Ayşe, nerede olursak olalım benim tek evim sensin. 🏠",
+                "Beni her seferinde ayağa kaldıran o sihirli ellerini hiç bırakma olur mu? 🤝",
+                "Senin adın, kalbime kazınmış en güzel mühür sevgilim. ❤️",
+                "Güneş batsa bile senin ışığın her zaman yolumu aydınlatıyor meleğim. 🌟",
+                "En kötü günümde tek bir gülümsemen dünyaları unutturur bana. 😊",
+                "Beni ben yapan her şeyin içinde biraz da sen gizlisin benim güzel sevgilim. 🧩",
+                "Yalnızca senin ve benim olduğumuz o küçücük dünya her şeye bedel. 🪐",
+                "Seni her geçen gün ilk günümmüşcesine, katlanarak seviyorum Ayşe'm. ✨",
+                "Mutfaktaki o tatlı telaşlarını bile dünyadaki her şeye değişirim. 🍳",
+                "Uykudan yeni uyanmış halin bile dünyadaki en saf ve tatlı şey canım sevgilim. 😴",
+                "Seninle içtiğimiz en basit kahve, en lüks tatilden bin kat güzel. ☕",
+                "Çalan bütün aşk şarkılarının nakaratında nedense hep seni duyuyorum. 🎵",
+                "Bana aşkın ne demek olduğunu gerçekten iliklerime kadar öğreten tek kadın sensin... 👩‍🏫",
+                "Birlikte attığımız her adım, sonu cennete çıkan bir yol gibi meleğim. 🛤️",
+                "Kalbim sadece ve sadece senin adını, Ayşe'yi zikrediyor... 🥁",
+                "Sonsuzluk benim için yaşamak değil, seninle birlikte yaşlanmak demek güzelim. ♾️",
+                "Sen kalbimin çölüne yağan yağmur, baharımda açan ilk narin çiçeksin çiçek... 🌸",
+                "Bir kışkırtan kadar güzel, bir melek kadar masumsun birtanem. 👼",
+                "Dünyaya bir daha gelsem, seni bulur yine sana aşık olurdum Ayşe'm. 🔙",
+                "Sırtımı dayadığım koca dünyadaki en zarif kelimemsin sen. 🏰",
+                "Senin o şefkat dolu sesinle dertleşmek her şeye en iyi gelen ilaç. 🗣️",
+                "Her bir mimiğini, kaş çatışını, gülüşünü ezbere biliyor ve hepsine kalbimi bırakıyorum. 🥰",
+                "Gündüzümü parlatan güneşim, gecemi aydınlatan güzel ayımsın sen. 🌞",
+                "Sadece senin mutlu olman benim şu hayattaki en büyük derdim ve davam. 🎯",
+                "Gözyaşlarının tek bir tanesine bütün dünyayı yakarım meleğim, asla unutma. 🔥",
+                "Birlikte yaşayacağımız anıları düşündükçe kalbim yerinden fırlayacak gibi oluyor. 🎢",
+                "Benim hayat denilen şu kumarda tutturduğum tek büyük ödülüm sensin... 🎰",
+                "Seni anlatabilmeme inan hiçbir kelime yetmiyor bebeğim. 🤫",
+                "Mert, senin sevginle her güne çok daha güçlü uyanıyor sevgilim... 🏁",
+                "Yüzündeki tek bir gülümsemeyi görmek için okyanusları aşabilirim Ayşe'm. 🌊",
+                "Güzelliğin karşısında şiirlerin bile dili tutulur birtanem. 📜",
+                "Dünyanın 8. harikası kim diye sorsalar hiç düşünmeden seni gösteririm. 🗿",
+                "Sarılman var ya... İşte o tüm dertlerin şifresidir sevgilim. 🫂",
+                "Senin benimle oluşun benim bütün savaşlarımın zaferidir. 🏆",
+                "Beni 'ben' yapan her şey sensin sevgili Ayşe'm, iyi ki varsın... ❤️",
+                "Rüzgarın saçlarını dalgalandırması hayatımda gördüğüm en muazzam tablo. 🖼️"
+            ];
+            t.innerText = quotes[Math.floor(Math.random()*quotes.length)];
+            m.style.display = 'flex';
+            m.style.visibility = 'visible';
+            setTimeout(function() {
+                m.style.opacity = '1';
+            }, 10);
+        }
+
+        function closeJar() {
+            var m = document.getElementById('jar-modal');
+            if(m) {
+                m.style.opacity = '0';
+                setTimeout(function(){ m.style.visibility = 'hidden'; }, 400);
+            }
+        }
+
+        // Tıklamayı beklemeden hemen açık olanlar
+        document.addEventListener('DOMContentLoaded', function(){
+            if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                var intro = document.getElementById('intro-screen');
+                var pass = document.getElementById('password-screen');
+                if(intro) intro.style.display='none';
+                if(pass) pass.style.display='none';
+                showMainDashboardSafe();
+            }
+        });
+    </script>
+
+
+    <!-- Modül: Firebase Gölge Koruyucu (varsa üzerine yazar) -->
+    <script type="module" src="script.js"></script>
+
+    <!-- PWA Servis Kaydı -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('PWA başarıyla aktif edildi! Kapsam: ', reg.scope))
+                    .catch(err => console.error('PWA kayıt hatası: ', err));
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sadece İkimiz 💌</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=5">
+    <style>
+        :root {
+            --chat-bg: #0d0d0d;
+            --bubble-me: #b04060;
+            --bubble-you: #2a2a2a;
+            --accent: #ff4b72;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--chat-bg);
+            color: #fff;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .chat-header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 10;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: #fff;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .partner-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .partner-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--accent);
+        }
+
+        .partner-status {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .status-online {
+            color: #1ed760;
+            font-weight: bold;
+        }
+
+        /* Messages Area */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
+            scroll-behavior: smooth;
+        }
+
+        .msg-bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .msg-me {
+            align-self: flex-end;
+            background: var(--bubble-me);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg-you {
+            align-self: flex-start;
+            background: var(--bubble-you);
+            color: #fff;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .msg-time {
+            font-size: 0.65rem;
+            opacity: 0.6;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        /* Input Area */
+        .input-area {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #msg-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: #fff;
+            font-family: inherit;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        #msg-input:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent);
+        }
+
+        .send-btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: 0.3s;
+            box-shadow: 0 0 20px rgba(255, 75, 114, 0.3);
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1);
+            background: #ff3360;
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Date Separator */
+        .date-separator {
+            align-self: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin: 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Offline Overlay */
+        .offline-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 13, 13, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none; /* JS ile açılacak */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .offline-overlay.active { display: flex; }
+
+        .offline-icon { font-size: 5rem; margin-bottom: 20px; animation: pulse 2s infinite; }
+        .offline-title { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--accent); margin-bottom: 10px; }
+        .offline-text { opacity: 0.8; line-height: 1.5; max-width: 300px; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        @media (max-width: 600px) {
+            .msg-bubble { max-width: 85%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="offline-overlay" id="offline-screen">
+        <div class="offline-icon">📶🚫</div>
+        <div class="offline-title">Bağlantımız Koptu Sevgilim...</div>
+        <div class="offline-text">
+            Sana ulaşmak için sabırsızlanıyorum ama şu an internette bir sorun var. Bağlantı gelince hemen buluşalım mı? ❤️
+        </div>
+    </div>
+
+    <header class="chat-header">
+        <a href="index.html" class="back-btn">‹</a>
+        <div class="partner-info">
+            <span class="partner-name" id="p-name">Zeytinim ❤️</span>
+            <span class="partner-status" id="p-status">çevrimdışı</span>
+        </div>
+    </header>
+
+    <div class="messages-container" id="msg-list">
+        <!-- Mesajlar buraya gelecek -->
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="msg-input" placeholder="Bir şeyler yaz sevgilim..." autocomplete="off">
+        <button class="send-btn" id="send-btn">➔</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, enableIndexedDbPersistence, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+            authDomain: "ayseye-surpriz.firebaseapp.com",
+            projectId: "ayseye-surpriz",
+            storageBucket: "ayseye-surpriz.firebasestorage.app",
+            messagingSenderId: "531177459988",
+            appId: "1:531177459988:web:09060a95bea0b06f197201"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        enableIndexedDbPersistence(db).catch(() => {});
+
+        const currentUser = localStorage.getItem('active_player');
+        if (!currentUser) window.location.href = 'index.html';
+
+        // İnternet Durumu Kontrolü
+        const offlineScreen = document.getElementById('offline-screen');
+        const checkOnline = () => {
+            if (navigator.onLine) {
+                offlineScreen.classList.remove('active');
+            } else {
+                offlineScreen.classList.add('active');
+            }
+        };
+        window.addEventListener('online', checkOnline);
+        window.addEventListener('offline', checkOnline);
+        checkOnline(); // Sayfa açılışında kontrol et
+
+        const partnerName = currentUser === 'Ayşe' ? 'Mert' : 'Ayşe';
+        document.getElementById('p-name').innerText = partnerName + " ❤️";
+
+        const msgList = document.getElementById('msg-list');
+        const msgInput = document.getElementById('msg-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        // Varlık Takibi (Presence)
+        const updateStatus = async (status) => {
+            const statusRef = doc(db, 'presence', currentUser);
+            await setDoc(statusRef, {
+                status: status,
+                lastSeen: serverTimestamp()
+            }, { merge: true });
+        };
+
+        // Partner Durumu Takibi
+        onSnapshot(doc(db, 'presence', partnerName), (docSnap) => {
+            const statusEl = document.getElementById('p-status');
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                const now = Date.now();
+                const lastSeen = data.lastSeen?.toMillis() || 0;
+                
+                // Eğer son görülme 2 dakikadan azsa online de (basit mantık)
+                if (data.status === 'online' && (now - lastSeen < 120000)) {
+                    statusEl.innerHTML = '<span class="status-online">çevrimiçi</span>';
+                } else {
+                    statusEl.innerText = formatLastSeen(lastSeen);
+                }
+            }
+        });
+
+        function formatLastSeen(ms) {
+            if (!ms) return 'çevrimdışı';
+            const d = new Date(ms);
+            const now = new Date();
+            const timeStr = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
+            if (d.toDateString() === now.toDateString()) return "son görülme bugün " + timeStr;
+            return "son görülme " + d.toLocaleDateString('tr-TR');
+        }
+
+        // Sayfa her odağa geldiğinde veya kapandığında durumu güncelle
+        updateStatus('online');
+        window.addEventListener('focus', () => updateStatus('online'));
+        window.addEventListener('blur', () => updateStatus('offline'));
+
+        // Bildirim İzni İste
+        if ("Notification" in window) {
+            if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                Notification.requestPermission();
+            }
+        }
+
+        function triggerNotification(text) {
+            if (Notification.permission === "granted" && document.visibilityState === "hidden") {
+                new Notification(partnerName + " ❤️", {
+                    body: text,
+                    icon: './icon.svg'
+                });
+            }
+        }
+
+        // Mesajları Dinle
+        const q = query(collection(db, 'chat_messages'), orderBy('timestamp', 'asc'), limit(100));
+        let lastDate = "";
+        let isInitialLoad = true;
+
+        onSnapshot(q, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === "added" && !isInitialLoad) {
+                    const data = change.doc.data();
+                    if (data.sender === partnerName) {
+                        triggerNotification(data.text);
+                    }
+                }
+            });
+
+            msgList.innerHTML = "";
+            lastDate = "";
+            snapshot.forEach(d => {
+                const data = d.data();
+                const date = data.timestamp?.toDate().toLocaleDateString('tr-TR') || "";
+                
+                if (date !== lastDate && date !== "") {
+                    const sep = document.createElement('div');
+                    sep.className = 'date-separator';
+                    sep.innerText = date;
+                    msgList.appendChild(sep);
+                    lastDate = date;
+                }
+
+                const bubble = document.createElement('div');
+                const isMe = data.sender === currentUser;
+                bubble.className = `msg-bubble ${isMe ? 'msg-me' : 'msg-you'}`;
+                
+                const time = data.timestamp ? data.timestamp.toDate().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : "...";
+                
+                bubble.innerHTML = `
+                    <div class="msg-text">${data.text}</div>
+                    <div class="msg-time">${time}</div>
+                `;
+                msgList.appendChild(bubble);
+            });
+            msgList.scrollTop = msgList.scrollHeight;
+            isInitialLoad = false;
+        });
+
+        // Mesaj Gönder
+        const sendMessage = async () => {
+            const text = msgInput.value.trim();
+            if (!text) return;
+
+            msgInput.value = "";
+            await addDoc(collection(db, 'chat_messages'), {
+                sender: currentUser,
+                text: text,
+                timestamp: serverTimestamp()
+            });
+        };
+
+        sendBtn.onclick = sendMessage;
+        msgInput.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
+    </script>
+</body>
+</html>

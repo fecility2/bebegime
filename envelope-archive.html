@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zaman Kapsülü Arşivi ⏳</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@1,600&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=4">
+    <style>
+        :root {
+            --gold: #ffd700;
+            --emerald: #1ed760;
+            --tangerine: #ff8c00;
+            --paper: #fff5e6; /* Eskitme kağıt rengi */
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: #fff; margin: 0; padding: 20px;
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+        }
+
+        #background-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(circle at center, #1a0520 0%, #0a0208 100%);
+        }
+
+        .back-nav {
+            position: fixed; top: 20px; left: 20px;
+            background: rgba(255,255,255,0.05); padding: 10px 20px;
+            border-radius: 30px; color: #fff; text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.1); z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header { margin-top: 60px; text-align: center; margin-bottom: 40px; }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: 3rem; color: var(--primary); text-shadow: 0 0 15px rgba(255, 75, 114, 0.5); }
+        .header p { opacity: 0.7; font-size: 1.1rem; }
+
+        .archive-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px; width: 100%; max-width: 1000px;
+        }
+
+        /* Kart Tasarımı */
+        .envelope-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px; padding: 25px;
+            text-align: center; position: relative;
+            transition: 0.3s; backdrop-filter: blur(10px);
+        }
+
+        .envelope-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+
+        .card-locked { border-color: var(--tangerine); background: rgba(255, 140, 0, 0.05); }
+        .card-open { border-color: var(--emerald); background: rgba(30, 215, 96, 0.05); }
+
+        .delete-btn {
+            position: absolute; top: 12px; right: 12px;
+            background: none; border: none; font-size: 1.2rem;
+            cursor: pointer; opacity: 0.4; transition: 0.3s;
+        }
+        .delete-btn:hover { opacity: 1; transform: scale(1.2); }
+
+        .env-icon { font-size: 3.5rem; margin-bottom: 10px; }
+        .env-meta { font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px; line-height: 1.4; }
+
+        .action-btn {
+            padding: 10px 20px; border-radius: 15px; font-weight: 600;
+            cursor: pointer; display: inline-block; transition: 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .btn-open {
+            background: rgba(30, 215, 96, 0.15); color: var(--emerald);
+            border-color: var(--emerald); box-shadow: 0 0 15px rgba(30, 215, 96, 0.2);
+        }
+        .btn-open:hover { background: var(--emerald); color: #000; }
+
+        .btn-locked {
+            background: rgba(255, 140, 0, 0.1); color: var(--tangerine);
+            border-color: rgba(255, 140, 0, 0.3); cursor: default;
+        }
+
+        /* Modal Sistemi */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 1000;
+            display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(15px);
+        }
+
+        .modal-content {
+            background: var(--paper); /* Not defteri rengi geri eklendi */
+            color: #1a0210;
+            padding: 50px 30px;
+            width: 90%; max-width: 550px; position: relative;
+            border-radius: 10px;
+            text-align: left;
+            border: 1px solid #d4c4b0;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 0 50px rgba(212, 196, 176, 0.3);
+            max-height: 85vh; overflow-y: auto;
+            
+            /* Not Defteri Çizgileri */
+            background-image: repeating-linear-gradient(
+                var(--paper),
+                var(--paper) 32px,
+                #e0d0c0 32px,
+                #e0d0c0 33px
+            );
+            line-height: 33px; /* Çizgilerle uyumlu satır yüksekliği */
+        }
+
+        .modal-close {
+            position: absolute; top: 10px; right: 15px;
+            font-size: 30px; cursor: pointer; color: #888;
+            transition: 0.3s; z-index: 10;
+        }
+        .modal-close:hover { opacity: 1; color: #cc0000; }
+
+        .modal-sender { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.5rem;
+            color: #b04060;
+            margin-bottom: 25px;
+            display: inline-block;
+            border-bottom: 2px solid #b04060;
+            line-height: normal;
+        }
+
+        .modal-text { 
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            line-height: 33px; /* Defter çizgilerine tam oturması için */
+            white-space: pre-wrap;
+            margin-top: 0px;
+            color: #333; /* Okunaklı siyah/koyu gri */
+            padding-top: 5px;
+            letter-spacing: 0.02em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2.5rem; }
+            .archive-grid { grid-template-columns: 1fr; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="background-canvas"></div>
+    <a href="envelopes.html" class="back-nav">← Mektup Yaz</a>
+
+    <div class="header">
+        <h1>Zaman Kapsülü ⏳</h1>
+        <p>Açılmayı bekleyen sırlar ve mühürlü anılar...</p>
+    </div>
+
+    <div class="archive-grid" id="grid">
+        <p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">Anıların mührü kontrol ediliyor...</p>
+    </div>
+
+    <!-- Okuma Modalı -->
+    <div class="modal-overlay" id="readModal" onclick="closeRead()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeRead()">&times;</span>
+            <div style="font-size: 4rem; margin-bottom: 10px;">💌</div>
+            <div class="modal-sender" id="m-sender">Kimden</div>
+            <div class="modal-text" id="m-text">Mesaj içeriği...</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, enableIndexedDbPersistence, collection, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+            authDomain: "ayseye-surpriz.firebaseapp.com",
+            projectId: "ayseye-surpriz",
+            storageBucket: "ayseye-surpriz.firebasestorage.app",
+            messagingSenderId: "531177459988",
+            appId: "1:531177459988:web:09060a95bea0b06f197201"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        enableIndexedDbPersistence(db).catch(() => {});
+        const colRef = collection(db, 'locked_envelopes');
+
+        let envelopes = [];
+
+        // Dinlemeye başla
+        const q = query(colRef, orderBy('unlock_date', 'asc'));
+        onSnapshot(q, (snap) => {
+            envelopes = [];
+            snap.forEach(d => envelopes.push({ id: d.id, ...d.data() }));
+            render();
+        });
+
+        function render() {
+            const container = document.getElementById('grid');
+            container.innerHTML = "";
+            const now = Date.now();
+
+            if (envelopes.length === 0) {
+                container.innerHTML = "<p style='grid-column: 1/-1; text-align: center; opacity: 0.5;'>Henüz hiçbir zarf mühürlenmemiş sevgilim. 🥺</p>";
+                return;
+            }
+
+            envelopes.forEach(env => {
+                const isReady = now >= env.unlock_date;
+                const cardClass = isReady ? 'card-open' : 'card-locked';
+                const statusHtml = isReady ? 
+                    `<div class="action-btn btn-open" onclick="window.viewMsg('${env.id}')">Zarfı Aç 🔓</div>` :
+                    `<div class="action-btn btn-locked">Açılmasına: ${getTimeLeft(env.unlock_date - now)} 🔒</div>`;
+
+                container.innerHTML += `
+                    <div class="envelope-card ${cardClass}">
+                        <button class="delete-btn" onclick="window.removeEnv('${env.id}')">🗑️</button>
+                        <div class="env-icon">${isReady ? '💌' : '📦'}</div>
+                        <div class="env-meta">
+                            <strong>Gönderen:</strong> ${env.sender}<br>
+                            <strong>Alıcı:</strong> ${env.receiver}
+                        </div>
+                        ${statusHtml}
+                    </div>
+                `;
+            });
+        }
+
+        function getTimeLeft(ms) {
+            const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+            if (days > 0) return `${days} gün, ${hours} sa`;
+            if (hours > 0) return `${hours} sa, ${mins} dk`;
+            return `${mins} dk`;
+        }
+
+        // Global Fonksiyonlar
+        window.viewMsg = (id) => {
+            const found = envelopes.find(e => e.id === id);
+            if (found) {
+                document.getElementById('m-sender').innerText = "Gönderen: " + found.sender + " 💖";
+                document.getElementById('m-text').innerText = found.message;
+                document.getElementById('readModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden'; // Kaydırmayı engelle
+            }
+        };
+
+        window.closeRead = () => {
+            document.getElementById('readModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        };
+
+        window.removeEnv = async (id) => {
+            if (confirm("Bu mühürlü anıyı silmek istediğine emin misin? 🥺")) {
+                try {
+                    await deleteDoc(doc(db, 'locked_envelopes', id));
+                } catch(e) { alert("Hata oluştu sevgilim."); }
+            }
+        };
+
+        // Geri sayımı güncellemek için her dakika render
+        setInterval(render, 60000);
+    </script>
+</body>
+</html>

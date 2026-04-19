@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oyun Dünyamız 🎮</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=3">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #background-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a0520 0%, #0a0208 100%);
+        }
+
+        .back-nav {
+            position: fixed;
+            top: 20px; left: 20px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: #fff;
+            text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.1);
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        .header {
+            margin-top: 60px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(255, 75, 114, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            margin-bottom: 20px;
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .dual-badge {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .user-balance {
+            background: rgba(255, 215, 0, 0.15);
+            border: 2px solid var(--gold, #ffd700);
+            color: var(--gold, #ffd700);
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+            position: relative;
+        }
+
+        .you-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            display: block;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(255, 75, 114, 0.2);
+        }
+
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .game-desc {
+            font-size: 0.95rem;
+            opacity: 0.7;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2.2rem; }
+            .games-grid { grid-template-columns: 1fr; padding: 0 10px; }
+            .game-card { padding: 25px 15px; }
+            .dual-badge { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="background-canvas"></div>
+    <a href="index.html" class="back-nav">← Ana Sayfaya Dön</a>
+
+    <div class="header">
+        <h1>Oyun Dünyamız 🎮</h1>
+        <p>Birlikte eğlenmek için harika bir yer!</p>
+        <div class="dual-badge" id="balances-container">
+            <div class="user-balance" id="badge-ayse">
+                Ayşe: <span id="balance-ayse">...</span> ❤️
+            </div>
+            <div class="user-balance" id="badge-mert">
+                Mert: <span id="balance-mert">...</span> ❤️
+            </div>
+        </div>
+    </div>
+
+    <div class="games-grid">
+        <a href="dice.html" class="game-card">
+            <span class="game-icon">🎲</span>
+            <div class="game-title">Şans Zarı</div>
+            <div class="game-desc">Paran bittiğinde zarı at, şansına göre Aşk Parası kazan!</div>
+        </a>
+
+        <a href="jackpot.html" class="game-card">
+            <span class="game-icon">🎰</span>
+            <div class="game-title">Aşk Jackpot</div>
+            <div class="game-desc">Bahsini koy, kader çarkını çevir! Şanslı günündeysen paranı 3'e katla!</div>
+        </a>
+
+        <a href="memory-game.html" class="game-card">
+            <span class="game-icon">🃏</span>
+            <div class="game-title">Aşk Hafızası</div>
+            <div class="game-desc">Bizi ne kadar hatırlıyorsun sevgilim? Fotoğrafları eşleştir, büyük ödülü kap!</div>
+        </a>
+
+        <a href="mine-game.html" class="game-card">
+            <span class="game-icon">💣</span>
+            <div class="game-title">Kalp Avcısı</div>
+            <div class="game-desc">Kutuların altındaki kalpleri bul, çarpanı arttır! Ama dikkat et, kırık kalbe basma...</div>
+        </a>
+
+        <a href="scratch-game.html" class="game-card">
+            <span class="game-icon">🎟️</span>
+            <div class="game-title">Aşk Kazı-Kazan</div>
+            <div class="game-desc">Gümüş alanı kazı, altındaki sürpriz ikramiyeyi anında hesabına al!</div>
+        </a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+            authDomain: "ayseye-surpriz.firebaseapp.com",
+            projectId: "ayseye-surpriz",
+            storageBucket: "ayseye-surpriz.firebasestorage.app",
+            messagingSenderId: "531177459988",
+            appId: "1:531177459988:web:09060a95bea0b06f197201"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        enableIndexedDbPersistence(db).catch((err) => {
+            console.log('Firebase Offline Persistence Error:', err.code);
+        });
+        const ecoRef = doc(db, 'economy', 'balances');
+
+        // Initialize doc if not exists
+        getDoc(ecoRef).then(snap => {
+            if (!snap.exists()) {
+                setDoc(ecoRef, { Ayşe: 0, Mert: 0 });
+            }
+        });
+
+        const currentUser = localStorage.getItem('active_player') || 'Ayşe'; // Fallback
+        
+        setupUserBadges(currentUser);
+        listenBalances();
+
+        function setupUserBadges(name) {
+            if(name === 'Ayşe') {
+                document.getElementById('badge-ayse').innerHTML += '<div class="you-badge">Sen</div>';
+            } else {
+                document.getElementById('badge-mert').innerHTML += '<div class="you-badge">Sen</div>';
+            }
+        }
+
+        function listenBalances() {
+            onSnapshot(ecoRef, (docSnap) => {
+                const data = docSnap.data();
+                if(data) {
+                    document.getElementById('balance-ayse').innerText = data['Ayşe'];
+                    document.getElementById('balance-mert').innerText = data['Mert'];
+                }
+            });
+        }
+    </script>
+</body>
+</html>
