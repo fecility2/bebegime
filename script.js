@@ -245,7 +245,7 @@ window.checkPassword = function () {
 window.selectUserName = function (name) {
     localStorage.setItem('active_player', name);
     sessionStorage.setItem('isLoggedIn', 'true');
-    location.reload();
+    window.location.href = window.location.pathname + "?login=done&t=" + Date.now();
 };
 
 function showMainDashboard() {
