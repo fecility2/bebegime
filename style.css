@@ -125,6 +125,32 @@ html {
     }
 }
 
+/* Sistem Yenileme Butonu */
+.system-refresh-btn {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    width: 45px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 1001;
+    transition: 0.3s;
+}
+
+.system-refresh-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: rotate(180deg);
+    border-color: var(--primary);
+}
+
 /* Aşk Kavanozu (Memory Jar) - Yeni Yuvarlak Tasarım */
 .memory-jar-container {
     position: fixed;
