@@ -287,14 +287,8 @@
         function selectUserName(name) {
             localStorage.setItem('active_player', name);
             sessionStorage.setItem('isLoggedIn', 'true');
-            var pass = document.getElementById('password-screen');
-            if (pass) {
-                pass.style.opacity = '0';
-                setTimeout(function() {
-                    pass.style.display = 'none';
-                    showMainDashboardSafe();
-                }, 800);
-            }
+            // Kullanıcı seçildiği an tüm sistemi tazelemek ve Firebase/Efektleri sıfırdan uyandırmak için yeniliyoruz
+            location.reload();
         }
 
         function showMainDashboardSafe() {
