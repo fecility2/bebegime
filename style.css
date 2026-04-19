@@ -440,18 +440,19 @@ html {
     }
 }
 
-/* �?ık Müzik Çalar (Spotify Style) */
+/* ?ık Müzik Çalar (Spotify Style) */
 .music-player {
     position: fixed;
     bottom: 30px;
     right: 30px;
+    width: 75px;
+    height: 75px;
     background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(15px);
-    padding: 10px 20px;
-    border-radius: 40px;
+    backdrop-filter: blur(12px);
+    border-radius: 50%;
     display: flex;
     align-items: center;
-    gap: 15px;
+    justify-content: center;
     cursor: pointer;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
     transition: all 0.4s;
@@ -1991,4 +1992,16 @@ canvas#scratch-canvas {
 @media (max-width: 768px) {
     .neon-languages h2 { font-size: 2.8rem; }
     .lang-flag { font-size: 2.2rem; }
+    .music-player {
+        width: 70px;
+        height: 70px;
+        bottom: 25px;
+        right: 25px;
+    }
+    .memory-jar-container {
+        width: 70px;
+        height: 70px;
+        bottom: 25px;
+        left: 25px;
+    }
 }
