@@ -245,14 +245,7 @@ window.checkPassword = function () {
 window.selectUserName = function (name) {
     localStorage.setItem('active_player', name);
     sessionStorage.setItem('isLoggedIn', 'true');
-    const pass = document.getElementById('password-screen');
-    if (pass) {
-        pass.style.opacity = '0';
-        setTimeout(() => {
-            pass.style.display = 'none';
-            showMainDashboard();
-        }, 800);
-    }
+    location.reload();
 };
 
 function showMainDashboard() {
