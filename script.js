@@ -341,15 +341,21 @@ window.setMood = function (mood, icon) {
     window.toggleHub();
 };
 window.triggerLoveStorm = function () {
-    for (let i = 0; i < 50; i++) {
-        setTimeout(() => {
-            const h = document.createElement('div');
-            h.innerText = (window._stormEmojis || ['❤️', '💕', '💖', '🌹', '✨'])[Math.floor(Math.random() * 5)];
-            h.style.cssText = `position:fixed;top:-60px;left:${Math.random() * 100}vw;font-size:${Math.random() * 25 + 18}px;transition:5s linear;z-index:999999;pointer-events:none;`;
-            document.body.appendChild(h);
-            setTimeout(() => h.style.top = '115vh', 100);
-            setTimeout(() => h.remove(), 5500);
-        }, i * 120);
+    var defaultEmojis = ['❤️', '💕', '💖', '🌹', '✨'];
+    var emojiList = (window._stormEmojis && window._stormEmojis.length > 0) ? window._stormEmojis : defaultEmojis;
+    
+    for (var i = 0; i < 50; i++) {
+        (function(idx) {
+            setTimeout(function() {
+                var h = document.createElement('div');
+                var randomEmoji = emojiList[Math.floor(Math.random() * emojiList.length)];
+                h.innerText = randomEmoji || '❤️';
+                h.style.cssText = 'position:fixed;top:-60px;left:' + (Math.random() * 100) + 'vw;font-size:' + (Math.random() * 25 + 18) + 'px;transition:5s linear;z-index:999999;pointer-events:none;';
+                document.body.appendChild(h);
+                setTimeout(function() { h.style.top = '115vh'; }, 100);
+                setTimeout(function() { h.remove(); }, 5500);
+            }, idx * 120);
+        })(i);
     }
 };
 
