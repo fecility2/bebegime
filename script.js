@@ -366,25 +366,28 @@ window._effectsInitialized = false;
 window.initGlobalStars = function () {
     if (window._effectsInitialized) return;
     window._effectsInitialized = true;
-    initMouseStars();
+    if (window.initMouseStars) {
+        window.initMouseStars();
+    }
 };
 
 
 
 
 // --- MOUSE YILDIZ TOZU ---
-function initMouseStars() {
+window.initMouseStars = function() {
     document.addEventListener('mousemove', function(e) {
         if (Math.random() < 0.08) {
             var p = document.createElement('div');
             p.style.cssText = 'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;pointer-events:none;font-size:14px;z-index:9999;transition:1s;line-height:1;';
-            p.innerText = ['✨', '💫', '⭐', '🌟', '💕'][Math.floor(Math.random() * 5)];
+            var stars = ['✨', '💫', '⭐', '🌟', '💕'];
+            p.innerText = stars[Math.floor(Math.random() * stars.length)];
             document.body.appendChild(p);
             setTimeout(function() { p.style.opacity = '0'; p.style.transform = 'translateY(-30px)'; }, 100);
             setTimeout(function() { p.remove(); }, 1100);
         }
     });
-}
+};
 
 // ===========================================================================
 // BAŞLANGIÇ KONTROLÜ
