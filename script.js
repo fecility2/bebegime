@@ -357,25 +357,21 @@ window.triggerLoveStorm = function () {
 // EFEKTLER (Fare Yıldız Tozu Sadece)
 // ===========================================================================
 window._effectsInitialized = false;
-window.initEffects = function () {
+window.initGlobalStars = function () {
     if (window._effectsInitialized) return;
     window._effectsInitialized = true;
     initMouseStars();
 };
-
-function initEffects() {
-    window.initEffects();
-}
 
 
 
 
 // --- MOUSE YILDIZ TOZU ---
 function initMouseStars() {
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener('mousemove', function(e) {
         if (Math.random() < 0.08) {
-            const p = document.createElement('div');
-            p.style.cssText = `position:fixed;left:${e.clientX}px;top:${e.clientY}px;pointer-events:none;font-size:14px;z-index:9999;transition:1s;line-height:1;`;
+            var p = document.createElement('div');
+            p.style.cssText = 'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;pointer-events:none;font-size:14px;z-index:9999;transition:1s;line-height:1;';
             p.innerText = ['✨', '💫', '⭐', '🌟', '💕'][Math.floor(Math.random() * 5)];
             document.body.appendChild(p);
             setTimeout(function() { p.style.opacity = '0'; p.style.transform = 'translateY(-30px)'; }, 100);
@@ -387,12 +383,13 @@ function initMouseStars() {
 // ===========================================================================
 // BAŞLANGIÇ KONTROLÜ
 // ===========================================================================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     if (sessionStorage.getItem('isLoggedIn') === 'true') {
-        const intro = document.getElementById('intro-screen');
-        const pass = document.getElementById('password-screen');
+        var intro = document.getElementById('intro-screen');
+        var pass = document.getElementById('password-screen');
         if (intro) intro.style.display = 'none';
         if (pass) pass.style.display = 'none';
         showMainDashboard();
+        if (window.initEffects) window.initEffects();
     }
 });
