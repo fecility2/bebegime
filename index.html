@@ -395,7 +395,8 @@
 
                 // Bir dilek tut... yazısını oluştur
                 var wish = document.createElement('div');
-                wish.innerText = 'Bir dilek tut... 💫';
+                var wishes = (window._clickWishes && window._clickWishes.length > 0) ? window._clickWishes : ["Bir dilek tut... 💫", "Seni çok seviyorum ❤️", "Her anım seninle ✨"];
+                wish.innerText = wishes[Math.floor(Math.random() * wishes.length)];
                 wish.style.position = 'fixed';
                 wish.style.left = e.clientX + 'px';
                 wish.style.top = e.clientY + 'px';
@@ -843,7 +844,7 @@
 
 
     <!-- Modül: Firebase Gölge Koruyucu (varsa üzerine yazar) -->
-    <script type="module" src="script.js"></script>
+    <script type="module" src="script.js?v=4"></script>
 
     <!-- Firebase Mood Synchronization -->
     <script type="module">
