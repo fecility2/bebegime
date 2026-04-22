@@ -448,6 +448,8 @@ html {
     right: 30px;
     width: 70px;
     height: 70px;
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(12px);
     border-radius: 50%;
@@ -1623,7 +1625,10 @@ canvas#scratch-canvas {
     .music-player {
         bottom: 25px !important;
         right: 20px !important;
-        width: 155px !important;
+        width: 70px !important;
+        height: 70px !important;
+        aspect-ratio: 1 / 1 !important;
+        flex-shrink: 0 !important;
     }
 
     .mood-options {
@@ -2136,6 +2141,8 @@ canvas#scratch-canvas {
     .music-player {
         width: 70px;
         height: 70px;
+        aspect-ratio: 1 / 1;
+        flex-shrink: 0;
         bottom: 25px;
         right: 25px;
     }
