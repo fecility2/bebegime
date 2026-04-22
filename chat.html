@@ -92,7 +92,7 @@
             flex-direction: column;
             gap: 16px;
             scroll-behavior: smooth;
-            padding-bottom: 120px; /* Space for the fixed input bar */
+            padding-bottom: 100px; /* Space for the fixed input bar */
             -webkit-overflow-scrolling: touch;
         }
 
@@ -166,9 +166,9 @@
             background: rgba(15, 5, 10, 0.98);
             backdrop-filter: blur(25px);
             padding: 12px 14px;
-            /* Ultra aggressive fix for Redmi navigation bar overlap */
-            padding-bottom: 15px;
-            margin-bottom: 55px; /* Huge margin to push it UP */
+            /* Refined fix for Redmi navigation bar overlap */
+            padding-bottom: 12px;
+            margin-bottom: 25px; /* Lowered from 55px to find the sweet spot */
             display: flex;
             align-items: flex-end;
             gap: 10px;
@@ -785,4 +785,5 @@
     </script>
 </body>
 </html>
+
 
