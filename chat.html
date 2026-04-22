@@ -92,7 +92,8 @@
             flex-direction: column;
             gap: 16px;
             scroll-behavior: smooth;
-            padding-bottom: 30px;
+            padding-bottom: 120px; /* Space for the fixed input bar */
+            -webkit-overflow-scrolling: touch;
         }
 
         .chat-flow::before {
@@ -162,18 +163,22 @@
 
         /* --- Input Bar --- */
         .chat-input-bar {
-            background: rgba(15, 5, 10, 0.95);
+            background: rgba(15, 5, 10, 0.98);
             backdrop-filter: blur(25px);
             padding: 12px 14px;
-            /* Aggressive padding for Android gesture/nav bars */
-            padding-bottom: calc(35px + env(safe-area-inset-bottom));
+            /* Ultra aggressive fix for Redmi navigation bar overlap */
+            padding-bottom: 15px;
+            margin-bottom: 55px; /* Huge margin to push it UP */
             display: flex;
             align-items: flex-end;
             gap: 10px;
             border-top: 1px solid var(--border);
-            position: sticky;
+            position: fixed;
             bottom: 0;
+            left: 0;
+            width: 100%;
             z-index: 1000;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.5);
         }
 
         .input-container {
@@ -764,14 +769,19 @@
         }
 
         // Android/Mobile Keyboard & Bottom Bar Fix
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', () => {
+        function adjustViewport() {
+            if (window.visualViewport) {
                 let viewHeight = window.visualViewport.height;
                 document.body.style.height = viewHeight + 'px';
-                // Scroll to bottom when keyboard opens
+                window.scrollTo(0, 0);
                 scrollToBottom();
-            });
+            }
         }
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', adjustViewport);
+            window.visualViewport.addEventListener('scroll', adjustViewport);
+        }
+        window.addEventListener('load', adjustViewport);
     </script>
 </body>
 </html>
