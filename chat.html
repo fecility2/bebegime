@@ -165,13 +165,14 @@
             background: rgba(15, 5, 10, 0.95);
             backdrop-filter: blur(25px);
             padding: 12px 14px;
-            /* Safe area + solid fallback for Android navigation bars */
-            padding-bottom: calc(15px + env(safe-area-inset-bottom));
+            /* Aggressive padding for Android gesture/nav bars */
+            padding-bottom: calc(35px + env(safe-area-inset-bottom));
             display: flex;
             align-items: flex-end;
             gap: 10px;
             border-top: 1px solid var(--border);
-            position: relative;
+            position: sticky;
+            bottom: 0;
             z-index: 1000;
         }
 
@@ -762,6 +763,16 @@
             });
         }
 
+        // Android/Mobile Keyboard & Bottom Bar Fix
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => {
+                let viewHeight = window.visualViewport.height;
+                document.body.style.height = viewHeight + 'px';
+                // Scroll to bottom when keyboard opens
+                scrollToBottom();
+            });
+        }
     </script>
 </body>
 </html>
+
