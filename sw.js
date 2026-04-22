@@ -1,7 +1,8 @@
-const CACHE_NAME = 'askim-pwa-v6';
+const CACHE_NAME = 'askim-pwa-v10';
 const urlsToCache = [
   './',
   './index.html',
+  './chat.html',
   './diary.html',
   './bucket-list.html',
   './lists.html',
@@ -57,6 +58,17 @@ self.addEventListener('fetch', event => {
     }).catch(() => {
       // İnternet yoksa veya hata varsa önbellekten getir (URL parametrelerini görmezden gel)
       return caches.match(event.request, { ignoreSearch: true });
+    })
+  );
+});
+// Eski önbellekleri temizle
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.filter(name => name !== CACHE_NAME)
+          .map(name => caches.delete(name))
+      );
     })
   );
 });
