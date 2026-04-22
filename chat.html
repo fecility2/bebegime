@@ -29,12 +29,18 @@
             font-family: 'Outfit', sans-serif;
             background: var(--chat-bg);
             color: var(--text-main);
+            height: 100vh;
             height: 100dvh;
+            min-height: -webkit-fill-available;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             background-image: radial-gradient(circle at top right, rgba(255, 75, 114, 0.05) 0%, transparent 40%),
                               radial-gradient(circle at bottom left, rgba(79, 172, 254, 0.05) 0%, transparent 40%);
+        }
+        
+        html {
+            height: -webkit-fill-available;
         }
 
         /* --- Header --- */
@@ -158,13 +164,15 @@
         .chat-input-bar {
             background: rgba(15, 5, 10, 0.95);
             backdrop-filter: blur(25px);
-            padding: 10px 14px;
-            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            padding: 12px 14px;
+            /* Safe area + solid fallback for Android navigation bars */
+            padding-bottom: calc(15px + env(safe-area-inset-bottom));
             display: flex;
             align-items: flex-end;
             gap: 10px;
             border-top: 1px solid var(--border);
             position: relative;
+            z-index: 1000;
         }
 
         .input-container {
@@ -757,4 +765,3 @@
     </script>
 </body>
 </html>
-
