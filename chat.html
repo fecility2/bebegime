@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Sizin Mesajlarınız 💬</title>
+    
+    <!-- OneSignal Push Notification SDK -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script src="onesignal-helper.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --chat-bg: #0b0208;
+            --ayse-color: #ff4b72;
+            --ayse-bubble: rgba(255, 75, 114, 0.15);
+            --mert-color: #4facfe;
+            --mert-bubble: rgba(79, 172, 254, 0.15);
+            --text-main: #fce4ec;
+            --text-muted: #f8bbd0;
+            --border: rgba(255, 255, 255, 0.08);
+            --surface: rgba(255, 255, 255, 0.04);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--chat-bg);
+            color: var(--text-main);
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-image: radial-gradient(circle at top right, rgba(255, 75, 114, 0.05) 0%, transparent 40%),
+                              radial-gradient(circle at bottom left, rgba(79, 172, 254, 0.05) 0%, transparent 40%);
+        }
+
+        /* --- Header --- */
+        .chat-header {
+            background: rgba(20, 5, 15, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 12px 18px;
+            padding-top: calc(12px + env(safe-area-inset-top));
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: #fff;
+            font-size: 1.8rem;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            opacity: 0.8;
+            transition: 0.3s;
+        }
+
+        .partner-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--ayse-color), var(--mert-color));
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .partner-info { display: flex; flex-direction: column; flex: 1; }
+        .partner-name { font-weight: 600; font-size: 1.05rem; }
+        .partner-status { font-size: 0.75rem; color: #48c78e; font-weight: 500; }
+
+        /* --- Messages Area --- */
+        .chat-flow {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scroll-behavior: smooth;
+            padding-bottom: 30px;
+        }
+
+        .chat-flow::before {
+            content: '';
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/dark-matter.png');
+            opacity: 0.3; pointer-events: none; z-index: -1;
+        }
+
+        .message-wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            max-width: 82%; 
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .msg-ayse { align-self: flex-start; }
+        .msg-mert { align-self: flex-end; }
+
+        .bubble {
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .bubble:active { transform: scale(0.98); }
+
+        .msg-ayse .bubble { 
+            background: var(--ayse-bubble); 
+            border: 1px solid rgba(255, 75, 114, 0.3);
+            color: #fff;
+            border-bottom-left-radius: 4px;
+        }
+
+        .msg-mert .bubble { 
+            background: var(--mert-bubble); 
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg-photo {
+            width: 100%;
+            border-radius: 12px;
+            margin-top: 5px;
+            display: block;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .msg-info {
+            font-size: 0.65rem;
+            opacity: 0.6;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .msg-mert .msg-info { justify-content: flex-end; }
+
+        /* --- Input Bar --- */
+        .chat-input-bar {
+            background: rgba(15, 5, 10, 0.95);
+            backdrop-filter: blur(25px);
+            padding: 10px 14px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            border-top: 1px solid var(--border);
+            position: relative;
+        }
+
+        .input-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            display: flex;
+            align-items: flex-end;
+            padding: 6px 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .action-icon {
+            color: var(--text-muted);
+            font-size: 1.4rem;
+            padding: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            background: none;
+            border: none;
+        }
+        .action-icon:hover { color: #fff; }
+
+        .chat-textarea {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.95rem;
+            max-height: 120px;
+            min-height: 24px;
+            padding: 8px;
+            resize: none;
+            outline: none;
+            line-height: 1.4;
+        }
+
+        .send-btn {
+            background: var(--ayse-color);
+            color: #fff;
+            border: none;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 75, 114, 0.3);
+            transition: 0.3s;
+            flex-shrink: 0;
+        }
+        .send-btn:active { transform: scale(0.9); }
+
+        /* --- Date Divider --- */
+        .date-divider {
+            align-self: center;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            padding: 5px 15px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin: 15px 0;
+            text-transform: capitalize;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* --- Reactions --- */
+        .reaction-bar {
+            position: absolute;
+            bottom: 100%;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 8px 12px;
+            border-radius: 30px;
+            display: none;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 200;
+            margin-bottom: 5px;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            white-space: nowrap;
+        }
+        .msg-ayse .reaction-bar { left: 0; }
+        .msg-mert .reaction-bar { right: 0; }
+        .reaction-bar.active { display: flex; }
+        
+        .re-emoji { font-size: 1.4rem; cursor: pointer; transition: 0.2s; }
+        .re-emoji:hover { transform: scale(1.3); }
+
+        .msg-reactions {
+            display: flex;
+            gap: 4px;
+            margin-top: -10px;
+            padding-left: 5px;
+            z-index: 2;
+        }
+        .msg-mert .msg-reactions { justify-content: flex-end; padding-right: 5px; }
+
+        .back-btn:hover {
+            background: rgba(255, 75, 114, 0.15);
+            border-color: rgba(255, 75, 114, 0.4);
+            color: #fff;
+            transform: translateX(-3px);
+        }
+
+        .delete-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            z-index: 2000; display:flex; justify-content:center; align-items:flex-end;
+        }
+
+        .delete-menu {
+            background: var(--chat-bg); border-top-left-radius: 20px; border-top-right-radius: 20px;
+            width: 100%; max-width: 600px; padding: 20px; text-align: center;
+            border-top: 1px solid var(--border); box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            transform: translateY(100%); animation: slideUp 0.3s forwards;
+        }
+
+        @keyframes slideUp { to { transform: translateY(0); } }
+
+        .delete-menu button {
+            width: 100%; padding: 15px; margin-top: 10px; border-radius: 12px;
+            border: none; font-family: 'Outfit', sans-serif; font-size: 1.1rem;
+            cursor: pointer; background: rgba(255,255,255,0.05); color: #fff;
+        }
+        .delete-menu button.danger { color: #ff4b72; font-weight: bold; background: rgba(255,75,114,0.1); }
+
+        .react-pill {
+            background: rgba(40, 40, 40, 0.9);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        /* --- Voice Waves --- */
+        .voice-waves {
+            display: none;
+            align-items: center;
+            gap: 3px;
+            margin-right: 10px;
+        }
+        .wave-bar {
+            width: 3px;
+            height: 15px;
+            background: var(--ayse-color);
+            border-radius: 3px;
+            animation: wavePulse 1s ease-in-out infinite;
+        }
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; height: 25px; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; height: 18px; }
+        .wave-bar:nth-child(4) { animation-delay: 0.3s; height: 22px; }
+
+        @keyframes wavePulse {
+            0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+            50% { transform: scaleY(1); opacity: 1; }
+        }
+
+        /* --- Previews --- */
+        #previews {
+            position: absolute;
+            bottom: 100%;
+            left: 14px;
+            right: 14px;
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 15px;
+            padding: 10px;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .preview-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
+        .cancel-preview { position: absolute; top: -8px; right: -8px; background: #ff4b72; color: #fff; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; }
+
+        /* --- Toast --- */
+        .toast {
+            position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); padding: 10px 20px;
+            border-radius: 20px; color: #fff; font-size: 0.9rem; opacity: 0; transition: 0.4s; z-index: 1000;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* --- Modal Zoom --- */
+        #img-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 3000; display: none;
+            align-items: center; justify-content: center; overflow: hidden;
+        }
+        #img-modal img { max-width: 95%; max-height: 90vh; border-radius: 10px; animation: zoomIn 0.3s; }
+        
+        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(0.8); } to { transform: scale(1); } }
+
+        audio { height: 35px; width: 100%; filter: invert(100%) hue-rotate(180deg) brightness(1.5); opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <header class="chat-header">
+        <a href="index.html#hub" class="back-btn">‹</a>
+        <div class="partner-avatar" id="p-avatar">❤️</div>
+        <div class="partner-info">
+            <span class="partner-name" id="p-name">Zeytinim</span>
+            <span class="partner-status" id="p-status">Bağlanıyor...</span>
+        </div>
+    </header>
+
+    <div class="chat-flow" id="chat-flow"></div>
+
+    <div class="chat-input-bar">
+        <div id="previews">
+            <div style="position: relative;">
+                <img id="temp-photo" class="preview-img" style="display: none;">
+                <div id="voice-label" style="display: none; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 10px; font-size: 0.8rem;">🎤 Ses kaydedildi</div>
+                <div class="cancel-preview" onclick="cancelMedia()">✕</div>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <label for="chat-file" class="action-icon">➕</label>
+            <input type="file" id="chat-file" hidden accept="image/*" onchange="handlePhoto()">
+            
+            <textarea id="chat-textarea" class="chat-textarea" placeholder="Mesajını yaz meleğim..." rows="1"></textarea>
+            
+            <div class="voice-waves" id="voice-waves">
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+            </div>
+            
+            <button class="action-icon" id="voice-btn" onclick="toggleVoice()">🎙️</button>
+        </div>
+
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">🚀</button>
+    </div>
+
+    <div id="img-modal" onclick="this.style.display='none'">
+        <img src="" id="modal-img">
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, updateDoc, setDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+            authDomain: "ayseye-surpriz.firebaseapp.com",
+            projectId: "ayseye-surpriz",
+            storageBucket: "ayseye-surpriz.firebasestorage.app",
+            messagingSenderId: "531177459988",
+            appId: "1:531177459988:web:09060a95bea0b06f197201"
+        };
+
+        const IMGBB_KEY = "7916dd11376f59a547ed252799f1328a";
+        const CLOUD_NAME = "dcxab3wb2";
+        const UPLOAD_PRESET = "mekade";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const currentUser = localStorage.getItem('active_player') || 'Bilinmeyen';
+        const partnerName = currentUser === 'Ayşe' ? 'Mert' : 'Ayşe';
+        document.getElementById('p-name').innerText = partnerName;
+        document.getElementById('p-avatar').innerText = partnerName[0];
+
+        const chatFlow = document.getElementById('chat-flow');
+        const ta = document.getElementById('chat-textarea');
+        const media = { photo: '', voice: null };
+        let activeStream = null;
+
+        // --- UI Interactions ---
+        ta.oninput = () => {
+            ta.style.height = 'auto';
+            ta.style.height = ta.scrollHeight + 'px';
+        };
+
+        window.showToast = (txt) => {
+            const t = document.getElementById('toast');
+            t.innerText = txt;
+            t.className = 'toast show';
+            setTimeout(() => t.className = 'toast', 3000);
+        };
+
+        // --- Media Handlers ---
+        window.handlePhoto = async () => {
+            const file = document.getElementById('chat-file').files[0];
+            if (!file) return;
+            showToast('Fotoğraf hazırlanıyor... 📸');
+            const fd = new FormData();
+            fd.append('image', file);
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
+                const json = await res.json();
+                if (json.success) {
+                    media.photo = json.data.url;
+                    document.getElementById('temp-photo').src = json.data.url;
+                    document.getElementById('temp-photo').style.display = 'block';
+                    document.getElementById('previews').style.display = 'flex';
+                }
+            } catch (e) { showToast('Yükleme hatası 😔'); }
+        };
+
+        let mediaRecorder;
+        let chunks = [];
+        window.toggleVoice = async () => {
+            const btn = document.getElementById('voice-btn');
+            const waves = document.getElementById('voice-waves');
+            const ta = document.getElementById('chat-textarea');
+
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                btn.style.color = '';
+                waves.style.display = 'none';
+                ta.style.display = 'block';
+                return;
+            }
+            try {
+                if (!activeStream || !activeStream.active) {
+                    activeStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                }
+                let mimeType = 'audio/webm';
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'audio/mp4';
+                }
+                mediaRecorder = new MediaRecorder(activeStream, { mimeType });
+                chunks = [];
+                mediaRecorder.ondataavailable = e => chunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    media.voice = new Blob(chunks, { type: mimeType });
+                    document.getElementById('voice-label').style.display = 'block';
+                    document.getElementById('previews').style.display = 'flex';
+                    showToast('Ses hazır! 🎤');
+                    // Artık track'leri durdurmuyoruz, oturum boyunca izni saklıyoruz
+                };
+                mediaRecorder.start();
+                btn.style.color = '#ff4b72';
+                waves.style.display = 'flex';
+                ta.style.display = 'none';
+                showToast('Kaydediliyor... 🔴');
+            } catch (e) { showToast('Mikrofon hatası ⚠️'); }
+        };
+
+        window.cancelMedia = () => {
+            media.photo = '';
+            media.voice = null;
+            document.getElementById('temp-photo').style.display = 'none';
+            document.getElementById('voice-label').style.display = 'none';
+            document.getElementById('previews').style.display = 'none';
+        };
+
+        async function uploadAudio(blob) {
+            const fd = new FormData();
+            fd.append('file', blob);
+            fd.append('upload_preset', UPLOAD_PRESET);
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, { method: 'POST', body: fd });
+            const data = await res.json();
+            return data.secure_url;
+        }
+
+        // --- Core Messaging ---
+        window.sendMessage = async () => {
+            const text = ta.value.trim();
+            if (!text && !media.photo && !media.voice) return;
+
+            const btn = document.getElementById('send-btn');
+            btn.disabled = true;
+            btn.innerText = '⏳';
+
+            try {
+                let audioUrl = null;
+                if (media.voice) audioUrl = await uploadAudio(media.voice);
+
+                await addDoc(collection(db, 'chat_messages'), {
+                    sender: currentUser,
+                    text: text,
+                    photo: media.photo,
+                    audio: audioUrl,
+                    reactions: {},
+                    timestamp: serverTimestamp()
+                });
+
+                // --- Kapalıyken Giden Push Bildirimi ---
+                if (window.sendLoveNotification && currentUser !== 'Bilinmeyen') {
+                    let notifMsg = text;
+                    if (!text) {
+                        if (media.voice) notifMsg = "🎤 Sana bir sesli mesaj gönderdi.";
+                        else if (media.photo) notifMsg = "📷 Sana bir fotoğraf gönderdi.";
+                    } else if (media.voice || media.photo) {
+                        notifMsg += " (Medyalı Mesaj)";
+                    }
+                    window.sendLoveNotification("Yeni Bir Mesajın Var 💌", `${currentUser}: ${notifMsg}`);
+                }
+
+                ta.value = '';
+                ta.style.height = 'auto';
+                cancelMedia();
+            } catch (e) { showToast('Hata oluştu 😔'); }
+            finally { btn.disabled = false; btn.innerText = '🚀'; }
+        };
+
+        // --- Messaging Logic ---
+        onSnapshot(query(collection(db, 'chat_messages'), orderBy('timestamp', 'asc')), (snap) => {
+            chatFlow.innerHTML = '';
+            let lastDate = null;
+
+            snap.forEach(d => {
+                const msg = d.data();
+                if (!msg.timestamp) return;
+
+                const currDate = msg.timestamp.toDate().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+                
+                // Benden Silinmişse atla
+                if (msg.deletedFor && msg.deletedFor[currentUser]) return;
+
+                if (currDate !== lastDate) {
+                    const divider = document.createElement('div');
+                    divider.className = 'date-divider';
+                    
+                    const today = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+                    if (currDate === today) divider.innerText = 'Bugün';
+                    else divider.innerText = currDate;
+                    
+                    chatFlow.appendChild(divider);
+                    lastDate = currDate;
+                }
+
+                const isMe = msg.sender === currentUser;
+                
+                const wrap = document.createElement('div');
+                wrap.className = `message-wrapper ${isMe ? 'msg-mert' : 'msg-ayse'}`;
+                
+                let content = `<div class="bubble">`;
+                if (msg.photo) content += `<img src="${msg.photo}" class="msg-photo" onclick="zoomImg('${msg.photo}')">`;
+                if (msg.text) content += `<div style="padding-top:4px;">${msg.text.replace(/\\n/g, '<br>')}</div>`;
+                if (msg.audio) content += `<audio src="${msg.audio}" controls style="margin-top:8px;"></audio>`;
+                
+                const time = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '...';
+                content += `<div class="msg-info">${time}</div></div>`;
+
+                // Reaction Selector
+                const reactBar = document.createElement('div');
+                reactBar.className = 'reaction-bar';
+                ['❤️','😂','🥺','🔥','😮'].forEach(emo => {
+                    const span = document.createElement('span');
+                    span.className = 're-emoji';
+                    span.innerText = emo;
+                    span.onclick = (e) => {
+                        e.stopPropagation();
+                        addReaction(d.id, emo, msg.reactions);
+                        reactBar.classList.remove('active');
+                    };
+                    reactBar.appendChild(span);
+                });
+
+                // Silme butonu ekle
+                const deleteSpan = document.createElement('span');
+                deleteSpan.className = 're-emoji';
+                deleteSpan.innerText = '🗑️';
+                deleteSpan.onclick = (e) => {
+                    e.stopPropagation();
+                    window.showDeleteMenu(d.id, isMe);
+                    reactBar.classList.remove('active');
+                };
+                reactBar.appendChild(deleteSpan);
+
+                // Reactions Display
+                let reactDisplay = '<div class="msg-reactions">';
+                if (msg.reactions) {
+                    for (const [emo, count] of Object.entries(msg.reactions)) {
+                        if (count > 0) reactDisplay += `<div class="react-pill">${emo} ${count}</div>`;
+                    }
+                }
+                reactDisplay += '</div>';
+
+                wrap.innerHTML = content + reactDisplay;
+                wrap.appendChild(reactBar);
+
+                wrap.onclick = function(e) {
+                    e.stopPropagation();
+                    document.querySelectorAll('.reaction-bar').forEach(function(b) { b.classList.remove('active'); });
+                    reactBar.classList.add('active');
+                };
+
+                chatFlow.appendChild(wrap);
+            });
+            chatFlow.scrollTop = chatFlow.scrollHeight;
+        });
+
+        async function addReaction(id, emoji, current) {
+            const ref = doc(db, 'chat_messages', id);
+            const val = (current?.[emoji] || 0) + 1;
+            await updateDoc(ref, { [`reactions.${emoji}`]: val });
+        }
+
+        window.zoomImg = function(url) {
+            var m = document.getElementById('img-modal');
+            document.getElementById('modal-img').src = url;
+            m.style.display = 'flex';
+        };
+
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.reaction-bar').forEach(function(b) { b.classList.remove('active'); });
+        });
+
+        // Delete Logic
+        window.showDeleteMenu = function(msgId, isMyMessage) {
+            var overlay = document.createElement('div');
+            overlay.className = 'delete-overlay';
+            var html = '<div class="delete-menu">';
+            html += '<button class="danger" onclick="deleteMsg(\'' + msgId + '\', \'benden\')">Benden Sil 🗑️</button>';
+            if (isMyMessage) {
+                html += '<button class="danger" onclick="deleteMsg(\'' + msgId + '\', \'herkesten\')">Herkesten Sil 🚫</button>';
+            }
+            html += '<button onclick="this.parentElement.parentElement.remove()">İptal</button>';
+            html += '</div>';
+            overlay.innerHTML = html;
+            document.body.appendChild(overlay);
+        };
+
+        window.deleteMsg = async (msgId, type) => {
+            const ref = doc(db, 'chat_messages', msgId);
+            try {
+                if (type === 'herkesten') {
+                    await updateDoc(ref, { 
+                        text: "🚫 Bu mesaj silindi", 
+                        photo: null, 
+                        audio: null, 
+                        reactions: {} 
+                    });
+                } else if (type === 'benden') {
+                    await updateDoc(ref, { [`deletedFor.${currentUser}`]: true });
+                }
+            } catch(e) {}
+            const ov = document.querySelector('.delete-overlay');
+            if(ov) ov.remove();
+        };
+
+        // --- Online Status Sync ---
+        setInterval(async function() {
+            if (document.visibilityState === 'visible') {
+                var userRef = doc(db, 'online_status', currentUser);
+                await setDoc(userRef, { last_seen: serverTimestamp() }, { merge: true });
+            }
+        }, 5000);
+
+        var partnerRef = doc(db, 'online_status', partnerName);
+        onSnapshot(partnerRef, function(docSnap) {
+            var statusEl = document.getElementById('p-status');
+            if (docSnap.exists()) {
+                var data = docSnap.data();
+                if (data.last_seen) {
+                    var lastSeenTime = data.last_seen.toDate().getTime();
+                    var now = new Date().getTime();
+                    var diffSecs = (now - lastSeenTime) / 1000;
+                    
+                    if (diffSecs < 15) {
+                        statusEl.innerText = "Çevrimiçi";
+                        statusEl.style.color = "#48c78e";
+                    } else {
+                        statusEl.innerText = "Son görülme: " + data.last_seen.toDate().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+                        statusEl.style.color = "var(--text-muted)";
+                    }
+                }
+            } else {
+                statusEl.innerText = "Son görülme bulunamadı";
+            }
+        });
+
+        // Mobile Scroll Optimization
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => {
+                chatFlow.scrollTop = chatFlow.scrollHeight;
+            });
+        }
+
+    </script>
+</body>
+</html>
+

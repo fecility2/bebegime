@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Bizim Günlüğümüz 💌</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
+        rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📓</text></svg>">
+        
+    <!-- OneSignal Push Notification SDK -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script src="onesignal-helper.js"></script>
+
+    <style>
+        :root {
+            --primary: #ff4b72;
+            --primary-glow: rgba(255, 75, 114, 0.6);
+            --bg: #0a0208;
+            --surface: rgba(255, 255, 255, 0.04);
+            --surface-hover: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #fce4ec;
+            --text-muted: #f8bbd0;
+            --ayse-color: #ff6b9d;
+            --ayse-glow: rgba(255, 107, 157, 0.5);
+            --mert-color: #7b8ff7;
+            --mert-glow: rgba(123, 143, 247, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body,
+        html {
+            min-height: 100vh;
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        #stars-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--dur, 3s) ease-in-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            50% {
+                opacity: var(--op, 0.8);
+                transform: scale(1.2);
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at top, rgba(255, 75, 114, 0.07) 0%, transparent 60%),
+                radial-gradient(ellipse at bottom, rgba(123, 143, 247, 0.05) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 75, 114, 0.15);
+            border-color: rgba(255, 75, 114, 0.4);
+            color: #fff;
+            transform: translateX(-3px);
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 80px 20px 40px;
+        }
+
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            color: #fff;
+            text-shadow: 0 0 30px var(--primary-glow);
+            margin-bottom: 12px;
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .sync-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 14px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s;
+        }
+
+        .sync-badge.connected {
+            border-color: rgba(72, 199, 142, 0.4);
+            color: #48c78e;
+        }
+
+        .sync-badge.loading {
+            border-color: rgba(255, 200, 80, 0.4);
+            color: #ffc850;
+        }
+
+        .sync-badge.error {
+            border-color: rgba(255, 75, 114, 0.4);
+            color: #ff4b72;
+        }
+
+        .sync-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulseDot 1.5s infinite;
+        }
+
+        @keyframes pulseDot {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .tab-bar {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+            max-width: 700px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px 20px;
+            border-radius: 14px;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--text-muted);
+        }
+
+        .tab-btn.ayse.active {
+            background: rgba(255, 107, 157, 0.15);
+            border-color: var(--ayse-color);
+            color: var(--ayse-color);
+            box-shadow: 0 0 20px var(--ayse-glow), inset 0 0 20px rgba(255, 107, 157, 0.05);
+        }
+
+        .tab-btn.mert.active {
+            background: rgba(123, 143, 247, 0.15);
+            border-color: var(--mert-color);
+            color: var(--mert-color);
+            box-shadow: 0 0 20px var(--mert-glow), inset 0 0 20px rgba(123, 143, 247, 0.05);
+        }
+
+        .tab-btn:not(.active):hover {
+            background: var(--surface-hover);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .diary-area {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px 80px;
+            animation: fadeUp 0.4s ease-out;
+        }
+
+        .diary-area.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .write-box {
+            background: var(--surface);
+            border-radius: 20px;
+            border: 1.5px solid var(--border);
+            backdrop-filter: blur(12px);
+            padding: 28px;
+            margin-bottom: 36px;
+            transition: border-color 0.3s;
+        }
+
+        .write-box.ayse-box {
+            border-color: rgba(255, 107, 157, 0.25);
+        }
+
+        .write-box.mert-box {
+            border-color: rgba(123, 143, 247, 0.25);
+        }
+
+        .write-box-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            opacity: 0.6;
+        }
+
+        .ayse-box .write-box-label {
+            color: var(--ayse-color);
+        }
+
+        .mert-box .write-box-label {
+            color: var(--mert-color);
+        }
+
+        .write-box textarea {
+            width: 100%;
+            min-height: 120px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            line-height: 1.75;
+            padding: 16px 20px;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        /* ===== Fotoğraf Yükleme Stilleri ===== */
+        .write-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .upload-trigger {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1.5px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-trigger:hover {
+            background: rgba(255, 75, 114, 0.1);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .photo-preview-container {
+            display: none;
+            position: relative;
+            margin-top: 15px;
+            width: fit-content;
+        }
+
+        .photo-preview-container.active {
+            display: block;
+        }
+
+        .photo-preview-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid var(--primary);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4b72;
+            color: #fff;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            border: 2px solid var(--bg);
+        }
+
+        .note-photo-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            background: rgba(255, 75, 114, 0.08);
+            border: 1px solid rgba(255, 75, 114, 0.2);
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            color: var(--primary);
+            font-weight: 600;
+            gap: 8px;
+        }
+
+        .note-photo-btn:hover {
+            background: rgba(255, 75, 114, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 75, 114, 0.2);
+            border-color: var(--primary);
+        }
+
+        .note-photo-btn i {
+            font-style: normal;
+            font-size: 1.2rem;
+        }
+
+        .note-photo {
+            display: none;
+            /* Artık doğrudan kart içinde görünmeyecek */
+        }
+
+        .upload-loading {
+            font-size: 0.8rem;
+            color: var(--primary);
+            display: none;
+            margin-left: 10px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* ===== Modal (Fotoğraf Büyütme) ===== */
+        .diary-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            cursor: zoom-out;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .diary-modal.show {
+            display: flex;
+        }
+
+        .modal-zoom-img {
+            max-width: 95%;
+            max-height: 90vh;
+            border-radius: 12px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            animation: zoomIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.85);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            color: #fff;
+            font-size: 35px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+
+        .save-btn {
+            padding: 12px 32px;
+            border-radius: 30px;
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ayse-box .save-btn {
+            background: linear-gradient(135deg, #ff6b9d, #ff4b72);
+            color: #fff;
+            box-shadow: 0 5px 20px rgba(255, 75, 114, 0.4);
+        }
+
+        .mert-box .save-btn {
+            background: linear-gradient(135deg, #7b8ff7, #5b6ef0);
+            color: #fff;
+            box-shadow: 0 5px 20px rgba(123, 143, 247, 0.4);
+        }
+
+        .notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .note-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 22px 24px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .ayse-note {
+            border-left: 3px solid var(--ayse-color);
+        }
+
+        .mert-note {
+            border-left: 3px solid var(--mert-color);
+        }
+
+        .note-timestamp {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .note-body {
+            font-size: 1rem;
+            line-height: 1.75;
+            color: var(--text-main);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .note-delete {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: none;
+            border: none;
+            color: #ff4b72;
+            font-size: 1.1rem;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: 0.3s;
+        }
+
+        .note-card:hover .note-delete {
+            opacity: 1;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 30px;
+            padding: 12px 28px;
+            color: #fff;
+            opacity: 0;
+            transition: 0.4s;
+            z-index: 999;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .back-btn {
+                font-size: 0.85rem;
+                padding: 8px 14px;
+            }
+        }
+
+        .diary-music-player {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            padding: 10px 20px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+            transition: all 0.4s;
+            z-index: 200;
+            -webkit-tap-highlight-color: transparent;
+            border: 1px solid transparent;
+        }
+
+        .diary-music-player:not(.paused) {
+            background: rgba(255, 75, 114, 0.15);
+            box-shadow: 0 10px 30px rgba(255, 75, 114, 0.3), inset 0 0 0 1.5px rgba(255, 75, 114, 0.5);
+            border-color: rgba(255, 75, 114, 0.3);
+        }
+
+        .diary-music-player:hover,
+        .diary-music-player:active {
+            transform: scale(1.05) translateY(-2px);
+            background: rgba(255, 75, 114, 0.25);
+            box-shadow: 0 15px 40px rgba(255, 75, 114, 0.4), inset 0 0 0 1.5px rgba(255, 75, 114, 0.6);
+        }
+
+        .diary-music-player:active {
+            transform: scale(0.95);
+            background: rgba(255, 75, 114, 0.35);
+        }
+
+        .diary-music-cover {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b9d, #7b8ff7);
+            border: 2px solid var(--primary);
+            animation: spin 5s linear infinite;
+        }
+
+        .diary-music-player.paused .diary-music-cover {
+            animation-play-state: paused;
+        }
+
+        .music-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .music-title {
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.2;
+            text-align: left;
+        }
+
+        .music-artist {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-align: left;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Ses Kayıt Stilleri */
+        .voice-rec-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+
+        .voice-rec-btn.recording {
+            background: rgba(255, 75, 114, 0.2);
+            border-color: var(--primary);
+            color: #fff;
+            animation: pulse-border 1.5s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 75, 114, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 75, 114, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 75, 114, 0);
+            }
+        }
+
+        .voice-preview-container {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .voice-preview-container.active {
+            display: flex;
+        }
+
+        .audio-note-container {
+            margin-top: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        audio {
+            height: 35px;
+            width: 100%;
+            filter: invert(100%) hue-rotate(180deg) brightness(1.5);
+            opacity: 0.8;
+        }
+
+        @media (max-width: 600px) {
+            .diary-music-player {
+                bottom: 15px;
+                right: 15px;
+                padding: 8px 15px;
+            }
+
+            .music-title {
+                font-size: 0.8rem;
+            }
+
+            .diary-music-cover {
+                width: 35px;
+                height: 35px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="stars-bg"></div>
+    <div class="overlay"></div>
+
+    <a href="index.html#hub" class="back-btn">← Ana Sayfaya Dön</a>
+
+    <div class="page-header">
+        <h1>Bizim Günlüğümüz 📓</h1>
+        <p>Kalbinden geçenleri buraya yaz... hiç kaybolmayacak ✨</p>
+        <div class="sync-badge loading" id="sync-badge">
+            <div class="sync-dot"></div>
+            <span id="sync-text">Bağlanıyor...</span>
+        </div>
+    </div>
+
+    <div class="tab-bar">
+        <button class="tab-btn ayse active" id="tab-ayse" onclick="switchTab('ayse')">🎀 Ayşe</button>
+        <button class="tab-btn mert" id="tab-mert" onclick="switchTab('mert')">💙 Mert</button>
+    </div>
+
+    <!-- Ayşe -->
+    <div class="diary-area active" id="area-ayse">
+        <div class="write-box ayse-box">
+            <div class="write-box-label">✏️ Ayşe yazıyor...</div>
+            <textarea id="textarea-ayse" placeholder="Bugün neler oldu? 🎀"></textarea>
+
+            <div class="photo-preview-container" id="preview-container-ayse">
+                <img src="" class="photo-preview-img" id="preview-img-ayse">
+                <div class="photo-remove" onclick="removePhoto('ayse')">✕</div>
+            </div>
+
+            <div class="voice-preview-container" id="voice-preview-ayse">
+                <audio id="audio-preview-ayse" controls></audio>
+                <div class="photo-remove" onclick="removeVoice('ayse')">✕</div>
+            </div>
+
+            <div class="write-actions">
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                    <label for="file-ayse" class="upload-trigger">📸 Fotoğraf</label>
+                    <input type="file" id="file-ayse" hidden accept="image/*" onchange="uploadDiaryPhoto('ayse')">
+                    <button class="voice-rec-btn" id="voice-btn-ayse" onclick="toggleRecording('ayse')">
+                        <span id="voice-icon-ayse">🎤</span> <span id="voice-text-ayse">Sesli Not</span>
+                    </button>
+                    <span class="upload-loading" id="loading-ayse">⏳ İşlemde...</span>
+                </div>
+                <button class="save-btn" id="save-ayse" onclick="saveNote('ayse')">💾 Kaydet</button>
+            </div>
+        </div>
+        <div class="notes-header" style="margin-bottom:15px; display:flex; justify-content:space-between;">
+            <span style="font-weight:600;">Geçmiş Notlar</span>
+            <span id="count-ayse" style="opacity:0.6;">0 not</span>
+        </div>
+        <div class="notes-list" id="list-ayse"></div>
+    </div>
+
+    <!-- Mert -->
+    <div class="diary-area" id="area-mert">
+        <div class="write-box mert-box">
+            <div class="write-box-label">✏️ Mert yazıyor...</div>
+            <textarea id="textarea-mert" placeholder="Bugün neler oldu? 💙"></textarea>
+
+            <div class="photo-preview-container" id="preview-container-mert">
+                <img src="" class="photo-preview-img" id="preview-img-mert">
+                <div class="photo-remove" onclick="removePhoto('mert')">✕</div>
+            </div>
+
+            <div class="voice-preview-container" id="voice-preview-mert">
+                <audio id="audio-preview-mert" controls></audio>
+                <div class="photo-remove" onclick="removeVoice('mert')">✕</div>
+            </div>
+
+            <div class="write-actions">
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                    <label for="file-mert" class="upload-trigger">📸 Fotoğraf</label>
+                    <input type="file" id="file-mert" hidden accept="image/*" onchange="uploadDiaryPhoto('mert')">
+                    <button class="voice-rec-btn" id="voice-btn-mert" onclick="toggleRecording('mert')">
+                        <span id="voice-icon-mert">🎤</span> <span id="voice-text-mert">Sesli Not</span>
+                    </button>
+                    <span class="upload-loading" id="loading-mert">⏳ İşlemde...</span>
+                </div>
+                <button class="save-btn" id="save-mert" onclick="saveNote('mert')">💾 Kaydet</button>
+            </div>
+        </div>
+        <div class="notes-header" style="margin-bottom:15px; display:flex; justify-content:space-between;">
+            <span style="font-weight:600;">Geçmiş Notlar</span>
+            <span id="count-mert" style="opacity:0.6;">0 not</span>
+        </div>
+        <div class="notes-list" id="list-mert"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <div class="diary-modal" id="diary-modal" onclick="closeImageModal()">
+        <span class="modal-close">×</span>
+        <img src="" class="modal-zoom-img" id="modal-zoom-img">
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, enableIndexedDbPersistence, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+            authDomain: "ayseye-surpriz.firebaseapp.com",
+            projectId: "ayseye-surpriz",
+            storageBucket: "ayseye-surpriz.firebasestorage.app",
+            messagingSenderId: "531177459988",
+            appId: "1:531177459988:web:09060a95bea0b06f197201",
+            measurementId: "G-2LBSDG1KDB"
+        };
+
+        const IMGBB_API_KEY = "7916dd11376f59a547ed252799f1328a";
+
+        // --- CLOUDINARY AYARLARI ---
+        const CLOUD_NAME = "dcxab3wb2"; // Cloudinary Dashboard'dan al
+        const UPLOAD_PRESET = "mekade"; // Ayarlardan "Unsigned" preset oluşturup yaz
+        // ---------------------------
+
+        const uploadedPhotos = { ayse: '', mert: '' };
+        const recordedVoices = { ayse: null, mert: null };
+        const mediaRecorders = { ayse: null, mert: null };
+        const audioChunks = { ayse: [], mert: [] };
+        let activeStream = null;
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        enableIndexedDbPersistence(db).catch(err => console.log('Offline DB hatası:', err.code));
+
+        // ================= SES KAYIT MANTIĞI =================
+        window.toggleRecording = async (who) => {
+            const btn = document.getElementById('voice-btn-' + who);
+            const text = document.getElementById('voice-text-' + who);
+            const icon = document.getElementById('voice-icon-' + who);
+
+            if (mediaRecorders[who] && mediaRecorders[who].state === 'recording') {
+                mediaRecorders[who].stop();
+                btn.classList.remove('recording');
+                return;
+            }
+
+            try {
+                if (!activeStream || !activeStream.active) {
+                    activeStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                }
+                let mimeType = 'audio/webm';
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'audio/mp4';
+                }
+                const recorder = new MediaRecorder(activeStream, { mimeType });
+                mediaRecorders[who] = recorder;
+                audioChunks[who] = [];
+
+                recorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) audioChunks[who].push(e.data);
+                };
+
+                recorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks[who], { type: mimeType });
+                    recordedVoices[who] = audioBlob;
+
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const preview = document.getElementById('audio-preview-' + who);
+                    preview.src = audioUrl;
+                    document.getElementById('voice-preview-' + who).classList.add('active');
+
+                    text.innerText = 'Ses Kaydedildi';
+                    icon.innerText = '✅';
+                    // İzni oturum boyunca saklıyoruz
+                };
+
+                recorder.start();
+                btn.classList.add('recording');
+                text.innerText = 'Kayıt Yapılıyor...';
+                icon.innerText = '🔴';
+                showToast('Sesin kaydediliyor... 🎤');
+            } catch (err) {
+                console.error('Mikrofon erişim hatası:', err);
+                showToast('Mikrofon erişimi engellendi! ⚠️');
+            }
+        };
+
+        window.removeVoice = (who) => {
+            recordedVoices[who] = null;
+            document.getElementById('voice-preview-' + who).classList.remove('active');
+            document.getElementById('voice-text-' + who).innerText = 'Sesli Not';
+            document.getElementById('voice-icon-' + who).innerText = '🎤';
+            showToast('Ses silindi 🗑️');
+        };
+
+        async function uploadVoice(who, blob) {
+            if (!blob) return null;
+
+            const formData = new FormData();
+            formData.append('file', blob);
+            formData.append('upload_preset', UPLOAD_PRESET);
+            formData.append('resource_type', 'auto');
+
+            try {
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.secure_url) {
+                    return data.secure_url;
+                } else {
+                    console.error('Cloudinary Hatası:', data);
+                    throw new Error('CLOUDINARY_ERROR');
+                }
+            } catch (e) {
+                console.error('Ses yükleme hatası:', e);
+                throw e;
+            }
+        }
+        // =====================================================
+
+        // Yıldızlar
+        (function () {
+            const container = document.getElementById('stars-bg');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2 + 1;
+                star.style.width = size + 'px'; star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%';
+                star.style.setProperty('--dur', (Math.random() * 3 + 2) + 's');
+                star.style.setProperty('--op', Math.random() * 0.7 + 0.3);
+                star.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(star);
+            }
+        })();
+
+        window.switchTab = (who) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.diary-area').forEach(a => a.classList.remove('active'));
+            document.getElementById('tab-' + who).classList.add('active');
+            document.getElementById('area-' + who).classList.add('active');
+        };
+
+        function formatDate(ts) {
+            const d = ts?.toDate ? ts.toDate() : new Date(ts);
+            return d.toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' - ' + d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+        }
+
+        function esc(str) { return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+        function setSync(state, text) {
+            const badge = document.getElementById('sync-badge');
+            const label = document.getElementById('sync-text');
+            if (badge && label) {
+                badge.className = 'sync-badge ' + state;
+                label.textContent = text;
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            if (t) {
+                t.textContent = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 3000);
+            }
+        }
+
+        // ========== OFFLİNE FOTOĞRAF KUYRUĞU ==========
+        const PENDING_STORE = 'pendingPhotos';
+
+        function openPendingDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open('ourstory_offline', 1);
+                req.onupgradeneeded = e => e.target.result.createObjectStore(PENDING_STORE, { keyPath: 'id', autoIncrement: true });
+                req.onsuccess = e => resolve(e.target.result);
+                req.onerror = e => reject(e);
+            });
+        }
+
+        async function savePendingPhoto(who, base64, noteId) {
+            const idb = await openPendingDB();
+            return new Promise((resolve, reject) => {
+                const tx = idb.transaction(PENDING_STORE, 'readwrite');
+                tx.objectStore(PENDING_STORE).add({ who, base64, noteId });
+                tx.oncomplete = resolve;
+                tx.onerror = reject;
+            });
+        }
+
+        async function getPendingPhotos() {
+            const idb = await openPendingDB();
+            return new Promise((resolve, reject) => {
+                const tx = idb.transaction(PENDING_STORE, 'readonly');
+                const req = tx.objectStore(PENDING_STORE).getAll();
+                req.onsuccess = e => resolve(e.target.result);
+                req.onerror = reject;
+            });
+        }
+
+        async function deletePendingPhoto(id) {
+            const idb = await openPendingDB();
+            return new Promise((resolve, reject) => {
+                const tx = idb.transaction(PENDING_STORE, 'readwrite');
+                tx.objectStore(PENDING_STORE).delete(id);
+                tx.oncomplete = resolve;
+                tx.onerror = reject;
+            });
+        }
+
+        async function processPendingPhotos() {
+            const pending = await getPendingPhotos();
+            if (!pending.length) return;
+            showToast(`⏳ ${pending.length} bekleyen fotoğraf yükleniyor...`);
+            for (const item of pending) {
+                try {
+                    const blob = await fetch(item.base64).then(r => r.blob());
+                    const formData = new FormData();
+                    formData.append('image', blob);
+                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+                    const json = await res.json();
+                    if (json.success) {
+                        // Firebase'deki notu güncelle
+                        const noteRef = doc(db, 'diary_' + item.who, item.noteId);
+                        await updateDoc(noteRef, { photo: json.data.url });
+                        await deletePendingPhoto(item.id);
+                        showToast('📸 Fotoğraf buluta yüklendi! ✨');
+                    }
+                } catch (e) {
+                    console.error('Bekleyen fotoğraf yüklenemedi:', e);
+                }
+            }
+        }
+
+        // İnternet gelince bekleyen fotoğrafları işle
+        window.addEventListener('online', processPendingPhotos);
+        // Sayfa açılınca da kontrol et
+        if (navigator.onLine) processPendingPhotos();
+        // ================================================
+
+        window.uploadDiaryPhoto = async (who) => {
+            const file = document.getElementById('file-' + who).files[0];
+            if (!file) return;
+            const loading = document.getElementById('loading-' + who);
+            const saveBtn = document.getElementById('save-' + who);
+            loading.style.display = 'inline';
+            saveBtn.disabled = true;
+
+            if (!navigator.onLine) {
+                // Çevrimdışı: fotoğrafı base64 olarak bellekte tut, notu kaydettiğinde ID ile eşleştirilecek
+                const reader = new FileReader();
+                reader.onload = e => {
+                    uploadedPhotos[who] = e.target.result; // base64 URL olarak sakla (önizleme için)
+                    uploadedPhotos[who + '_offline'] = true; // offline bayrağı
+                    document.getElementById('preview-img-' + who).src = e.target.result;
+                    document.getElementById('preview-container-' + who).classList.add('active');
+                    showToast('📴 İnternetsiz! Fotoğraf not kaydedilince sıraya alınacak.');
+                };
+                reader.readAsDataURL(file);
+                loading.style.display = 'none';
+                saveBtn.disabled = false;
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+                const json = await res.json();
+                if (json.success) {
+                    uploadedPhotos[who] = json.data.url;
+                    uploadedPhotos[who + '_offline'] = false;
+                    document.getElementById('preview-img-' + who).src = json.data.url;
+                    document.getElementById('preview-container-' + who).classList.add('active');
+                    showToast('Fotoğraf hazır! ✨');
+                } else {
+                    showToast('Yükleme başarısız 😔');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('Hata oluştu ⚠️');
+            }
+            loading.style.display = 'none';
+            saveBtn.disabled = false;
+        };
+
+        window.removePhoto = function(who) {
+            uploadedPhotos[who] = '';
+            document.getElementById('preview-container-' + who).classList.remove('active');
+            showToast('Fotoğraf kaldırıldı 🗑️');
+        };
+
+        function listenNotes(who) {
+            var q = query(collection(db, 'diary_' + who), orderBy('ts', 'desc'));
+            onSnapshot(q, function(snap) {
+                var list = document.getElementById('list-' + who);
+                document.getElementById('count-' + who).innerText = snap.size + ' not';
+                list.innerHTML = '';
+                setSync('connected', 'Buluta bağlı ☁️ (Yazı: Firebase, Resim: ImgBB)');
+                if (snap.empty) {
+                    var emoji = who === 'ayse' ? '🎀' : '💙';
+                    list.innerHTML = '<div class="empty-state"><div class="empty-icon">' + emoji + '</div><p>Henüz hiç not yok...<br>İlk notunu yaz! ✨</p></div>';
+                    return;
+                }
+                snap.forEach(function(docSnap) {
+                    var data = docSnap.data();
+                    let photoHtml = '';
+                    if (data.photo) {
+                        photoHtml = `<div class="note-photo-btn" onclick="openImageModal('${data.photo}')"><i>🖼️</i> Fotoğrafa Bak</div>`;
+                    }
+                    let audioHtml = '';
+                    if (data.audio) {
+                        audioHtml = `
+                            <div class="audio-note-container">
+                                <div style="font-size:0.75rem; margin-bottom:5px; opacity:0.6;">🎤 Sesli Not</div>
+                                <audio src="${data.audio}" controls style="width:100%;"></audio>
+                            </div>
+                        `;
+                    }
+                    var content = '<div class="note-timestamp">✨ ' + (data.ts ? formatDate(data.ts) : '...') + '</div>';
+                    content += '<div class="note-body">' + esc(data.text || '') + '</div>';
+                    content += audioHtml + photoHtml;
+                    content += '<button class="note-delete" onclick="deleteNote(\'' + who + '\',\'' + docSnap.id + '\')">🗑️</button>';
+                    
+                    var card = document.createElement('div');
+                    card.className = 'note-card ' + who + '-note';
+                    card.innerHTML = content;
+                    list.appendChild(card);
+                });
+            }, function(err) {
+                setSync('error', 'Hata oluştu ⚠️');
+                console.error(err);
+            });
+        }
+
+        window.deleteNote = async function(who, id) {
+            if (confirm('Bu hatırayı silmek istediğine emin misin sevgilim? 🥺')) {
+                await deleteDoc(doc(db, 'diary_' + who, id));
+                showToast('Hatıra silindi 🗑️');
+            }
+        };
+
+        window.saveNote = async function(who) {
+            var ta = document.getElementById('textarea-' + who);
+            var btn = document.getElementById('save-' + who);
+            var text = ta.value.trim();
+            var photo = uploadedPhotos[who];
+            var isOfflinePhoto = uploadedPhotos[who + '_offline'];
+            var voice = recordedVoices[who];
+
+            if (!text && !photo && !voice) {
+                showToast('Önce bir şeyler yaz sevgilim veya ses ekle... 🥺');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Kaydediliyor...';
+            try {
+                let audioUrl = null;
+                if (voice) {
+                    audioUrl = await uploadVoice(who, voice);
+                }
+
+                // Offline fotoğraf varsa placeholder ile kaydet, sıraya al
+                const photoUrl = isOfflinePhoto ? '' : (photo || '');
+                const noteRef = await addDoc(collection(db, 'diary_' + who), {
+                    text,
+                    photo: photoUrl,
+                    audio: audioUrl,
+                    pendingPhoto: isOfflinePhoto ? true : false,
+                    ts: serverTimestamp()
+                });
+
+                // --- Kapalıyken Giden Push Bildirimi ---
+                if (window.sendLoveNotification) {
+                    var posterName = who === 'ayse' ? 'Ayşe' : 'Mert';
+                    window.sendLoveNotification("Günlüğe Yeni Bir Not Yazıldı 📓", posterName + " az önce günlüğe yeni bir anı bıraktı...");
+                }
+
+                // Offline fotoğraf sıraya alınıyor
+                if (isOfflinePhoto && photo) {
+                    await savePendingPhoto(who, photo, noteRef.id);
+                    showToast('📝 Not kaydedildi! Fotoğraf internete bağlanınca yüklenecek 📴');
+                }
+
+                ta.value = '';
+                uploadedPhotos[who + '_offline'] = false;
+                removePhoto(who);
+                removeVoice(who);
+                showToast('Hatıran kalbimize mühürlendi! ✨❤️');
+            } catch (e) {
+                console.error(e);
+                if (e.message === 'CLOUDINARY_ERROR' || e.message === 'TypeError') {
+                    showToast('⚠️ Ses yüklenemedi! Cloudinary ayarlarını (Cloud Name ve Preset) kontrol et sevgilim.');
+                } else {
+                    showToast('Kayıt hatası... 😔');
+                }
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '💾 Kaydet';
+            }
+        };
+
+        listenNotes('ayse'); listenNotes('mert');
+
+        window.openImageModal = function(url) {
+            var m = document.getElementById('diary-modal');
+            var img = document.getElementById('modal-zoom-img');
+            img.src = url;
+            m.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Kaydırmayı engelle
+        };
+
+        window.closeImageModal = function() {
+            document.getElementById('diary-modal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        };
+    </script>
+
+    <!-- Müzik (Büklüm Büklüm) -->
+    <audio id="diary-audio" loop preload="auto" autoplay muted>
+        <source
+            src="https://dl.dropboxusercontent.com/scl/fi/5yuqhuwbbhbz5rgpxbqmf/buklum.mp4?rlkey=arext6xm0sdk2tnx8okasufse&st=zjn4492f&dl=1"
+            type="audio/mp4">
+        <!-- Yerel Yedek (Klasöre 'buklum.mp4' ismiyle koyarsan telifsiz ve tertemiz çalar!) -->
+        <source src="buklum.mp4" type="audio/mp4">
+    </audio>
+
+    <div class="diary-music-player paused" onclick="toggleM()">
+        <div class="diary-music-cover"></div>
+        <div class="music-info">
+            <div class="music-title">Büklüm Büklüm</div>
+            <div class="music-artist">Bizim Şarkımız</div>
+        </div>
+        <div id="m-icon" style="color:var(--primary); font-size:24px; width:24px; text-align:center;">▶</div>
+    </div>
+
+    <script>
+        const diaryAudio = document.getElementById('diary-audio');
+        let diaryPlaying = false;
+
+        function updateUI(playing) {
+            const player = document.querySelector('.diary-music-player');
+            const icon = document.getElementById('m-icon');
+            if (playing) {
+                player.classList.remove('paused');
+                icon.innerText = '⏸';
+            } else {
+                player.classList.add('paused');
+                icon.innerText = '▶';
+            }
+        }
+
+        diaryAudio.addEventListener('play', () => {
+            diaryPlaying = true;
+            updateUI(true);
+        });
+
+        diaryAudio.addEventListener('pause', () => {
+            diaryPlaying = false;
+            updateUI(false);
+        });
+
+        function toggleM() {
+            if (!diaryAudio) return;
+            if (diaryAudio.paused) {
+                diaryAudio.play();
+            } else {
+                diaryAudio.pause();
+            }
+        }
+
+        // Sayfa içinde herhangi bir yere ilk tıklandığında sesi aç ve başlatmayı zorla
+        document.body.addEventListener('click', () => {
+            if (diaryAudio) {
+                diaryAudio.muted = false;
+                diaryAudio.volume = 0.7;
+                if (diaryAudio.paused) {
+                    diaryAudio.play().catch(e => console.log("Otomatik çalma hala engellendi"));
+                }
+            }
+        }, { once: true });
+    </script>
+</body>
+
+</html>
