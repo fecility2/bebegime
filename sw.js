@@ -1,4 +1,4 @@
-const CACHE_NAME = 'askim-pwa-v11';
+const CACHE_NAME = 'askim-pwa-v12';
 const urlsToCache = [
   './',
   './index.html',
