@@ -336,6 +336,9 @@
 
         window.initEffects = function () {
             initRelevantEffects();
+            if (window.initGlobalStars) {
+                window.initGlobalStars();
+            }
         };
 
         function initRelevantEffects() {
