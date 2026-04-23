@@ -42,22 +42,27 @@ if (currentUser && !isOnChatPage) {
         Notification.requestPermission();
     }
 
-    // Presence: Ana sayfada olduğunu kaydet
-    const updatePresence = async (status) => {
+    // Global Presence: Sitede nerede olursa olsun online durumunu güncelle
+    const updatePresence = async (isOnline) => {
         try {
-            await setDoc(doc(db, 'presence', currentUser), {
-                status,
-                lastSeen: serverTimestamp()
+            await setDoc(doc(db, 'online_status', currentUser), {
+                last_seen: serverTimestamp(),
+                online: isOnline 
             }, { merge: true });
         } catch (e) { /* sessizce geç */ }
     };
 
-    updatePresence('online');
-    window.addEventListener('focus', function() { updatePresence('online'); });
-    window.addEventListener('blur', function() { updatePresence('offline'); });
-    document.addEventListener('visibilitychange', function() {
-        updatePresence(document.hidden ? 'offline' : 'online');
+    updatePresence(true);
+    window.addEventListener('focus', () => updatePresence(true));
+    window.addEventListener('blur', () => updatePresence(false));
+    document.addEventListener('visibilitychange', () => {
+        updatePresence(!document.hidden);
     });
+
+    // Periyodik güncelleme (Tarayıcı açık kaldığı sürece)
+    setInterval(() => {
+        if (!document.hidden) updatePresence(true);
+    }, 10000);
 
     // Gölge Koruyucu — Mesajları Dinle
     let isInitialLoad = true;
