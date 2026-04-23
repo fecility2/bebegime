@@ -12,7 +12,7 @@
         rel="stylesheet">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
-        
+
     <!-- OneSignal Push Notification SDK -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script src="onesignal-helper.js"></script>
@@ -471,7 +471,7 @@
         };
 
         // KENDİ IMGBB API ANAHTARINI BURAYA YAZ SEVGİLİM (https://api.imgbb.com/)
-        const IMGBB_API_KEY = "7916dd11376f59a547ed252799f1328a"; 
+        const IMGBB_API_KEY = "7916dd11376f59a547ed252799f1328a";
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -497,28 +497,28 @@
         })();
 
         const q = query(bucketRef, orderBy('createdAt', 'desc'));
-        onSnapshot(q, function(snapshot) {
+        onSnapshot(q, function (snapshot) {
             var listEl = document.getElementById('bucket-list');
             listEl.innerHTML = '';
             document.getElementById('sync-status').innerText = 'Buluta bağlı (Yazılar: Firebase, Resimler: ImgBB) ✨';
-            snapshot.forEach(function(doc) {
+            snapshot.forEach(function (doc) {
                 var data = doc.data();
                 var item = document.createElement('div');
                 item.className = 'bucket-item ' + (data.isDone ? 'completed' : '') + ' ' + (data.photo ? 'has-photo' : '');
                 item.innerHTML = '<div class="check-circle" onclick="toggleComplete(\'' + doc.id + '\', ' + data.isDone + ')"></div>' +
-                                 '<div class="item-text">' + data.text + '</div>' +
-                                 '<div class="photo-btn" onclick="openPhotoModal(\'' + doc.id + '\', \'' + (data.photo || '') + '\')">🖼️</div>' +
-                                 '<div class="delete-btn" onclick="deleteItem(\'' + doc.id + '\')">🗑️</div>';
+                    '<div class="item-text">' + data.text + '</div>' +
+                    '<div class="photo-btn" onclick="openPhotoModal(\'' + doc.id + '\', \'' + (data.photo || '') + '\')">🖼️</div>' +
+                    '<div class="delete-btn" onclick="deleteItem(\'' + doc.id + '\')">🗑️</div>';
                 listEl.appendChild(item);
             });
         });
 
-        document.getElementById('add-btn').onclick = async function() {
+        document.getElementById('add-btn').onclick = async function () {
             var input = document.getElementById('bucket-input');
             var text = input.value.trim();
             if (!text) return;
             await addDoc(bucketRef, { text: text, isDone: false, photo: '', createdAt: serverTimestamp() });
-            
+
             if (window.sendLoveNotification) {
                 var author = localStorage.getItem('active_player') || 'Sevgilin';
                 window.sendLoveNotification("Hayal Listemiz Büyüyor ✨", author + ", listemize yepyeni bir hayal ekledi: \"" + text + "\"");
@@ -527,7 +527,7 @@
             input.value = '';
         };
 
-        window.toggleComplete = async function(id, currentStatus) {
+        window.toggleComplete = async function (id, currentStatus) {
             await updateDoc(doc(db, 'bucket_list', id), { isDone: !currentStatus });
         };
 
@@ -537,7 +537,7 @@
             }
         };
 
-        window.openPhotoModal = function(id, photoUrl) {
+        window.openPhotoModal = function (id, photoUrl) {
             currentItemId = id;
             var modal = document.getElementById('photo-modal');
             var preview = document.getElementById('modal-img-preview');
@@ -554,9 +554,18 @@
             modal.classList.add('show');
         };
 
-        window.closeModal = function() {
+        window.closeModal = function () {
             document.getElementById('photo-modal').classList.remove('show');
         };
+
+        // --- SESSİZ GLOBAL DURUM TAKİBİ (Chat'te her zaman online görünmek için) ---
+        const userPresenceRef = doc(db, 'online_status', localStorage.getItem('active_player') || 'Bilinmeyen');
+        async function updateStatus(isOnline) {
+            try { await updateDoc(userPresenceRef, { last_seen: serverTimestamp(), online: isOnline }); } catch(e) {}
+        }
+        updateStatus(true);
+        setInterval(() => { if (!document.hidden) updateStatus(true); }, 10000);
+        document.addEventListener('visibilitychange', () => updateStatus(!document.hidden));
 
         // ========== OFFLİNE FOTOĞRAF KUYRUĞU (Bucket List) ==========
         const PENDING_STORE = 'pendingBucketPhotos';
