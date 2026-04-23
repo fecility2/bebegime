@@ -273,14 +273,27 @@
         .re-emoji { font-size: 1.4rem; cursor: pointer; transition: 0.2s; }
         .re-emoji:hover { transform: scale(1.3); }
 
-        .msg-reactions {
-            display: flex;
-            gap: 4px;
-            margin-top: -10px;
-            padding-left: 5px;
-            z-index: 2;
-        }
         .msg-mert .msg-reactions { justify-content: flex-end; padding-right: 5px; }
+        
+        .msg-reactions .react-pill {
+            background: rgba(40, 40, 40, 0.9);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            animation: popIn 0.2s;
+        }
+
+        .custom-emoji-btn {
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0 5px;
+            border-left: 1px solid rgba(255,255,255,0.1);
+        }
 
         .back-btn:hover {
             background: rgba(255, 75, 114, 0.15);
@@ -635,7 +648,7 @@
                 // Reaction Selector
                 const reactBar = document.createElement('div');
                 reactBar.className = 'reaction-bar';
-                ['❤️','😂','🥺','🔥','😮'].forEach(emo => {
+                ['❤️','😂','🥺','🔥','😮','👍'].forEach(emo => {
                     const span = document.createElement('span');
                     span.className = 're-emoji';
                     span.innerText = emo;
@@ -646,6 +659,18 @@
                     };
                     reactBar.appendChild(span);
                 });
+
+                // Custom Emoji Option
+                const customBtn = document.createElement('span');
+                customBtn.className = 'custom-emoji-btn';
+                customBtn.innerText = '➕';
+                customBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const custom = prompt("Hangi ifadeyi bırakmak istersin sevgilim? ✨");
+                    if (custom) addReaction(d.id, custom, msg.reactions);
+                    reactBar.classList.remove('active');
+                };
+                reactBar.appendChild(customBtn);
 
                 // Silme butonu ekle
                 const deleteSpan = document.createElement('span');
@@ -658,11 +683,16 @@
                 };
                 reactBar.appendChild(deleteSpan);
 
-                // Reactions Display
+                // Reactions Display (WP-Style: One reaction per user)
                 let reactDisplay = '<div class="msg-reactions">';
                 if (msg.reactions) {
-                    for (const [emo, count] of Object.entries(msg.reactions)) {
-                        if (count > 0) reactDisplay += `<div class="react-pill">${emo} ${count}</div>`;
+                    const uniqueReactions = {}; // { emoji: count }
+                    Object.values(msg.reactions).forEach(emo => {
+                        if (emo) uniqueReactions[emo] = (uniqueReactions[emo] || 0) + 1;
+                    });
+                    
+                    for (const [emo, count] of Object.entries(uniqueReactions)) {
+                        reactDisplay += `<div class="react-pill">${emo} ${count > 1 ? count : ''}</div>`;
                     }
                 }
                 reactDisplay += '</div>';
@@ -681,10 +711,11 @@
             chatFlow.scrollTop = chatFlow.scrollHeight;
         });
 
-        async function addReaction(id, emoji, current) {
+        async function addReaction(id, emoji, currentReactions) {
             const ref = doc(db, 'chat_messages', id);
-            const val = (current?.[emoji] || 0) + 1;
-            await updateDoc(ref, { [`reactions.${emoji}`]: val });
+            // WhatsApp style: one reaction per user. Toggle off if same emoji.
+            const newEmoji = currentReactions?.[currentUser] === emoji ? null : emoji;
+            await updateDoc(ref, { [`reactions.${currentUser}`]: newEmoji });
         }
 
         window.zoomImg = function(url) {
@@ -730,13 +761,18 @@
             if(ov) ov.remove();
         };
 
-        // --- Online Status Sync ---
-        setInterval(async function() {
-            if (document.visibilityState === 'visible') {
-                var userRef = doc(db, 'online_status', currentUser);
-                await setDoc(userRef, { last_seen: serverTimestamp() }, { merge: true });
-            }
-        }, 5000);
+        // --- Presence Sync (Global Online Status) ---
+        const updateMyPresence = async (isOnline) => {
+            try {
+                await setDoc(doc(db, 'online_status', currentUser), {
+                    last_seen: serverTimestamp(),
+                    online: isOnline 
+                }, { merge: true });
+            } catch (e) {}
+        };
+        updateMyPresence(true);
+        setInterval(() => { if (!document.hidden) updateMyPresence(true); }, 10000);
+        document.addEventListener('visibilitychange', () => updateMyPresence(!document.hidden));
 
         var partnerRef = doc(db, 'online_status', partnerName);
         onSnapshot(partnerRef, function(docSnap) {
@@ -744,15 +780,16 @@
             if (docSnap.exists()) {
                 var data = docSnap.data();
                 if (data.last_seen) {
-                    var lastSeenTime = data.last_seen.toDate().getTime();
+                    var lastSeenDate = data.last_seen.toDate();
+                    var lastSeenTime = lastSeenDate.getTime();
                     var now = new Date().getTime();
                     var diffSecs = (now - lastSeenTime) / 1000;
                     
-                    if (diffSecs < 15) {
+                    if (data.online || diffSecs < 30) {
                         statusEl.innerText = "Çevrimiçi";
                         statusEl.style.color = "#48c78e";
                     } else {
-                        statusEl.innerText = "Son görülme: " + data.last_seen.toDate().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+                        statusEl.innerText = "Son görülme: " + lastSeenDate.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
                         statusEl.style.color = "var(--text-muted)";
                     }
                 }
