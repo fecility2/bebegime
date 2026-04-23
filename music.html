@@ -185,15 +185,35 @@
         }
 
         @keyframes floatUp {
-            0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
-            10%  { opacity: 0.5; }
-            90%  { opacity: 0.3; }
-            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.5;
+            }
+
+            90% {
+                opacity: 0.3;
+            }
+
+            100% {
+                transform: translateY(-110vh) rotate(360deg);
+                opacity: 0;
+            }
         }
 
         @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         /* === PLAYER KARTI === */
@@ -292,7 +312,8 @@
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            background: #1DB954; /* Spotify Green */
+            background: #1DB954;
+            /* Spotify Green */
             color: #000;
             text-decoration: none;
             padding: 12px 24px;
@@ -324,6 +345,59 @@
             color: rgba(255, 255, 255, 0.4);
             font-style: italic;
         }
+
+        .app-btn {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .app-btn:hover {
+            background: rgba(29, 185, 84, 0.15);
+            border-color: #1DB954;
+            color: #1ed760;
+            transform: translateY(-2px);
+        }
+
+        /* === MOBILE HELP MODAL === */
+        .mobile-help {
+            margin-top: 25px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: left;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .mobile-help h4 {
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .refresh-btn {
+            background: #ff4b72;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
     </style>
 </head>
 
@@ -354,7 +428,10 @@
         <!-- Spotify Login & Player -->
         <div class="login-section">
             <a href="https://accounts.spotify.com/tr/login" target="_blank" class="spotify-login-btn">
-                <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.503 17.306c-.217.334-.654.444-.988.228-2.73-1.669-6.162-2.046-10.208-1.12-.38.087-.758-.153-.845-.533-.087-.38.153-.758.533-.845 4.43-1.013 8.236-.581 11.28 1.283.334.217.444.654.228.987zm1.467-3.268c-.273.44-.848.578-1.288.305-3.123-1.92-7.882-2.47-11.576-1.348-.485.148-.997-.132-1.144-.617-.148-.485.132-.997.617-1.144 4.225-1.283 9.47-.654 13.106 1.583.44.273.578.848.305 1.288zm.139-3.418C14.684 7.648 7.371 7.406 3.123 8.694c-.682.207-1.395-.184-1.603-.866-.207-.682.184-1.395.866-1.603 4.885-1.482 13.003-1.205 18.234 1.9 0.613.364 0.814 1.155 0.45 1.768-.364.613-1.155.814-1.768 0.45z"/></svg>
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.503 17.306c-.217.334-.654.444-.988.228-2.73-1.669-6.162-2.046-10.208-1.12-.38.087-.758-.153-.845-.533-.087-.38.153-.758.533-.845 4.43-1.013 8.236-.581 11.28 1.283.334.217.444.654.228.987zm1.467-3.268c-.273.44-.848.578-1.288.305-3.123-1.92-7.882-2.47-11.576-1.348-.485.148-.997-.132-1.144-.617-.148-.485.132-.997.617-1.144 4.225-1.283 9.47-.654 13.106 1.583.44.273.578.848.305 1.288zm.139-3.418C14.684 7.648 7.371 7.406 3.123 8.694c-.682.207-1.395-.184-1.603-.866-.207-.682.184-1.395.866-1.603 4.885-1.482 13.003-1.205 18.234 1.9 0.613.364 0.814 1.155 0.45 1.768-.364.613-1.155.814-1.768 0.45z" />
+                </svg>
                 Spotify'da Giriş Yap
             </a>
             <span class="login-hint">Şarkıların tamamını dinleyebilmek için giriş yapmalısın sevgilim ❤️</span>
@@ -368,12 +445,22 @@
             <div style="border-radius:18px; overflow:hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.4);">
                 <iframe
                     src="https://open.spotify.com/embed/playlist/4V2wcD8Rm3G4JuXDDHjt1K?utm_source=generator&theme=0"
-                    width="100%"
-                    height="500"
-                    style="display:block; border:none;"
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    allowfullscreen>
+                    width="100%" height="600" style="display:block; border:none;"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowfullscreen>
                 </iframe>
+            </div>
+
+            <!-- Mobile Fix Instructions -->
+            <div class="mobile-help">
+                <h4><svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.308.533.19 0 .452-.088.655-.238a.11.11 0 0 1 .037.062l-.125.471a.63.63 0 0 1-.562.328c-.51 0-.897-.433-.761-.908l1-4.705c.07-.34-.029-.533-.308-.533-.19 0-.452.088-.655.238a.11.11 0 0 1-.037-.062l.125.471a.63.63 0 0 1 .562-.328c.51 0 .897.433.761.908zM8 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                </svg> Şarkılar Yarıda mı Kesiliyor?</h4>
+                <p>Telefonda şarkıların tamamını <b>bu sayfa içinde</b> dinleyebilmek için:</p>
+                <ul style="margin: 10px 0 0 18px; color: rgba(255,255,255,0.7);">
+                    <li>Yukarıdaki butondan Spotify'a giriş yap sevgilim.</li>
+                    <li>iPhone kullanıyorsan: <b>Ayarlar > Safari > Siteler Arası Takibi Engelle</b> seçeneğini <u>KAPAT</u>.</li>
+                </ul>
+                <button class="refresh-btn" onclick="refreshPlayer()">Şimdi Player'ı Yenile ✨</button>
             </div>
         </div>
 
@@ -404,6 +491,15 @@
             ].join(';');
             container.appendChild(n);
             setTimeout(function () { if (n.parentNode) n.parentNode.removeChild(n); }, (dur + 5) * 1000);
+        }
+
+        function refreshPlayer() {
+            const frame = document.querySelector('iframe');
+            const src = frame.src;
+            frame.src = '';
+            setTimeout(() => {
+                frame.src = src;
+            }, 100);
         }
 
         // Başlangıçta birkaç not yap, sonra düzenli ekle
