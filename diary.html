@@ -12,7 +12,7 @@
         rel="stylesheet">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📓</text></svg>">
-        
+
     <!-- OneSignal Push Notification SDK -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script src="onesignal-helper.js"></script>
@@ -1158,7 +1158,7 @@
             saveBtn.disabled = false;
         };
 
-        window.removePhoto = function(who) {
+        window.removePhoto = function (who) {
             uploadedPhotos[who] = '';
             document.getElementById('preview-container-' + who).classList.remove('active');
             showToast('Fotoğraf kaldırıldı 🗑️');
@@ -1166,7 +1166,7 @@
 
         function listenNotes(who) {
             var q = query(collection(db, 'diary_' + who), orderBy('ts', 'desc'));
-            onSnapshot(q, function(snap) {
+            onSnapshot(q, function (snap) {
                 var list = document.getElementById('list-' + who);
                 document.getElementById('count-' + who).innerText = snap.size + ' not';
                 list.innerHTML = '';
@@ -1176,7 +1176,7 @@
                     list.innerHTML = '<div class="empty-state"><div class="empty-icon">' + emoji + '</div><p>Henüz hiç not yok...<br>İlk notunu yaz! ✨</p></div>';
                     return;
                 }
-                snap.forEach(function(docSnap) {
+                snap.forEach(function (docSnap) {
                     var data = docSnap.data();
                     let photoHtml = '';
                     if (data.photo) {
@@ -1195,26 +1195,26 @@
                     content += '<div class="note-body">' + esc(data.text || '') + '</div>';
                     content += audioHtml + photoHtml;
                     content += '<button class="note-delete" onclick="deleteNote(\'' + who + '\',\'' + docSnap.id + '\')">🗑️</button>';
-                    
+
                     var card = document.createElement('div');
                     card.className = 'note-card ' + who + '-note';
                     card.innerHTML = content;
                     list.appendChild(card);
                 });
-            }, function(err) {
+            }, function (err) {
                 setSync('error', 'Hata oluştu ⚠️');
                 console.error(err);
             });
         }
 
-        window.deleteNote = async function(who, id) {
+        window.deleteNote = async function (who, id) {
             if (confirm('Bu hatırayı silmek istediğine emin misin sevgilim? 🥺')) {
                 await deleteDoc(doc(db, 'diary_' + who, id));
                 showToast('Hatıra silindi 🗑️');
             }
         };
 
-        window.saveNote = async function(who) {
+        window.saveNote = async function (who) {
             var ta = document.getElementById('textarea-' + who);
             var btn = document.getElementById('save-' + who);
             var text = ta.value.trim();
@@ -1277,7 +1277,7 @@
 
         listenNotes('ayse'); listenNotes('mert');
 
-        window.openImageModal = function(url) {
+        window.openImageModal = function (url) {
             var m = document.getElementById('diary-modal');
             var img = document.getElementById('modal-zoom-img');
             img.src = url;
@@ -1285,7 +1285,7 @@
             document.body.style.overflow = 'hidden'; // Kaydırmayı engelle
         };
 
-        window.closeImageModal = function() {
+        window.closeImageModal = function () {
             document.getElementById('diary-modal').classList.remove('show');
             document.body.style.overflow = 'auto';
         };
