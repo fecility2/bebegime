@@ -2,7 +2,7 @@
 // AYŞE & MERT — GÖLGE KORUYUCU SİSTEMİ (Firebase Notifications + Full App)
 // ===========================================================================
 
-import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { getApps, initializeAp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import {
     getFirestore,
     collection,
