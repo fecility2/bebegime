@@ -456,9 +456,18 @@
                     <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.308.533.19 0 .452-.088.655-.238a.11.11 0 0 1 .037.062l-.125.471a.63.63 0 0 1-.562.328c-.51 0-.897-.433-.761-.908l1-4.705c.07-.34-.029-.533-.308-.533-.19 0-.452.088-.655.238a.11.11 0 0 1-.037-.062l.125.471a.63.63 0 0 1 .562-.328c.51 0 .897.433.761.908zM8 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
                 </svg> Şarkılar Yarıda mı Kesiliyor?</h4>
                 <p>Telefonda şarkıların tamamını <b>bu sayfa içinde</b> dinleyebilmek için:</p>
-                <ul style="margin: 10px 0 0 18px; color: rgba(255,255,255,0.7);">
-                    <li>Yukarıdaki butondan Spotify'a giriş yap sevgilim.</li>
-                    <li>iPhone kullanıyorsan: <b>Ayarlar > Safari > Siteler Arası Takibi Engelle</b> seçeneğini <u>KAPAT</u>.</li>
+                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px;">
+                        <b style="color: #fff; display: block; margin-bottom: 5px;">🍎 iPhone (Safari):</b>
+                        <span style="font-size: 0.75rem; color: rgba(255,255,255,0.6);">Ayarlar > Safari > Siteler Arası Takibi Engelle -> <b>Kapat</b></span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px;">
+                        <b style="color: #fff; display: block; margin-bottom: 5px;">🤖 Android (Chrome):</b>
+                        <span style="font-size: 0.75rem; color: rgba(255,255,255,0.6);">Ayarlar > Gizlilik > Üçüncü Taraf Çerezleri -> <b>İzin Ver</b></span>
+                    </div>
+                </div>
+                <ul style="margin: 15px 0 0 18px; color: rgba(255,255,255,0.7);">
+                    <li>Yukarıdaki yeşil butondan Spotify'a giriş yap sevgilim.</li>
                 </ul>
                 <button class="refresh-btn" onclick="refreshPlayer()">Şimdi Player'ı Yenile ✨</button>
             </div>
