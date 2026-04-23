@@ -189,6 +189,11 @@
             
             const canvas = document.getElementById('top-canvas');
             const ctx = canvas.getContext('2d');
+
+            // ÖNEMLİ: Önceki oyundan kalan stilleri sıfırla
+            canvas.style.opacity = '1';
+            canvas.style.pointerEvents = 'auto';
+            canvas.classList.remove('fade-out');
             
             // Çözünürlüğü konteynere göre ayarla
             canvas.width = container.offsetWidth;
