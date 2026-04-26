@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=3">
     <style>
-        body { font-family: 'Outfit', sans-serif; color: #fff; margin: 0; padding: 20px; min-height: 100vh; background: #0a0208; }
+        body { font-family: 'Outfit', sans-serif; color: #fff; margin: 0; padding: 20px; padding-bottom: 120px; min-height: 100vh; background: #0a0208; }
         #background-canvas { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, #1a0520 0%, #0a0208 100%); }
         .back-nav { position: fixed; top: 20px; left: 20px; background: rgba(255,255,255,.06); padding: 10px 18px; border-radius: 25px; color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,.16); }
         .header { text-align: center; margin-top: 58px; margin-bottom: 22px; }
@@ -225,15 +225,19 @@
                 const card = document.createElement('div');
                 const downloadable = canDownloadPhoto(item);
                 const isOwn = item.seller === currentUser;
+                const isRevealed = downloadable || isOwn;
                 card.className = 'photo-card';
                 card.innerHTML = `
-                    <img src="${item.photoUrl}" alt="market-photo">
+                    ${isRevealed 
+                        ? `<img src="${item.photoUrl}" alt="market-photo">`
+                        : `<div style="width:100%; height:160px; background:linear-gradient(45deg, #1a0520, #0a0208); display:flex; align-items:center; justify-content:center; font-size:3rem; border-bottom:1px solid rgba(255,255,255,0.1);">🔒</div>`
+                    }
                     <div class="photo-meta">
-                        <div style="font-weight:700;">${item.title || 'Fotoğraf'}</div>
+                        <div style="font-weight:700;">${isRevealed ? (item.title || 'Fotoğraf') : 'Gizli İçerik 🔒'}</div>
                         <div style="opacity:.8;">Satıcı: ${item.seller}</div>
                         <div style="margin-top:4px;">Fiyat: ${item.price} ❤️</div>
                         <div class="photo-actions">
-                            <button class="action-btn buy-photo-btn" ${isOwn ? 'disabled' : ''} data-buy="${item.id}">${isOwn ? 'Kendi ilanın' : 'Satın Al'}</button>
+                            <button class="action-btn buy-photo-btn" ${isOwn || downloadable ? 'disabled' : ''} data-buy="${item.id}">${isOwn ? 'Kendi ilanın' : (downloadable ? 'Satın Alındı' : 'Satın Al')}</button>
                             ${isOwn ? `<button class="action-btn dl-btn" data-edit="${item.id}">Düzenle</button>` : ''}
                             ${isOwn ? `<button class="action-btn dl-btn" data-remove="${item.id}">Kaldır</button>` : ''}
                             ${downloadable ? `<a class="action-btn dl-btn" href="${item.photoUrl}" download="ask-market-${item.id}.jpg" target="_blank" rel="noopener">İndir</a>` : ''}
@@ -311,8 +315,14 @@
         }
 
         async function uploadPhotoAndGetUrl(file) {
+            const base64 = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
             const fd = new FormData();
-            fd.append('image', file);
+            fd.append('image', base64);
             const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
             const json = await res.json();
             if (!json.success) throw new Error('Foto yükleme başarısız');
