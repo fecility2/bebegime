@@ -299,18 +299,6 @@ window.toggleHub = function () {
     }
 };
 
-window.toggleAudio = function () {
-    const icon = document.getElementById('play-pause-icon');
-    if (!audio) return;
-    if (audio.paused) {
-        audio.play().catch(() => { });
-        if (icon) icon.innerText = '⏸';
-    } else {
-        audio.pause();
-        if (icon) icon.innerText = '▶';
-    }
-};
-
 window.openJar = function () {
     const text = document.getElementById('jar-note-text');
     const modal = document.getElementById('jar-modal');
@@ -332,14 +320,15 @@ window.closeJar = function () {
 window.toggleAudio = function () {
     var icon = document.getElementById('play-pause-icon');
     if (!audio) return;
-    if (isPlaying) {
-        audio.pause();
-        if (icon) icon.innerText = '▶';
-    } else {
-        audio.play();
+    if (audio.paused) {
+        audio.play().catch(() => { });
+        isPlaying = true;
         if (icon) icon.innerText = '⏸';
+    } else {
+        audio.pause();
+        isPlaying = false;
+        if (icon) icon.innerText = '▶';
     }
-    isPlaying = !isPlaying;
 };
 
 window.setMood = function (mood, icon) {
