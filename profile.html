@@ -23,7 +23,9 @@
         
         /* User Card */
         .user-card { text-align: center; display: flex; flex-direction: column; align-items: center; }
-        .avatar-wrap { position: relative; margin-bottom: 15px; }
+        .avatar-wrap { position: relative; margin-bottom: 15px; cursor: pointer; transition: 0.3s; }
+        .avatar-wrap:hover { transform: scale(1.03); }
+        .avatar-wrap::after { content: '📷'; position: absolute; top: 0; right: 0; background: rgba(0,0,0,0.6); border-radius: 50%; padding: 6px; font-size: 1.2rem; }
         .avatar { width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #1a0520, #ff4b72); margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 4rem; box-shadow: 0 0 25px rgba(255, 75, 114, 0.4); border: 3px solid rgba(255,255,255,0.2); }
         .level-badge { position: absolute; bottom: 0; right: 0; background: #ff8c00; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; border: 2px solid #0a0208; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
         
@@ -83,10 +85,11 @@
     <div class="profile-container">
         <!-- Sol Panel: User Info & Inventory -->
         <div class="panel user-card animate-pop" style="animation-delay: 0.1s;">
-            <div class="avatar-wrap">
-                <div class="avatar" id="user-avatar">👤</div>
+            <div class="avatar-wrap" onclick="document.getElementById('avatar-upload').click()">
+                <div class="avatar" id="user-avatar" style="background-size: cover; background-position: center;">👤</div>
                 <div class="level-badge" id="level-badge">1</div>
             </div>
+            <input type="file" id="avatar-upload" hidden accept="image/*">
             <div class="username" id="user-name">...</div>
             <div class="balance-badge"><span id="user-balance">0</span> ❤️</div>
             
@@ -189,8 +192,13 @@
             { id: "rich_bitch", title: "Zenginliğin Böylesi", icon: "💰", desc: "10.000 ❤️ barajını geçtin." },
             { id: "shopping_spree", title: "Para Harcamayı Severim", icon: "🛍️", desc: "Marketten ilk eşyanı aldın." },
             { id: "jackpot_master", title: "Şans Meleği", icon: "🎰", desc: "Jackpot Boost aldın, büyük oynuyorsun." },
-            { id: "coupon_hoarder", title: "Kupon Canavarı", icon: "🎟️", desc: "Bir tane gerçek hayat kuponu satın aldın." },
-            { id: "loyal_lover", title: "Sadık Aşık", icon: "📅", desc: "3 farklı günde günlük ödülünü topladın." }
+            { id: "coupon_hoarder", title: "Kupon Canavarı", icon: "🎟️", desc: "İlk kuponunu aldın." },
+            { id: "loyal_lover", title: "Sadık Aşık", icon: "📅", desc: "3 farklı günde günlük ödül topladın." },
+            { id: "profile_pic", title: "Yakışıklı/Güzel", icon: "📸", desc: "Kendi muhteşem profil fotoğrafını güncelledin." },
+            { id: "wealth_50k", title: "Banker Bilo", icon: "🏦", desc: "50.000 ❤️ eşiğini geçtin, paraya para demiyorsun!" },
+            { id: "true_addict", title: "Bağımlı", icon: "🔥", desc: "Toplam 10 kez giriş yaparak kalbini belli ettin." },
+            { id: "shopaholic", title: "Alışveriş Kolik", icon: "🛒", desc: "Toplam 5 farklı eşya veya kozmetik satın aldın." },
+            { id: "love_god", title: "Aşk Tanrısı", icon: "👼", desc: "Geliştirmeler ve başarımlarla Seviye 10'a ulaştın!" }
         ];
 
         let userBalance = 0;
@@ -243,11 +251,49 @@
             renderAchievements();
             checkDailyStatus();
             
+            if (statsData.profilePic) {
+                document.getElementById('user-avatar').style.backgroundImage = `url(${statsData.profilePic})`;
+                document.getElementById('user-avatar').textContent = "";
+            }
+
             // Calc Level based on login count + unlocked achi
             const unlockedCount = Object.keys(statsData.achievements || {}).length;
             const logins = statsData.loginCount || 1;
             const level = Math.floor((unlockedCount * 2 + logins * 0.5) / 3) + 1;
             document.getElementById('level-badge').textContent = level > 99 ? 99 : level;
+        });
+
+        const IMGBB_KEY = "7916dd11376f59a547ed252799f1328a";
+
+        // Handle Avatar Upload
+        document.getElementById('avatar-upload').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            showToast('Fotoğraf yükleniyor... Lütfen bekle ⏳');
+            try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                });
+                const fd = new FormData();
+                fd.append('image', base64);
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
+                const json = await res.json();
+                if (json.success) {
+                    const url = json.data.url;
+                    await setDoc(userStatsRef, { profilePic: url }, { merge: true });
+                    showToast('Profil fotoğrafın harika oldu! 📸');
+                    
+                    const unlocked = statsData.achievements || {};
+                    if (!unlocked["profile_pic"]) {
+                        await setDoc(userStatsRef, { achievements: { ...unlocked, "profile_pic": new Date().toISOString() } }, { merge: true });
+                    }
+                }
+            } catch (err) {
+                showToast('Yükleme hatası 😔');
+            }
         });
 
         function renderInventory() {
@@ -320,14 +366,23 @@
             }
 
             if (userBalance >= 10000) unlock("rich_bitch");
+            if (userBalance >= 50000) unlock("wealth_50k");
             
             const cons = inventoryData.consumables || {};
             const cos = inventoryData.cosmetics || {};
+            const totalItems = Object.keys(cons).length + Object.keys(cos).length;
             
-            if (Object.keys(cons).length > 0 || Object.keys(cos).length > 0) unlock("shopping_spree");
+            if (totalItems > 0) unlock("shopping_spree");
+            if (totalItems >= 5) unlock("shopaholic");
             if (cons["jackpot_boost"] > 0) unlock("jackpot_master");
-            if (cons["coupon_hug"] > 0 || cons["coupon_snack"] > 0 || cons["coupon_right"] > 0) unlock("coupon_hoarder");
+            if (cons["coupon_hug"] > 0 || cons["coupon_snack"] > 0 || cons["coupon_right"] > 0 || cons["coupon_choice"] > 0 || cons["coupon_hair"] > 0 || cons["coupon_call"] > 0 || cons["coupon_treat"] > 0) unlock("coupon_hoarder");
             if ((statsData.loginCount || 1) >= 3) unlock("loyal_lover");
+            if ((statsData.loginCount || 1) >= 10) unlock("true_addict");
+            
+            const unlockedCount = Object.keys(updates.achievements).length;
+            const logins = statsData.loginCount || 1;
+            const level = Math.floor((unlockedCount * 2 + logins * 0.5) / 3) + 1;
+            if (level >= 10) unlock("love_god");
             
             if (newlyUnlocked) {
                 await setDoc(userStatsRef, updates, { merge: true });

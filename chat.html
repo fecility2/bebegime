@@ -649,6 +649,18 @@
         document.getElementById('p-name').innerText = partnerName;
         document.getElementById('p-avatar').innerText = partnerName[0];
 
+        // Listen for Partner's Profile Picture
+        onSnapshot(doc(db, 'user_stats', partnerName), (snap) => {
+            if (snap.exists() && snap.data().profilePic) {
+                const url = snap.data().profilePic;
+                const av = document.getElementById('p-avatar');
+                av.style.backgroundImage = `url(${url})`;
+                av.style.backgroundSize = 'cover';
+                av.style.backgroundPosition = 'center';
+                av.innerText = '';
+            }
+        });
+
         const chatFlow = document.getElementById('chat-flow');
         const ta = document.getElementById('chat-textarea');
         const media = { photo: '', voice: null };

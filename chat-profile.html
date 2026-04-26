@@ -136,7 +136,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, getDocs, limit, where } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, getDocs, limit, where, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -156,6 +156,18 @@
         
         document.getElementById('partner-name').textContent = partner;
         document.getElementById('avatar').textContent = partner === 'Mert' ? '🤴🏻' : '👸🏻';
+
+        // Load partner's custom profile picture
+        onSnapshot(doc(db, 'user_stats', partner), (snap) => {
+            if (snap.exists() && snap.data().profilePic) {
+                const img = snap.data().profilePic;
+                const av = document.getElementById('avatar');
+                av.style.backgroundImage = `url(${img})`;
+                av.style.backgroundSize = 'cover';
+                av.style.backgroundPosition = 'center';
+                av.textContent = '';
+            }
+        });
 
         // --- Wallpapers ---
         const CHAT_WP_KEY = 'chat_wallpaper_pref';
