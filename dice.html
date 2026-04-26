@@ -205,7 +205,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, updateDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -222,6 +222,7 @@
             console.log('Firebase Offline Persistence Error:', err.code);
         });
         const ecoRef = doc(db, 'economy', 'balances');
+        const inventoryRef = doc(db, 'user_inventory', localStorage.getItem('active_player') || 'Ayşe');
 
         const currentUser = localStorage.getItem('active_player');
         if (!currentUser) {
@@ -235,6 +236,8 @@
         
         let currentBalance = 0;
         let isRolling = false;
+        let diceInsuranceStock = 0;
+        let insuranceActive = false;
 
         // Buluttan dinle
         onSnapshot(ecoRef, (docSnap) => {
@@ -244,6 +247,11 @@
                 walletDisp.innerText = currentUser + ': ' + currentBalance + ' ❤️';
                 checkEligibility();
             }
+        });
+
+        onSnapshot(inventoryRef, (snap) => {
+            if (!snap.exists()) return;
+            diceInsuranceStock = snap.data()?.consumables?.dice_insurance || 0;
         });
 
         function checkEligibility() {
@@ -262,7 +270,7 @@
 
         window.rollDice = function() {
             if (currentBalance > 0 || isRolling) return;
-
+            insuranceActive = false;
             isRolling = true;
             rollBtn.disabled = true;
             statusMsg.innerText = "Zar atılıyor... 🎲 Karar anı!";
@@ -280,11 +288,29 @@
         }
 
         async function finishRoll() {
+            if (diceInsuranceStock > 0) {
+                const shouldUse = confirm(`Zar Sigortası (${diceInsuranceStock}) kullanılsın mı?`);
+                if (shouldUse) {
+                    await runTransaction(db, async (tx) => {
+                        const invSnap = await tx.get(inventoryRef);
+                        const data = invSnap.exists() ? invSnap.data() : {};
+                        const cur = data?.consumables?.dice_insurance || 0;
+                        if (cur <= 0) throw new Error('Sigorta stok yok');
+                        tx.set(inventoryRef, {
+                            consumables: { ...(data.consumables || {}), dice_insurance: cur - 1 }
+                        }, { merge: true });
+                    });
+                    insuranceActive = true;
+                }
+            }
             diceVal.classList.remove('rolling');
             const finalResult = Math.floor(Math.random() * 6) + 1;
             diceVal.innerText = finalResult;
 
-            const wonAmount = payouts[finalResult];
+            let wonAmount = payouts[finalResult];
+            if (insuranceActive && wonAmount < 100) {
+                wonAmount = 100;
+            }
             currentBalance += wonAmount;
             
             // Firebase'e Kaydet
