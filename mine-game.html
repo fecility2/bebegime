@@ -127,7 +127,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, updateDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -141,6 +141,7 @@
         const db = getFirestore(app);
         enableIndexedDbPersistence(db).catch(console.error);
         const ecoRef = doc(db, 'economy', 'balances');
+        const inventoryRef = doc(db, 'user_inventory', localStorage.getItem('active_player') || 'Ayşe');
 
         const currentUser = localStorage.getItem('active_player');
         if (!currentUser) window.location.href = 'index.html';
@@ -159,8 +160,15 @@
         let currentMult = 1.0;
         let boxes = [];
         let isPlaying = false;
+        let mineShieldStock = 0;
+        let shieldActive = false;
         const totalBoxes = 16;
         const totalBombs = 3;
+
+        onSnapshot(inventoryRef, (snap) => {
+            if (!snap.exists()) return;
+            mineShieldStock = snap.data()?.consumables?.mine_shield || 0;
+        });
 
         window.startGame = async function() {
             const betInput = parseInt(document.getElementById('bet-amt').value);
@@ -172,6 +180,22 @@
             }
 
             try {
+                shieldActive = false;
+                if (mineShieldStock > 0) {
+                    const useShield = confirm(`Kalp Kalkanı (${mineShieldStock}) kullanılsın mı?`);
+                    if (useShield) {
+                        await runTransaction(db, async (tx) => {
+                            const invSnap = await tx.get(inventoryRef);
+                            const data = invSnap.exists() ? invSnap.data() : {};
+                            const cur = data?.consumables?.mine_shield || 0;
+                            if (cur <= 0) throw new Error('Stok yok');
+                            tx.set(inventoryRef, {
+                                consumables: { ...(data.consumables || {}), mine_shield: cur - 1 }
+                            }, { merge: true });
+                        });
+                        shieldActive = true;
+                    }
+                }
                 await updateDoc(ecoRef, { [currentUser]: userBalance - betInput });
                 currentBet = betInput;
                 currentMult = 1.0;
@@ -220,9 +244,19 @@
             el.classList.add('opened');
 
             if(type === 'bomb') {
-                el.innerHTML = '💔';
-                el.classList.add('bomb');
-                gameOver(false);
+                if (shieldActive) {
+                    shieldActive = false;
+                    el.innerHTML = '🛡️';
+                    el.classList.add('safe');
+                    currentMult += 0.2;
+                    document.getElementById('cashout-btn').style.display = 'block';
+                    updateBar();
+                    alert("Kalkan bombayı engelledi! Oyuna devam.");
+                } else {
+                    el.innerHTML = '💔';
+                    el.classList.add('bomb');
+                    gameOver(false);
+                }
             } else {
                 el.innerHTML = '❤️';
                 el.classList.add('safe');
