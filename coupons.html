@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kuponlarım 🎟️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0208;
+            --primary: #ff4b72;
+            --secondary: #ff8c00;
+            --border: rgba(255,255,255,0.08);
+            --surface: rgba(255,255,255,0.04);
+            --text: #fff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding: 20px; min-height: 100vh; padding-bottom: 80px; }
+        #bg-canvas { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, #1a0520 0%, #0a0208 100%); }
+        
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; margin-top: max(20px, env(safe-area-inset-top)); }
+        .back-btn { text-decoration: none; color: #fff; font-size: 1.5rem; background: rgba(255,255,255,0.08); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); transition: 0.3s; }
+        .back-btn:hover { background: rgba(255,255,255,0.15); }
+        h1 { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--primary); text-align: center; flex: 1; margin: 0; text-shadow: 0 0 15px rgba(255,75,114,0.4); }
+        
+        .tabs { display: flex; background: rgba(255,255,255,0.05); border-radius: 15px; padding: 5px; margin-bottom: 25px; border: 1px solid var(--border); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .tab { flex: 1; text-align: center; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: 600; color: rgba(255,255,255,0.5); transition: 0.3s; }
+        .tab.active { background: linear-gradient(45deg, rgba(255,75,114,0.2), transparent); color: #fff; border: 1px solid rgba(255,75,114,0.3); box-shadow: 0 0 10px rgba(255,75,114,0.1); }
+        
+        .view { display: none; animation: fadeIn 0.3s forwards; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .coupon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+        
+        .coupon-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            border: 1px solid var(--border); border-radius: 20px; padding: 20px;
+            display: flex; flex-direction: column; position: relative; overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); transition: 0.3s;
+        }
+        .coupon-card:hover { transform: translateY(-5px); border-color: rgba(255,75,114,0.3); box-shadow: 0 15px 30px rgba(255,75,114,0.15); }
+        .coupon-card::before { content: ''; position: absolute; left: -20px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; background: var(--bg); border-radius: 50%; border-right: 1px solid var(--border); }
+        .coupon-card::after { content: ''; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; background: var(--bg); border-radius: 50%; border-left: 1px solid var(--border); }
+        
+        .c-icon { font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(255,75,114,0.3)); }
+        .c-head { display: flex; justify-content: space-between; align-items: flex-start; }
+        .c-title { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+        .c-count { background: rgba(255,75,114,0.2); color: #ffb6c1; padding: 5px 12px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; border: 1px solid rgba(255,75,114,0.3); }
+        
+        .use-btn {
+            background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 12px;
+            font-size: 1rem; font-weight: 700; font-family: inherit; margin-top: 15px; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255,75,114,0.3); transition: 0.3s; width: 100%;
+        }
+        .use-btn:active { transform: scale(0.96); }
+        .use-btn.disabled { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); box-shadow: none; cursor: not-allowed; }
+
+        .empty-state { text-align: center; padding: 40px 20px; font-style: italic; opacity: 0.6; }
+        .partner-locked { text-align: center; color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-top: 15px; font-weight: 600; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px; }
+
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(255,75,114,0.95); color: #fff; padding: 12px 24px; border-radius: 30px; font-weight: 600; opacity: 0; pointer-events: none; transition: 0.4s; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+    <div id="bg-canvas"></div>
+    
+    <div class="header">
+        <a href="index.html#hub" class="back-btn">‹</a>
+        <h1>Aşk Kuponları</h1>
+        <div style="width: 40px;"></div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" id="tab-my" onclick="switchTab('my')">Benim Kuponlarım</div>
+        <div class="tab" id="tab-partner" onclick="switchTab('partner')">Sevgilimin Kuponları</div>
+    </div>
+
+    <div class="view active" id="view-my">
+        <div class="coupon-list" id="my-coupons">
+            <div class="empty-state">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <div class="view" id="view-partner">
+        <div class="coupon-list" id="partner-coupons">
+            <div class="empty-state">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+            authDomain: "ayseye-surpriz.firebaseapp.com",
+            projectId: "ayseye-surpriz",
+            storageBucket: "ayseye-surpriz.firebasestorage.app",
+            messagingSenderId: "531177459988",
+            appId: "1:531177459988:web:09060a95bea0b06f197201"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const activePlayer = localStorage.getItem('active_player');
+        if (!activePlayer) window.location.href = 'index.html';
+        const partnerName = activePlayer === 'Ayşe' ? 'Mert' : 'Ayşe';
+
+        document.getElementById('tab-partner').textContent = `${partnerName} Kuponları`;
+
+        const myInvRef = doc(db, 'user_inventory', activePlayer);
+        const partnerInvRef = doc(db, 'user_inventory', partnerName);
+
+        const COUPON_META = {
+            "coupon_hug": { title: "Sınırsız Sarılma", icon: "🫂", desc: "Sımsıcak ve uzun bir sarılma! ❤️" },
+            "coupon_snack": { title: "Atıştırmalık Kölesi", icon: "🍿", desc: "Sana anında abur cubur servisi!" },
+            "coupon_choice": { title: "Seçim Hakkı", icon: "🎮", desc: "Film, dizi veya oyunu sen seçersin." },
+            "coupon_hair": { title: "Saçlarımla Oyna", icon: "💆‍♀️", desc: "Rahatlatıcı saç okşama seansı." },
+            "coupon_call": { title: "Gece Telefon", icon: "📞", desc: "Birlikte uyuyana kadar konuşma." },
+            "coupon_treat": { title: "Tatlı/Kahve", icon: "🧋", desc: "Özel bir tatlı veya kahve ısmarlansın!" },
+            "coupon_right": { title: "Haklı Sayılma Jokeri", icon: "👑", desc: "%100 haklı olma ayrıcalığı." }
+        };
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        window.switchTab = (target) => {
+            document.getElementById('tab-my').className = target === 'my' ? 'tab active' : 'tab';
+            document.getElementById('tab-partner').className = target === 'partner' ? 'tab active' : 'tab';
+            document.getElementById('view-my').className = target === 'my' ? 'view active' : 'view';
+            document.getElementById('view-partner').className = target === 'partner' ? 'view active' : 'view';
+        }
+
+        // --- Render function ---
+        function renderList(containerId, inventoryData, isMine) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            const cons = inventoryData?.consumables || {};
+            
+            let countTotal = 0;
+            for (const [key, amount] of Object.entries(cons)) {
+                if (key.startsWith('coupon_') && amount > 0) {
+                    countTotal++;
+                    const meta = COUPON_META[key] || { title: key, icon: "🎟️", desc: "Sürpriz kupon!" };
+                    
+                    const card = document.createElement('div');
+                    card.className = 'coupon-card';
+                    card.innerHTML = `
+                        <div class="c-head">
+                            <div class="c-title">${meta.title}</div>
+                            <div class="c-count">${amount}x</div>
+                        </div>
+                        <div class="c-icon">${meta.icon}</div>
+                        <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 5px; flex: 1;">${meta.desc}</div>
+                        ${isMine ? 
+                            `<button class="use-btn" onclick="useCoupon('${key}')">🌟 Bozdur / Kullan</button>` : 
+                            `<div class="partner-locked">🔒 Sadece O Kullanabilir</div>`
+                        }
+                    `;
+                    container.appendChild(card);
+                }
+            }
+            
+            if (countTotal === 0) {
+                container.innerHTML = `<div class="empty-state">Hiç kupon yok. <br>Marketten satın alıp sevgilini şaşırt!</div>`;
+            }
+        }
+
+        // --- Use Coupon ---
+        window.useCoupon = async (key) => {
+            const conf = confirm(`Emin misin? "${COUPON_META[key].title}" kuponunu şimdi kullanmak istiyorsun!`);
+            if (!conf) return;
+            
+            try {
+                await runTransaction(db, async (tx) => {
+                    const snap = await tx.get(myInvRef);
+                    if (!snap.exists()) throw "Envanter yok!";
+                    const currentCons = snap.data().consumables || {};
+                    const amount = currentCons[key] || 0;
+                    
+                    if (amount <= 0) throw "Yetersiz kupon!";
+                    
+                    tx.update(myInvRef, { [`consumables.${key}`]: amount - 1 });
+                });
+                showToast("✨ Kupon kullanıldı! Gidip hakkını isteyebilirsin!");
+            } catch (err) {
+                showToast("Kupon kullanılamadı 😔");
+            }
+        }
+
+        // Listen Mine
+        onSnapshot(myInvRef, (snap) => renderList('my-coupons', snap.data(), true));
+        // Listen Partner
+        onSnapshot(partnerInvRef, (snap) => renderList('partner-coupons', snap.data(), false));
+
+    </script>
+</body>
+</html>
