@@ -56,6 +56,7 @@
         <button class="tab-btn active" data-tab="all">Tümü</button>
         <button class="tab-btn" data-tab="cosmetic">Kozmetik</button>
         <button class="tab-btn" data-tab="consumable">Tüketilebilir</button>
+        <button class="tab-btn" data-tab="coupon" style="color: #ff8c00; border-color: rgba(255,140,0,0.5);">Kuponlar 🎟️</button>
     </div>
     <div id="items-grid" class="grid"></div>
     <div id="status-msg" class="status"></div>
@@ -108,7 +109,10 @@
             { id: "con_mine_shield", title: "Kalp Kalkanı", icon: "🛡️", type: "consumable", price: 750, effectKey: "mine_shield", description: "Kalp Avcısı'nda ilk bombayı bloklar." },
             { id: "con_dice_insurance", title: "Zar Sigortası", icon: "🎲", type: "consumable", price: 150, effectKey: "dice_insurance", description: "Şans Zarı'nda kötü sonuçta min 100❤️." },
             { id: "con_jackpot_boost", title: "Jackpot Boost", icon: "🎰", type: "consumable", price: 425, effectKey: "jackpot_boost", description: "Tek turda jackpot şansını artırır." },
-            { id: "con_scratch_extra", title: "Ekstra Kazıma", icon: "🎟️", type: "consumable", price: 50, effectKey: "scratch_extra", description: "Kazı-Kazan'da kaybedersen 1 ek şans." }
+            { id: "con_scratch_extra", title: "Ekstra Kazıma", icon: "🎟️", type: "consumable", price: 50, effectKey: "scratch_extra", description: "Kazı-Kazan'da kaybedersen 1 ek şans." },
+            { id: "coupon_hug", title: "Sınırsız Sarılma", icon: "🫂", type: "coupon", price: 1000, effectKey: "coupon_hug", description: "Anında ve koşulsuz sarılma hakkı." },
+            { id: "coupon_snack", title: "Atıştırmalık Kölesi", icon: "🍿", type: "coupon", price: 2500, effectKey: "coupon_snack", description: "Film izlerken sana patlamış mısır getirmesi için." },
+            { id: "coupon_right", title: "Haklı Sayılma Jokeri", icon: "👑", type: "coupon", price: 5000, effectKey: "coupon_right", description: "Haklı olmasan bile tartışmada %100 haklı sayılma." }
         ];
         const MIN_PRICE = 1;
         const IMGBB_KEY = "7916dd11376f59a547ed252799f1328a";
