@@ -723,9 +723,15 @@
             const file = e.target.files[0];
             if(!file) return;
             showToast('Duvar kağıdı yükleniyor... ⏳');
-            const fd = new FormData();
-            fd.append('image', file);
             try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                });
+                const fd = new FormData();
+                fd.append('image', base64);
                 const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
                 const json = await res.json();
                 if (json.success) {
@@ -822,9 +828,15 @@
             const file = document.getElementById('chat-file').files[0];
             if (!file) return;
             showToast('Fotoğraf hazırlanıyor... 📸');
-            const fd = new FormData();
-            fd.append('image', file);
             try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                });
+                const fd = new FormData();
+                fd.append('image', base64);
                 const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
                 const json = await res.json();
                 if (json.success) {
@@ -1206,4 +1218,5 @@
     </script>
 </body>
 </html>
+
 
