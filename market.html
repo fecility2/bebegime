@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aşk Marketi 🛍️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=3">
+    <style>
+        body { font-family: 'Outfit', sans-serif; color: #fff; margin: 0; padding: 20px; min-height: 100vh; background: #0a0208; }
+        #background-canvas { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, #1a0520 0%, #0a0208 100%); }
+        .back-nav { position: fixed; top: 20px; left: 20px; background: rgba(255,255,255,.06); padding: 10px 18px; border-radius: 25px; color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,.16); }
+        .header { text-align: center; margin-top: 58px; margin-bottom: 22px; }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: 2.7rem; color: var(--primary); margin: 0; }
+        .wallet-row { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin: 16px 0 28px; }
+        .chip { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.16); border-radius: 24px; padding: 10px 16px; font-weight: 600; }
+        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+        .tab-btn { border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.07); color: #fff; border-radius: 22px; padding: 10px 16px; cursor: pointer; }
+        .tab-btn.active { border-color: var(--primary); background: rgba(255,75,114,.18); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; max-width: 980px; margin: 0 auto; }
+        .item-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 18px; padding: 16px; }
+        .item-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .item-icon { font-size: 1.6rem; }
+        .item-title { font-size: 1.05rem; font-weight: 700; }
+        .item-desc { opacity: .78; min-height: 42px; font-size: .92rem; }
+        .item-meta { margin-top: 10px; font-size: .88rem; opacity: .9; display: flex; justify-content: space-between; gap: 8px; }
+        .buy-btn { margin-top: 12px; width: 100%; border: none; border-radius: 12px; padding: 10px 12px; font-weight: 700; cursor: pointer; background: linear-gradient(45deg, #ff4b72, #ff8c00); color: #fff; }
+        .buy-btn:disabled { opacity: .5; cursor: not-allowed; }
+        .status { max-width: 980px; margin: 12px auto 0; text-align: center; font-weight: 600; min-height: 24px; }
+    </style>
+</head>
+<body>
+    <div id="background-canvas"></div>
+    <a href="games.html" class="back-nav">← Oyunlar Menüsü</a>
+    <div class="header">
+        <h1>Aşk Marketi 🛍️</h1>
+        <p style="opacity:.8;">Kazandığın Aşk Paralarıyla güçlen, güzelleştir, eğlen.</p>
+    </div>
+    <div class="wallet-row">
+        <div class="chip">Oyuncu: <span id="user-name">...</span></div>
+        <div class="chip">Bakiye: <span id="user-balance">0</span> ❤️</div>
+    </div>
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="all">Tümü</button>
+        <button class="tab-btn" data-tab="cosmetic">Kozmetik</button>
+        <button class="tab-btn" data-tab="consumable">Tüketilebilir</button>
+    </div>
+    <div id="items-grid" class="grid"></div>
+    <div id="status-msg" class="status"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import {
+            getFirestore,
+            enableIndexedDbPersistence,
+            doc,
+            collection,
+            getDoc,
+            getDocs,
+            setDoc,
+            runTransaction,
+            onSnapshot,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+            authDomain: "ayseye-surpriz.firebaseapp.com",
+            projectId: "ayseye-surpriz",
+            storageBucket: "ayseye-surpriz.firebasestorage.app",
+            messagingSenderId: "531177459988",
+            appId: "1:531177459988:web:09060a95bea0b06f197201"
+        };
+
+        const DEFAULT_ITEMS = [
+            { id: "cos_badge_star", title: "Yıldız Rozet", icon: "⭐", type: "cosmetic", price: 250, effectKey: "badge_star", description: "Profilde yıldız rozeti." },
+            { id: "cos_theme_rose", title: "Gül Teması", icon: "🌹", type: "cosmetic", price: 450, effectKey: "theme_rose", description: "Oyun arka planına gül tonları." },
+            { id: "con_memory_retry", title: "Hafıza İkinci Şans", icon: "🃏", type: "consumable", price: 180, effectKey: "memory_retry", description: "Aşk Hafızası'nda 1 kez +10sn." },
+            { id: "con_mine_shield", title: "Kalp Kalkanı", icon: "🛡️", type: "consumable", price: 220, effectKey: "mine_shield", description: "Kalp Avcısı'nda ilk bombayı bloklar." },
+            { id: "con_dice_insurance", title: "Zar Sigortası", icon: "🎲", type: "consumable", price: 120, effectKey: "dice_insurance", description: "Şans Zarı'nda kötü sonuçta min 100❤️." },
+            { id: "con_jackpot_boost", title: "Jackpot Boost", icon: "🎰", type: "consumable", price: 260, effectKey: "jackpot_boost", description: "Tek turda jackpot şansını artırır." },
+            { id: "con_scratch_extra", title: "Ekstra Kazıma", icon: "🎟️", type: "consumable", price: 150, effectKey: "scratch_extra", description: "Kazı-Kazan'da kaybedersen 1 ek şans." }
+        ];
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        enableIndexedDbPersistence(db).catch(() => {});
+
+        const currentUser = localStorage.getItem('active_player');
+        if (!currentUser) window.location.href = 'index.html';
+
+        const economyRef = doc(db, 'economy', 'balances');
+        const inventoryRef = doc(db, 'user_inventory', currentUser);
+        const itemsRef = collection(db, 'shop_items');
+        const statusEl = document.getElementById('status-msg');
+        const gridEl = document.getElementById('items-grid');
+
+        let selectedTab = 'all';
+        let userBalance = 0;
+        let inventory = { cosmetics: {}, consumables: {}, activeCosmetics: {} };
+        let shopItems = [];
+
+        document.getElementById('user-name').textContent = currentUser;
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedTab = btn.dataset.tab;
+                renderItems();
+            });
+        });
+
+        async function ensureInventoryDoc() {
+            const snap = await getDoc(inventoryRef);
+            if (!snap.exists()) {
+                await setDoc(inventoryRef, { cosmetics: {}, consumables: {}, activeCosmetics: {}, updatedAt: serverTimestamp() });
+            }
+        }
+
+        async function ensureCatalog() {
+            const snap = await getDocs(itemsRef);
+            if (snap.empty) {
+                for (const item of DEFAULT_ITEMS) {
+                    await setDoc(doc(db, 'shop_items', item.id), { ...item, enabled: true });
+                }
+                shopItems = DEFAULT_ITEMS.map(x => ({ ...x, enabled: true }));
+                return;
+            }
+            shopItems = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(i => i.enabled !== false);
+        }
+
+        function getStock(item) {
+            if (item.type === 'cosmetic') return inventory.cosmetics?.[item.effectKey] ? 1 : 0;
+            return inventory.consumables?.[item.effectKey] || 0;
+        }
+
+        function renderItems() {
+            const list = shopItems.filter(item => selectedTab === 'all' ? true : item.type === selectedTab);
+            gridEl.innerHTML = '';
+            list.forEach(item => {
+                const stock = getStock(item);
+                const isOwnedCosmetic = item.type === 'cosmetic' && stock > 0;
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.innerHTML = `
+                    <div class="item-top"><div class="item-icon">${item.icon || '🛍️'}</div><div class="item-title">${item.title}</div></div>
+                    <div class="item-desc">${item.description || ''}</div>
+                    <div class="item-meta">
+                        <span>Fiyat: ${item.price} ❤️</span>
+                        <span>${item.type === 'cosmetic' ? (isOwnedCosmetic ? 'Sahipsin' : 'Kozmetik') : `Stok: ${stock}`}</span>
+                    </div>
+                    <button class="buy-btn" ${isOwnedCosmetic ? 'disabled' : ''} data-id="${item.id}">${isOwnedCosmetic ? 'Alındı' : 'Satın Al'}</button>
+                `;
+                card.querySelector('.buy-btn').addEventListener('click', () => purchaseItem(item.id));
+                gridEl.appendChild(card);
+            });
+        }
+
+        async function purchaseItem(itemId) {
+            statusEl.textContent = 'Satın alma işleniyor...';
+            try {
+                await runTransaction(db, async (tx) => {
+                    const ecoSnap = await tx.get(economyRef);
+                    const invSnap = await tx.get(inventoryRef);
+                    const itemSnap = await tx.get(doc(db, 'shop_items', itemId));
+                    if (!ecoSnap.exists() || !itemSnap.exists()) throw new Error('Eksik veri');
+
+                    const item = { id: itemSnap.id, ...itemSnap.data() };
+                    const ecoData = ecoSnap.data();
+                    const invData = invSnap.exists() ? invSnap.data() : { cosmetics: {}, consumables: {}, activeCosmetics: {} };
+                    const balance = ecoData[currentUser] || 0;
+                    if (balance < item.price) throw new Error('Yetersiz bakiye');
+
+                    const nextInv = {
+                        cosmetics: { ...(invData.cosmetics || {}) },
+                        consumables: { ...(invData.consumables || {}) },
+                        activeCosmetics: { ...(invData.activeCosmetics || {}) }
+                    };
+
+                    if (item.type === 'cosmetic') {
+                        if (nextInv.cosmetics[item.effectKey]) throw new Error('Zaten sahip');
+                        nextInv.cosmetics[item.effectKey] = true;
+                        if (!nextInv.activeCosmetics.gameTheme && item.effectKey.indexOf('theme_') === 0) {
+                            nextInv.activeCosmetics.gameTheme = item.effectKey;
+                        }
+                    } else {
+                        const cur = nextInv.consumables[item.effectKey] || 0;
+                        nextInv.consumables[item.effectKey] = cur + 1;
+                    }
+
+                    tx.update(economyRef, { [currentUser]: balance - item.price });
+                    tx.set(inventoryRef, { ...nextInv, updatedAt: serverTimestamp() }, { merge: true });
+                    tx.set(doc(collection(db, 'shop_transactions')), {
+                        user: currentUser,
+                        itemId: item.id,
+                        effectKey: item.effectKey,
+                        type: item.type,
+                        price: item.price,
+                        createdAt: serverTimestamp()
+                    });
+                });
+                statusEl.textContent = 'Satın alma başarılı.';
+            } catch (e) {
+                statusEl.textContent = e?.message || 'Satın alma başarısız.';
+            }
+        }
+
+        onSnapshot(economyRef, (snap) => {
+            if (!snap.exists()) return;
+            const data = snap.data();
+            userBalance = data[currentUser] || 0;
+            document.getElementById('user-balance').textContent = userBalance;
+        });
+
+        onSnapshot(inventoryRef, (snap) => {
+            if (!snap.exists()) return;
+            inventory = snap.data();
+            renderItems();
+        });
+
+        await ensureInventoryDoc();
+        await ensureCatalog();
+        renderItems();
+    </script>
+</body>
+</html>
