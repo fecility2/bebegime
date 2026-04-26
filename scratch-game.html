@@ -138,7 +138,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, updateDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -152,6 +152,7 @@
         const db = getFirestore(app);
         enableIndexedDbPersistence(db).catch(console.error);
         const ecoRef = doc(db, 'economy', 'balances');
+        const inventoryRef = doc(db, 'user_inventory', localStorage.getItem('active_player') || 'Ayşe');
 
         const currentUser = localStorage.getItem('active_player');
         if (!currentUser) window.location.href = 'index.html';
@@ -167,6 +168,14 @@
         const entryFee = 50;
         let isScratched = false;
         let winAmount = 0;
+        let scratchExtraStock = 0;
+        let extraChanceActive = false;
+        let extraChanceUsed = false;
+
+        onSnapshot(inventoryRef, (snap) => {
+            if (!snap.exists()) return;
+            scratchExtraStock = snap.data()?.consumables?.scratch_extra || 0;
+        });
 
         window.buyTicket = async function() {
             if (userBalance < entryFee) {
@@ -174,6 +183,23 @@
             }
 
             try {
+                extraChanceActive = false;
+                extraChanceUsed = false;
+                if (scratchExtraStock > 0) {
+                    const shouldUse = confirm(`Ekstra Kazıma hakkın var (${scratchExtraStock}). Bu bilette kullanılsın mı?`);
+                    if (shouldUse) {
+                        await runTransaction(db, async (tx) => {
+                            const invSnap = await tx.get(inventoryRef);
+                            const data = invSnap.exists() ? invSnap.data() : {};
+                            const cur = data?.consumables?.scratch_extra || 0;
+                            if (cur <= 0) throw new Error('Stok yok');
+                            tx.set(inventoryRef, {
+                                consumables: { ...(data.consumables || {}), scratch_extra: cur - 1 }
+                            }, { merge: true });
+                        });
+                        extraChanceActive = true;
+                    }
+                }
                 await updateDoc(ecoRef, { [currentUser]: userBalance - entryFee });
                 setupCard();
             } catch (e) {
@@ -292,7 +318,14 @@
             canvas.style.opacity = '0';
             canvas.style.pointerEvents = 'none';
 
-            if(winAmount > 0) {
+            if(winAmount <= 0 && extraChanceActive && !extraChanceUsed) {
+                extraChanceUsed = true;
+                document.getElementById('status-msg').innerText = "Ekstra Kazıma devrede, bir şans daha! ✨";
+                setTimeout(() => {
+                    setupCard();
+                }, 1200);
+                return;
+            } else if(winAmount > 0) {
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
                 document.getElementById('status-msg').innerText = `+${winAmount} ❤️ Hesabına Eklendi! 🎉`;
                 try {
