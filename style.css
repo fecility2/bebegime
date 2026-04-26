@@ -1414,8 +1414,7 @@ canvas#scratch-canvas {
     text-align: center;
     padding: 12px 0 30px;
     flex-shrink: 0;
-    /* Ensures container never gets hidden above viewport */
-    align-self: flex-start;
+    margin: 0 auto;
     min-height: min-content;
 }
 
