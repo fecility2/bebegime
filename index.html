@@ -910,21 +910,6 @@
             }
         };
 
-        // --- SÜRE SAYACI (her 60 saniyede +1 dakika Firestore'a yazar) ---
-        function startTimeTracker() {
-            if (!currentUser || (currentUser !== 'Ayşe' && currentUser !== 'Mert')) return;
-            const today = new Date().toISOString().split('T')[0];
-            const statsRef = doc(db, 'user_stats', currentUser);
-            setInterval(async () => {
-                const nowDay = new Date().toISOString().split('T')[0];
-                try {
-                    await setDoc(statsRef, {
-                        timeSpent: { [nowDay]: increment(1) }
-                    }, { merge: true });
-                } catch(e) { /* sessizce geç */ }
-            }, 60000); // her 1 dakikada bir
-        }
-        startTimeTracker();
     </script>
 
     <!-- PWA Servis Kaydı -->
@@ -937,6 +922,7 @@
             });
         }
     </script>
+<script type="module" src="time-tracker.js"></script>
 </body>
 
 </html>

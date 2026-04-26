@@ -1204,19 +1204,9 @@
         }
         window.addEventListener('load', adjustViewport);
 
-        // --- SÜRE SAYACI ---
-        const statsRef = doc(db, 'user_stats', currentUser);
-        setInterval(async () => {
-            if (currentUser !== 'Ayşe' && currentUser !== 'Mert') return;
-            const today = new Date().toISOString().split('T')[0];
-            try {
-                await setDoc(statsRef, {
-                    timeSpent: { [today]: increment(1) }
-                }, { merge: true });
-            } catch(e) {}
-        }, 60000);
 
     </script>
+<script type="module" src="time-tracker.js"></script>
 </body>
 </html>
 
