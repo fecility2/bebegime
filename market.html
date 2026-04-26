@@ -104,11 +104,11 @@
         const DEFAULT_ITEMS = [
             { id: "cos_badge_star", title: "Yıldız Rozet", icon: "⭐", type: "cosmetic", price: 1250, effectKey: "badge_star", description: "Profilde yıldız rozeti." },
             { id: "cos_theme_rose", title: "Gül Teması", icon: "🌹", type: "cosmetic", price: 1850, effectKey: "theme_rose", description: "Oyun arka planına gül tonları." },
-            { id: "con_memory_retry", title: "Hafıza İkinci Şans", icon: "🃏", type: "consumable", price: 1350, effectKey: "memory_retry", description: "Aşk Hafızası'nda 1 kez +10sn." },
-            { id: "con_mine_shield", title: "Kalp Kalkanı", icon: "🛡️", type: "consumable", price: 1450, effectKey: "mine_shield", description: "Kalp Avcısı'nda ilk bombayı bloklar." },
-            { id: "con_dice_insurance", title: "Zar Sigortası", icon: "🎲", type: "consumable", price: 1250, effectKey: "dice_insurance", description: "Şans Zarı'nda kötü sonuçta min 100❤️." },
-            { id: "con_jackpot_boost", title: "Jackpot Boost", icon: "🎰", type: "consumable", price: 1650, effectKey: "jackpot_boost", description: "Tek turda jackpot şansını artırır." },
-            { id: "con_scratch_extra", title: "Ekstra Kazıma", icon: "🎟️", type: "consumable", price: 1300, effectKey: "scratch_extra", description: "Kazı-Kazan'da kaybedersen 1 ek şans." }
+            { id: "con_memory_retry", title: "Hafıza İkinci Şans", icon: "🃏", type: "consumable", price: 175, effectKey: "memory_retry", description: "Aşk Hafızası'nda 1 kez +10sn." },
+            { id: "con_mine_shield", title: "Kalp Kalkanı", icon: "🛡️", type: "consumable", price: 750, effectKey: "mine_shield", description: "Kalp Avcısı'nda ilk bombayı bloklar." },
+            { id: "con_dice_insurance", title: "Zar Sigortası", icon: "🎲", type: "consumable", price: 150, effectKey: "dice_insurance", description: "Şans Zarı'nda kötü sonuçta min 100❤️." },
+            { id: "con_jackpot_boost", title: "Jackpot Boost", icon: "🎰", type: "consumable", price: 425, effectKey: "jackpot_boost", description: "Tek turda jackpot şansını artırır." },
+            { id: "con_scratch_extra", title: "Ekstra Kazıma", icon: "🎟️", type: "consumable", price: 50, effectKey: "scratch_extra", description: "Kazı-Kazan'da kaybedersen 1 ek şans." }
         ];
         const MIN_PRICE = 1;
         const IMGBB_KEY = "7916dd11376f59a547ed252799f1328a";
@@ -172,8 +172,12 @@
             }
             const loaded = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(i => i.enabled !== false);
             for (const item of loaded) {
-                if ((item.price || 0) < MIN_PRICE) {
-                    const bumped = DEFAULT_ITEMS.find(x => x.id === item.id)?.price || MIN_PRICE;
+                const defaultItem = DEFAULT_ITEMS.find(x => x.id === item.id);
+                if (defaultItem && item.price !== defaultItem.price) {
+                    await setDoc(doc(db, 'shop_items', item.id), { price: defaultItem.price }, { merge: true });
+                    item.price = defaultItem.price;
+                } else if ((item.price || 0) < MIN_PRICE) {
+                    const bumped = defaultItem?.price || MIN_PRICE;
                     await setDoc(doc(db, 'shop_items', item.id), { price: bumped }, { merge: true });
                     item.price = bumped;
                 }
