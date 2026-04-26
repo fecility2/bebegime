@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -194,6 +194,11 @@
             <div class="game-title">Aşk Kazı-Kazan</div>
             <div class="game-desc">Gümüş alanı kazı, altındaki sürpriz ikramiyeyi anında hesabına al!</div>
         </a>
+        <a href="market.html" class="game-card">
+            <span class="game-icon">🛍️</span>
+            <div class="game-title">Aşk Marketi</div>
+            <div class="game-desc">Aşk Paralarını kozmetiklere ve tek kullanımlık güçlere dönüştür.</div>
+        </a>
     </div>
 
     <script type="module">
@@ -215,6 +220,7 @@
             console.log('Firebase Offline Persistence Error:', err.code);
         });
         const ecoRef = doc(db, 'economy', 'balances');
+        const inventoryRef = doc(db, 'user_inventory', localStorage.getItem('active_player') || 'Ayşe');
 
         // Initialize doc if not exists
         getDoc(ecoRef).then(snap => {
@@ -227,6 +233,7 @@
         
         setupUserBadges(currentUser);
         listenBalances();
+        applyCosmeticTheme();
 
         function setupUserBadges(name) {
             if(name === 'Ayşe') {
@@ -242,6 +249,16 @@
                 if(data) {
                     document.getElementById('balance-ayse').innerText = data['Ayşe'];
                     document.getElementById('balance-mert').innerText = data['Mert'];
+                }
+            });
+        }
+
+        function applyCosmeticTheme() {
+            onSnapshot(inventoryRef, (snap) => {
+                if (!snap.exists()) return;
+                const activeTheme = snap.data()?.activeCosmetics?.gameTheme;
+                if (activeTheme === 'theme_rose') {
+                    document.getElementById('background-canvas').style.background = "radial-gradient(circle at center, #2b0715 0%, #12040a 100%)";
                 }
             });
         }
