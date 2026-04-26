@@ -307,6 +307,7 @@
         function selectUserName(name) {
             localStorage.setItem('active_player', name);
             sessionStorage.setItem('isLoggedIn', 'true');
+            if (window.syncOneSignalUserTag) window.syncOneSignalUserTag();
 
             var pass = document.getElementById('password-screen');
             if (pass) {
