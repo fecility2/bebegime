@@ -254,6 +254,7 @@ window.checkPassword = function () {
 window.selectUserName = function (name) {
     localStorage.setItem('active_player', name);
     sessionStorage.setItem('isLoggedIn', 'true');
+    if (window.syncOneSignalUserTag) window.syncOneSignalUserTag();
     
     // Kesintisiz geçiş: Sayfayı yenilemiyoruz
     var pass = document.getElementById('password-screen');
