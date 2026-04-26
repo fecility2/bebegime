@@ -435,6 +435,10 @@
                 Spotify'da Giriş Yap
             </a>
             <span class="login-hint">Şarkıların tamamını dinleyebilmek için giriş yapmalısın sevgilim ❤️</span>
+            <div style="margin-top: 12px;">
+                <a href="https://open.spotify.com/playlist/4V2wcD8Rm3G4JuXDDHjt1K" target="_blank" class="app-btn"
+                    id="open-in-spotify-btn">Spotify Uygulamasında Aç 🎧</a>
+            </div>
         </div>
 
         <!-- Spotify Player -->
@@ -481,6 +485,9 @@
     </div>
 
     <script>
+        const PLAYLIST_URL = 'https://open.spotify.com/playlist/4V2wcD8Rm3G4JuXDDHjt1K';
+        const PLAYLIST_URI = 'spotify:playlist:4V2wcD8Rm3G4JuXDDHjt1K';
+
         // Yüzen müzik notaları
         var noteSymbols = ['♪', '♫', '♬', '♩', '🎵', '🎶'];
         var container = document.getElementById('notes-container');
@@ -510,6 +517,26 @@
                 frame.src = src;
             }, 100);
         }
+
+        (function setupSpotifyOpenButton() {
+            var btn = document.getElementById('open-in-spotify-btn');
+            if (!btn) return;
+            btn.addEventListener('click', function (e) {
+                var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                if (!isMobile) return;
+                e.preventDefault();
+                var hiddenFrame = document.createElement('iframe');
+                hiddenFrame.style.display = 'none';
+                hiddenFrame.src = PLAYLIST_URI;
+                document.body.appendChild(hiddenFrame);
+                setTimeout(function () {
+                    if (hiddenFrame && hiddenFrame.parentNode) {
+                        hiddenFrame.parentNode.removeChild(hiddenFrame);
+                    }
+                    window.open(PLAYLIST_URL, '_blank');
+                }, 700);
+            });
+        })();
 
         // Başlangıçta birkaç not yap, sonra düzenli ekle
         for (var i = 0; i < 8; i++) spawnNote();
