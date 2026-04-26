@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Sohbet Profili & Medyalar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0208;
+            --primary: #ff4b72;
+            --secondary: #ff8c00;
+            --border: rgba(255,255,255,0.08);
+            --surface: rgba(255,255,255,0.04);
+            --text: #fff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 50px; overflow-x: hidden; }
+
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(11, 2, 8, 0.85); backdrop-filter: blur(20px);
+            padding: 15px 20px; padding-top: calc(15px + env(safe-area-inset-top));
+            display: flex; align-items: center; border-bottom: 1px solid var(--border);
+        }
+        .back-btn { font-size: 1.8rem; color: #fff; text-decoration: none; margin-right: 15px; }
+        .page-title { font-size: 1.2rem; font-weight: 600; }
+
+        .hero { text-align: center; padding: 40px 20px 20px; position: relative; }
+        .hero::after {
+            content: ''; position: absolute; bottom: 0; left: 10%; right: 10%;
+            height: 1px; background: linear-gradient(90deg, transparent, rgba(255,75,114,0.5), transparent);
+        }
+        .avatar {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; border: 3px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 30px rgba(255,75,114,0.3);
+        }
+        .partner-name { font-size: 2rem; font-family: 'Playfair Display', serif; }
+        .relationship-status { font-size: 0.9rem; opacity: 0.7; color: var(--primary); font-weight: 600; margin-top: 5px; }
+
+        .section { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.9); }
+
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px; backdrop-filter: blur(10px); }
+        
+        /* Wallpapers */
+        .wp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+        .wp-item {
+            aspect-ratio: 1/1; border-radius: 15px; border: 2px solid rgba(255,255,255,0.1);
+            cursor: pointer; position: relative; overflow: hidden; transition: 0.3s;
+        }
+        .wp-item:hover, .wp-item.active { border-color: var(--primary); transform: scale(1.05); box-shadow: 0 5px 15px rgba(255,75,114,0.2); }
+        .wp-item span { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; white-space: nowrap; backdrop-filter: blur(4px); }
+        .custom-upload-btn {
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            background: rgba(255,75,114,0.1); border: 2px dashed rgba(255,75,114,0.4);
+            border-radius: 15px; color: var(--primary); font-weight: 600; cursor: pointer;
+            transition: 0.3s; padding: 15px;
+        }
+        .custom-upload-btn:hover { background: rgba(255,75,114,0.2); }
+
+        /* Media Gallery */
+        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+        .media-grid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; cursor: pointer; transition: 0.3s; border: 1px solid rgba(255,255,255,0.1); }
+        .media-grid img:hover { transform: scale(1.03); border-color: rgba(255,255,255,0.3); }
+        .empty-text { opacity: 0.5; font-size: 0.9rem; font-style: italic; text-align: center; padding: 20px; }
+
+        /* Actions */
+        .action-row { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { flex: 1; padding: 14px; border-radius: 15px; border: none; font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #fff; box-shadow: 0 5px 15px rgba(255,75,114,0.3); }
+        .btn-secondary { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(255,75,114,0.9); color: #fff; padding: 12px 24px; border-radius: 30px; font-weight: 600; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* Modal image zoom */
+        #img-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        #img-modal img { max-width: 100%; max-height: 90vh; border-radius: 15px; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <a href="chat.html" class="back-btn">‹</a>
+        <div class="page-title">Mesaj Ayarları & Medya</div>
+    </header>
+
+    <div class="hero">
+        <div class="avatar" id="avatar">👤</div>
+        <div class="partner-name" id="partner-name">...</div>
+        <div class="relationship-status">Senin Biricik Aşkın ✨</div>
+        <div class="action-row" style="max-width: 400px; margin: 20px auto 0;">
+            <button class="btn btn-primary" onclick="window.location.href='theme-editor.html?from=chat'">🎨 Renkleri Değiştir</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">🖼️ Sohbet Duvar Kağıdı</div>
+        <div class="panel">
+            <div class="wp-grid" id="wp-grid">
+                <!-- Javascript will render these -->
+            </div>
+            <div style="margin-top: 15px;">
+                <label for="custom-upload" class="custom-upload-btn">
+                    + Kendi Fotoğrafını Yükle
+                </label>
+                <input type="file" id="custom-upload" hidden accept="image/*">
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">📸 Ortak Fotoğraflar</div>
+        <div class="panel">
+            <div class="media-grid" id="media-grid">
+                <div class="empty-text">Medyalar yükleniyor...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TODO: Optional audio files section could be here too -->
+
+    <div id="toast"></div>
+
+    <div id="img-modal" onclick="this.style.display='none'">
+        <img src="" id="modal-img" onclick="event.stopPropagation()">
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, getDocs, limit, where } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+            authDomain: "ayseye-surpriz.firebaseapp.com",
+            projectId: "ayseye-surpriz",
+            storageBucket: "ayseye-surpriz.firebasestorage.app",
+            messagingSenderId: "531177459988",
+            appId: "1:531177459988:web:09060a95bea0b06f197201"
+        };
+        
+        const IMGBB_KEY = "7916dd11376f59a547ed252799f1328a";
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const activePlayer = localStorage.getItem('active_player') || 'Ayşe';
+        const partner = activePlayer === 'Ayşe' ? 'Mert' : 'Ayşe';
+        
+        document.getElementById('partner-name').textContent = partner;
+        document.getElementById('avatar').textContent = partner === 'Mert' ? '🤴🏻' : '👸🏻';
+
+        // --- Wallpapers ---
+        const CHAT_WP_KEY = 'chat_wallpaper_pref';
+        const CUSTOM_WP_KEY = 'chat_custom_wallpaper_url';
+        
+        const WALLPAPERS = [
+            { id: 'default', label: 'Varsayılan', css: 'radial-gradient(circle at top right, rgba(255, 75, 114, 0.05) 0%, transparent 40%), radial-gradient(circle at bottom left, rgba(79, 172, 254, 0.05) 0%, transparent 40%)' },
+            { id: 'soft', label: 'Soft Gece', css: 'linear-gradient(180deg, #1a0b16 0%, #0d0610 100%)' },
+            { id: 'aurora', label: 'Aurora', css: 'radial-gradient(circle at 20% 20%, rgba(255,75,114,0.2) 0%, transparent 35%), radial-gradient(circle at 80% 80%, rgba(79,172,254,0.22) 0%, transparent 35%), #0b0208' },
+            { id: 'night', label: 'Karanlık', css: 'linear-gradient(180deg, #080a14 0%, #09030d 100%)' }
+        ];
+
+        function renderWallpapers() {
+            const grid = document.getElementById('wp-grid');
+            grid.innerHTML = '';
+            
+            const customUrl = localStorage.getItem(CUSTOM_WP_KEY);
+            let templates = [...WALLPAPERS];
+            if (customUrl) {
+                templates.push({ id: 'custom_saved', label: 'Özel (Senin)', css: `url(${customUrl}) center/cover no-repeat fixed` });
+            }
+
+            const currentId = localStorage.getItem(CHAT_WP_KEY) || 'default';
+
+            templates.forEach(wp => {
+                const item = document.createElement('div');
+                item.className = 'wp-item';
+                if (wp.id === currentId) item.classList.add('active');
+                item.style.background = wp.css;
+                item.innerHTML = `<span>${wp.label}</span>`;
+                item.onclick = () => {
+                    localStorage.setItem(CHAT_WP_KEY, wp.id);
+                    renderWallpapers();
+                    showToast('Duvar kağıdı güncellendi! 🌸');
+                };
+                grid.appendChild(item);
+            });
+        }
+        renderWallpapers();
+
+        // Custom upload
+        document.getElementById('custom-upload').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            showToast('Fotoğraf yükleniyor... Lütfen bekle ⏳');
+            try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.readAsDataURL(file);
+                });
+                const fd = new FormData();
+                fd.append('image', base64);
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
+                const json = await res.json();
+                
+                if (json.success) {
+                    const url = json.data.url;
+                    localStorage.setItem(CUSTOM_WP_KEY, url);
+                    localStorage.setItem(CHAT_WP_KEY, 'custom_saved');
+                    renderWallpapers();
+                    showToast('Harika! Duvar kağıdın değişti ✨');
+                }
+            } catch (err) {
+                showToast('Hım, bir hata oldu 🥺 Yüklenemedi.');
+            }
+        });
+
+        // --- Fetch Media via query ---
+        async function fetchMedia() {
+            const qPhotos = query(collection(db, 'messages'), orderBy('createdAt', 'desc'), limit(100));
+            const snap = await getDocs(qPhotos);
+            const urls = [];
+            snap.forEach(doc => {
+                const d = doc.data();
+                if (d.imageUrl) urls.push(d.imageUrl);
+            });
+
+            const grid = document.getElementById('media-grid');
+            if (urls.length === 0) {
+                grid.innerHTML = `<div class="empty-text" style="grid-column: 1/-1;">Henüz hiç fotoğraf paylaşmadınız. Hadi sohbette ilk fotoğrafı sen gönder! 📷</div>`;
+                return;
+            }
+            grid.innerHTML = '';
+            urls.forEach(url => {
+                const img = document.createElement('img');
+                img.src = url;
+                img.loading = "lazy";
+                img.onclick = () => {
+                    document.getElementById('modal-img').src = url;
+                    document.getElementById('img-modal').style.display = 'flex';
+                };
+                grid.appendChild(img);
+            });
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        fetchMedia();
+
+    </script>
+</body>
+</html>
