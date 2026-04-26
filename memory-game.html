@@ -204,7 +204,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, updateDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -219,6 +219,7 @@
         const db = getFirestore(app);
         enableIndexedDbPersistence(db).catch(console.error);
         const ecoRef = doc(db, 'economy', 'balances');
+        const inventoryRef = doc(db, 'user_inventory', localStorage.getItem('active_player') || 'Ayşe');
 
         const currentUser = localStorage.getItem('active_player');
         if (!currentUser) window.location.href = 'index.html';
@@ -233,8 +234,17 @@
             }
         });
 
+        onSnapshot(inventoryRef, (snap) => {
+            if (!snap.exists()) return;
+            memoryRetryStock = snap.data()?.consumables?.memory_retry || 0;
+            updateHintText();
+        });
+
         const entryFee = 100;
         const winPrize = 300;
+        let memoryRetryStock = 0;
+        let retryEnabledForRound = false;
+        let retryAlreadyUsed = false;
         let isPlaying = false;
         let timeLeft = 20;
         let timerInterval;
@@ -252,6 +262,22 @@
             }
 
             try {
+                retryEnabledForRound = false;
+                retryAlreadyUsed = false;
+                if (memoryRetryStock > 0) {
+                    retryEnabledForRound = confirm(`İkinci Şans ürünün var (${memoryRetryStock}). Bu turda kullanılsın mı?`);
+                    if (retryEnabledForRound) {
+                        await runTransaction(db, async (tx) => {
+                            const invSnap = await tx.get(inventoryRef);
+                            const invData = invSnap.exists() ? invSnap.data() : {};
+                            const current = invData?.consumables?.memory_retry || 0;
+                            if (current <= 0) throw new Error('Stok yok');
+                            tx.set(inventoryRef, {
+                                consumables: { ...(invData.consumables || {}), memory_retry: current - 1 }
+                            }, { merge: true });
+                        });
+                    }
+                }
                 await updateDoc(ecoRef, { [currentUser]: userBalance - entryFee });
                 document.getElementById('start-panel').style.display = 'none';
                 document.getElementById('grid').style.display = 'grid';
@@ -303,7 +329,18 @@
                 timeLeft--;
                 timerObj.innerText = timeLeft;
                 if (timeLeft <= 0) {
-                    endGame(false);
+                    if (retryEnabledForRound && !retryAlreadyUsed) {
+                        retryAlreadyUsed = true;
+                        timeLeft = 10;
+                        timerObj.style.color = '#1ed760';
+                        timerObj.innerText = 'Ekstra Şans +10';
+                        setTimeout(() => {
+                            timerObj.style.color = '#ff8c00';
+                            timerObj.innerText = timeLeft;
+                        }, 700);
+                    } else {
+                        endGame(false);
+                    }
                 }
             }, 1000);
         }
@@ -380,6 +417,14 @@
                 document.getElementById('start-panel').style.display = 'block';
                 timerObj.style.color = '#ff8c00'; // reset style
             }, 3000);
+        }
+
+        function updateHintText() {
+            const panel = document.getElementById('start-panel');
+            if (!panel) return;
+            const hint = panel.querySelector('p');
+            if (!hint) return;
+            hint.textContent = `Bütün fotoğrafların eşini 20 saniyede bul, Aşk Parası (❤️) kazan! İkinci Şans Stok: ${memoryRetryStock}`;
         }
     </script>
 </body>
