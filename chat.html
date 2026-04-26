@@ -1203,6 +1203,24 @@
             window.visualViewport.addEventListener('scroll', adjustViewport);
         }
         window.addEventListener('load', adjustViewport);
+        // --- TIME TRACKER ---
+        let lastTimeUpdate = Date.now();
+        setInterval(async () => {
+            const now = Date.now();
+            if (now - lastTimeUpdate > 45000) { 
+                const today = new Date().toISOString().split('T')[0];
+                lastTimeUpdate = now;
+                if (typeof currentUser !== 'undefined') {
+                    try {
+                        const { increment, doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js");
+                        await setDoc(doc(db, 'user_stats', currentUser), {
+                            timeSpent: { [today]: increment(1) }
+                        }, { merge: true });
+                    } catch(e) {}
+                }
+            }
+        }, 60000);
+
     </script>
 </body>
 </html>

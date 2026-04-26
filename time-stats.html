@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Birlikte Geçirilen Zaman ⏳</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #0b0208;
+            --primary: #ff4b72;
+            --secondary: #ff8c00;
+            --mert: #4facfe;
+            --ayse: #ff4b72;
+            --border: rgba(255,255,255,0.08);
+            --surface: rgba(255,255,255,0.04);
+            --text: #fff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding: 20px; min-height: 100vh; padding-bottom: 80px; }
+        #bg-canvas { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, #1a0520 0%, #0a0208 100%); }
+        
+        .header { display: flex; align-items: center; justify-content: center; margin-bottom: 30px; margin-top: max(40px, env(safe-area-inset-top)); position: relative; }
+        .back-nav { position: absolute; top: 0; left: 0; background: rgba(255,255,255,.06); padding: 10px 18px; border-radius: 25px; color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,.16); z-index: 100; backdrop-filter: blur(5px); transition: all 0.3s; font-size: 0.9rem; }
+        .back-nav:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.3); }
+        h1 { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--primary); text-align: center; margin: 0; text-shadow: 0 0 15px rgba(255,75,114,0.4); }
+        
+        .summary-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px; text-align: center; backdrop-filter: blur(10px); position: relative; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .summary-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
+        #card-ayse::before { background: linear-gradient(90deg, #ff4b72, #ff8c00); }
+        #card-mert::before { background: linear-gradient(90deg, #4facfe, #00f2fe); }
+        .summary-avatar { font-size: 2.5rem; margin-bottom: 10px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); display: block; }
+        .summary-name { font-size: 1.1rem; font-weight: 700; font-family: 'Playfair Display', serif; opacity: 0.8; }
+        .summary-time { font-size: 1.8rem; font-weight: 700; margin-top: 5px; }
+        .summary-time span { font-size: 0.9rem; font-weight: 400; opacity: 0.7; }
+        
+        .chart-container { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; backdrop-filter: blur(10px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); position: relative; }
+        .chart-header { font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .chart-icon { font-size: 1.5rem; }
+        
+        canvas { max-width: 100%; }
+
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .animate-pop { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    </style>
+</head>
+<body>
+    <div id="bg-canvas"></div>
+    
+    <div class="header">
+        <a href="profile.html" class="back-nav">← Aşk Profiline Dön</a>
+        <div>
+            <h1>Geçirilen Süreler ⏳</h1>
+            <div style="font-size: 0.8rem; text-align: center; opacity: 0.7; margin-top: 5px;">Aşk Dünyamızın İstatistikleri</div>
+        </div>
+    </div>
+
+    <div class="summary-cards">
+        <div class="summary-card animate-pop" id="card-ayse" style="animation-delay: 0.1s;">
+            <span class="summary-avatar">👸🏻</span>
+            <div class="summary-name">Ayşe</div>
+            <div class="summary-time" id="ayse-total">0 <span>dk</span></div>
+        </div>
+        <div class="summary-card animate-pop" id="card-mert" style="animation-delay: 0.2s;">
+            <span class="summary-avatar">🤴🏻</span>
+            <div class="summary-name">Mert</div>
+            <div class="summary-time" id="mert-total">0 <span>dk</span></div>
+        </div>
+    </div>
+
+    <div class="chart-container animate-pop" style="animation-delay: 0.3s;">
+        <div class="chart-header">
+            <span>📅 Son 7 Günlük Aktivite</span>
+            <span class="chart-icon">📈</span>
+        </div>
+        <canvas id="weeklyChart" height="250"></canvas>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+            authDomain: "ayseye-surpriz.firebaseapp.com",
+            projectId: "ayseye-surpriz",
+            storageBucket: "ayseye-surpriz.firebasestorage.app",
+            messagingSenderId: "531177459988",
+            appId: "1:531177459988:web:09060a95bea0b06f197201"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const activePlayer = localStorage.getItem('active_player');
+        if (!activePlayer) window.location.href = 'index.html';
+
+        let ayseData = {};
+        let mertData = {};
+        let chartInstance = null;
+
+        // Fetch Data Realtime
+        onSnapshot(doc(db, 'user_stats', 'Ayşe'), (snap) => {
+            if (snap.exists() && snap.data().timeSpent) {
+                ayseData = snap.data().timeSpent;
+            }
+            updateView();
+        });
+
+        onSnapshot(doc(db, 'user_stats', 'Mert'), (snap) => {
+            if (snap.exists() && snap.data().timeSpent) {
+                mertData = snap.data().timeSpent;
+            }
+            updateView();
+        });
+
+        function updateView() {
+            // Calculate Totals
+            let aTotal = 0; let mTotal = 0;
+            Object.values(ayseData).forEach(v => aTotal += v);
+            Object.values(mertData).forEach(v => mTotal += v);
+
+            document.getElementById('ayse-total').innerHTML = `${aTotal} <span>dk</span>`;
+            document.getElementById('mert-total').innerHTML = `${mTotal} <span>dk</span>`;
+
+            // Prepare Chart Data for Last 7 Days
+            const labels = [];
+            const aData = [];
+            const mData = [];
+            
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const iso = d.toISOString().split('T')[0];
+                const display = d.toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric' });
+                
+                labels.push(display);
+                aData.push(ayseData[iso] || 0);
+                mData.push(mertData[iso] || 0);
+            }
+
+            renderChart(labels, aData, mData);
+        }
+
+        function renderChart(labels, aData, mData) {
+            const ctx = document.getElementById('weeklyChart').getContext('2d');
+            
+            if (chartInstance) {
+                chartInstance.data.labels = labels;
+                chartInstance.data.datasets[0].data = aData;
+                chartInstance.data.datasets[1].data = mData;
+                chartInstance.update();
+                return;
+            }
+
+            Chart.defaults.color = 'rgba(255, 255, 255, 0.7)';
+            Chart.defaults.font.family = "'Outfit', sans-serif";
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '👸🏻 Ayşe',
+                            data: aData,
+                            backgroundColor: 'rgba(255, 75, 114, 0.8)',
+                            borderColor: '#ff4b72',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        },
+                        {
+                            label: '🤴🏻 Mert',
+                            data: mData,
+                            backgroundColor: 'rgba(79, 172, 254, 0.8)',
+                            borderColor: '#4facfe',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } },
+                        tooltip: { backgroundColor: 'rgba(10, 2, 8, 0.9)', titleColor: '#fff', bodyColor: '#fff', padding: 12, cornerRadius: 10 }
+                    },
+                    scales: {
+                        x: { grid: { display: false, drawBorder: false } },
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false }, title: { display: true, text: 'Dakika (dk)' } }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
