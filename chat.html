@@ -625,7 +625,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, updateDoc, setDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, updateDoc, setDoc, doc, onSnapshot, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -1203,22 +1203,17 @@
             window.visualViewport.addEventListener('scroll', adjustViewport);
         }
         window.addEventListener('load', adjustViewport);
-        // --- TIME TRACKER ---
-        let lastTimeUpdate = Date.now();
+
+        // --- SÜRE SAYACI ---
+        const statsRef = doc(db, 'user_stats', currentUser);
         setInterval(async () => {
-            const now = Date.now();
-            if (now - lastTimeUpdate > 45000) { 
-                const today = new Date().toISOString().split('T')[0];
-                lastTimeUpdate = now;
-                if (typeof currentUser !== 'undefined') {
-                    try {
-                        const { increment, doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js");
-                        await setDoc(doc(db, 'user_stats', currentUser), {
-                            timeSpent: { [today]: increment(1) }
-                        }, { merge: true });
-                    } catch(e) {}
-                }
-            }
+            if (currentUser !== 'Ayşe' && currentUser !== 'Mert') return;
+            const today = new Date().toISOString().split('T')[0];
+            try {
+                await setDoc(statsRef, {
+                    timeSpent: { [today]: increment(1) }
+                }, { merge: true });
+            } catch(e) {}
         }, 60000);
 
     </script>

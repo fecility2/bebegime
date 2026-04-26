@@ -860,7 +860,7 @@
     <!-- Firebase Mood Synchronization -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -909,6 +909,22 @@
                 console.error("Mood güncellenirken hata:", error);
             }
         };
+
+        // --- SÜRE SAYACI (her 60 saniyede +1 dakika Firestore'a yazar) ---
+        function startTimeTracker() {
+            if (!currentUser || (currentUser !== 'Ayşe' && currentUser !== 'Mert')) return;
+            const today = new Date().toISOString().split('T')[0];
+            const statsRef = doc(db, 'user_stats', currentUser);
+            setInterval(async () => {
+                const nowDay = new Date().toISOString().split('T')[0];
+                try {
+                    await setDoc(statsRef, {
+                        timeSpent: { [nowDay]: increment(1) }
+                    }, { merge: true });
+                } catch(e) { /* sessizce geç */ }
+            }, 60000); // her 1 dakikada bir
+        }
+        startTimeTracker();
     </script>
 
     <!-- PWA Servis Kaydı -->
