@@ -262,7 +262,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, enableIndexedDbPersistence, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, enableIndexedDbPersistence, doc, updateDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -279,6 +279,7 @@
             console.log('Firebase Offline Persistence Error:', err.code);
         });
         const ecoRef = doc(db, 'economy', 'balances');
+        const inventoryRef = doc(db, 'user_inventory', localStorage.getItem('active_player') || 'Ayşe');
 
         const currentUser = localStorage.getItem('active_player');
         if (!currentUser) {
@@ -304,6 +305,8 @@
         let currentBalance = 0;
         let activeBet = 0;
         let isSpinning = false;
+        let jackpotBoostStock = 0;
+        let jackpotChance = 0.07;
         
         // Listen to cloud balances
         onSnapshot(ecoRef, (docSnap) => {
@@ -312,6 +315,11 @@
                 currentBalance = data[currentUser] || 0;
                 walletDisp.innerText = currentUser + ': ' + currentBalance + ' ❤️';
             }
+        });
+
+        onSnapshot(inventoryRef, (snap) => {
+            if (!snap.exists()) return;
+            jackpotBoostStock = snap.data()?.consumables?.jackpot_boost || 0;
         });
 
         async function saveBalance(newVal) {
@@ -344,6 +352,22 @@
             }
 
             isSpinning = true;
+            jackpotChance = 0.07;
+            if (jackpotBoostStock > 0) {
+                const useBoost = confirm(`Jackpot Boost (${jackpotBoostStock}) kullanılsın mı?`);
+                if (useBoost) {
+                    await runTransaction(db, async (tx) => {
+                        const invSnap = await tx.get(inventoryRef);
+                        const data = invSnap.exists() ? invSnap.data() : {};
+                        const cur = data?.consumables?.jackpot_boost || 0;
+                        if (cur <= 0) throw new Error('Boost stok yok');
+                        tx.set(inventoryRef, {
+                            consumables: { ...(data.consumables || {}), jackpot_boost: cur - 1 }
+                        }, { merge: true });
+                    });
+                    jackpotChance = 0.2;
+                }
+            }
 
             // Bahisi düş ve kaydet
             await saveBalance(currentBalance - activeBet);
@@ -371,7 +395,7 @@
         async function finishSpin() {
             const results = [];
             
-            if (Math.random() < 0.07) {
+            if (Math.random() < jackpotChance) {
                 const winSym = symbols[Math.floor(Math.random() * symbols.length)];
                 results.push(winSym, winSym, winSym);
             } else {
