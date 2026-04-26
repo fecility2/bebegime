@@ -507,7 +507,6 @@
             position: relative;
             overflow: hidden;
         }
-        .wp-item.active { border-color: var(--ayse-color); }
         .wp-item span {
             position: absolute;
             left: 5px;
@@ -516,37 +515,6 @@
             background: rgba(0,0,0,0.45);
             padding: 2px 5px;
             border-radius: 6px;
-        }
-        .quick-emoji-bar {
-            position: fixed;
-            left: 12px;
-            right: 12px;
-            bottom: 72px;
-            z-index: 1001;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            overflow-x: auto;
-            padding: 6px 8px;
-            background: rgba(15, 5, 10, 0.9);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            backdrop-filter: blur(14px);
-        }
-        .quick-emoji {
-            border: none;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            min-width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-        .quick-emoji.manage {
-            min-width: auto;
-            padding: 0 8px;
-            font-size: 0.78rem;
         }
 
         /* --- Modal Zoom --- */
@@ -575,7 +543,6 @@
     </header>
 
     <div class="chat-flow" id="chat-flow"></div>
-    <div class="quick-emoji-bar" id="quick-emoji-bar"></div>
 
     <div class="chat-input-bar">
         <div id="previews">
@@ -626,7 +593,26 @@
                 <input id="msg-search-input" class="search-input" placeholder="Mesaj ara...">
                 <button id="media-filter-btn" class="toggle-btn">Sadece Medya</button>
             </div>
+            
+            <div class="search-row" style="margin-top:4px;">
+                <select id="sender-filter" class="search-input" style="color-scheme: dark;">
+                    <option value="all">Tüm Mesajlar</option>
+                    <option value="me">Sadece Benim Mesajlarım</option>
+                    <option value="partner">Karşı Tarafın Mesajları</option>
+                </select>
+            </div>
+
+            <div class="sheet-title">Tarih Aralığına Göre Ara</div>
+            <div class="search-row">
+                <input type="date" id="date-start" class="search-input" style="color-scheme:dark;">
+                <input type="date" id="date-end" class="search-input" style="color-scheme:dark;">
+            </div>
+
             <div class="sheet-title">Sohbet Duvar Kağıdı</div>
+            <div style="margin-bottom: 10px;">
+                <label for="custom-wp-upload" class="sheet-btn" style="display:block; text-align:center;">Kendi Fotoğrafını Yükle 🖼️</label>
+                <input type="file" id="custom-wp-upload" hidden accept="image/*">
+            </div>
             <div class="wallpaper-grid" id="wallpaper-grid"></div>
             <div class="sheet-title">Paylaşılan Medyalar</div>
             <div class="media-grid" id="shared-media-grid"></div>
@@ -679,7 +665,11 @@
         let messageCache = [];
         let searchTerm = '';
         let mediaOnlyFilter = false;
+        let senderFilter = 'all';
+        let dateStartStr = '';
+        let dateEndStr = '';
         const CHAT_WP_KEY = 'chat_wallpaper_pref';
+        const CUSTOM_WP_KEY = 'chat_custom_wallpaper_url';
         const QUICK_EMOJI_KEY = 'chat_quick_emojis';
         let quickEmojis = JSON.parse(localStorage.getItem(QUICK_EMOJI_KEY) || '["❤️","😍","🥺","🔥","😂","✨"]');
         const WALLPAPERS = [
@@ -688,6 +678,10 @@
             { id: 'aurora', label: 'Aurora', css: 'radial-gradient(circle at 20% 20%, rgba(255,75,114,0.2) 0%, transparent 35%), radial-gradient(circle at 80% 80%, rgba(79,172,254,0.22) 0%, transparent 35%), #0b0208' },
             { id: 'night', label: 'Night', css: 'linear-gradient(180deg, #080a14 0%, #09030d 100%)' }
         ];
+        const customWpUrl = localStorage.getItem(CUSTOM_WP_KEY);
+        if (customWpUrl) {
+            WALLPAPERS.push({ id: 'custom_saved', label: 'Özel', css: `url(${customWpUrl}) center/cover no-repeat fixed` });
+        }
         const openThemeBtn = document.getElementById('open-theme-editor-btn');
         [document.getElementById('p-avatar'), document.getElementById('p-name'), document.getElementById('partner-info-clickable')].forEach((el) => {
             if (!el) return;
@@ -713,8 +707,42 @@
             mediaFilterBtn.classList.toggle('active', mediaOnlyFilter);
             renderMessages();
         });
+        document.getElementById('sender-filter').addEventListener('change', (e) => {
+            senderFilter = e.target.value;
+            renderMessages();
+        });
+        document.getElementById('date-start').addEventListener('change', (e) => {
+            dateStartStr = e.target.value;
+            renderMessages();
+        });
+        document.getElementById('date-end').addEventListener('change', (e) => {
+            dateEndStr = e.target.value;
+            renderMessages();
+        });
+        document.getElementById('custom-wp-upload').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            showToast('Duvar kağıdı yükleniyor... ⏳');
+            const fd = new FormData();
+            fd.append('image', file);
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
+                const json = await res.json();
+                if (json.success) {
+                    const url = json.data.url;
+                    localStorage.setItem(CUSTOM_WP_KEY, url);
+                    let existing = WALLPAPERS.find(w => w.id === 'custom_saved');
+                    if(existing) { existing.css = `url(${url}) center/cover no-repeat fixed`; }
+                    else { WALLPAPERS.push({ id: 'custom_saved', label: 'Özel', css: `url(${url}) center/cover no-repeat fixed` }); }
+                    initWallpaperUI();
+                    applyWallpaper('custom_saved');
+                    showToast('Duvar kağıdı güncellendi! ✅');
+                }
+            } catch (err) {
+                showToast('Yükleme hatası 😔');
+            }
+        });
         initWallpaperUI();
-        renderQuickEmojiBar();
 
         onSnapshot(inventoryRef, (snap) => {
             if (!snap.exists()) return;
@@ -742,33 +770,6 @@
             t.className = 'toast show';
             setTimeout(() => t.className = 'toast', 3000);
         };
-        function renderQuickEmojiBar() {
-            quickEmojiBar.innerHTML = '';
-            quickEmojis.forEach((emo) => {
-                const b = document.createElement('button');
-                b.className = 'quick-emoji';
-                b.innerText = emo;
-                b.onclick = () => {
-                    ta.value += emo + ' ';
-                    ta.focus();
-                    ta.dispatchEvent(new Event('input'));
-                };
-                quickEmojiBar.appendChild(b);
-            });
-            const manage = document.createElement('button');
-            manage.className = 'quick-emoji manage';
-            manage.innerText = 'Düzenle';
-            manage.onclick = () => {
-                const raw = prompt('Hızlı emojileri virgülle gir (max 8):', quickEmojis.join(','));
-                if (!raw) return;
-                const arr = raw.split(',').map(x => x.trim()).filter(Boolean).slice(0, 8);
-                if (!arr.length) return;
-                quickEmojis = arr;
-                localStorage.setItem(QUICK_EMOJI_KEY, JSON.stringify(quickEmojis));
-                renderQuickEmojiBar();
-            };
-            quickEmojiBar.appendChild(manage);
-        }
         function openProfileSheet() {
             document.getElementById('sheet-avatar').innerText = partnerName[0] || 'P';
             document.getElementById('sheet-name').innerText = partnerName;
@@ -951,7 +952,27 @@
                 if (searchTerm && !(msg.text || '').toLowerCase().includes(searchTerm)) return;
                 if (mediaOnlyFilter && !msg.photo && !msg.audio) return;
 
-                const currDate = msg.timestamp.toDate().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+                const isMe = msg.sender === currentUser;
+                if (senderFilter === 'me' && !isMe) return;
+                if (senderFilter === 'partner' && isMe) return;
+
+                const msgDateD = msg.timestamp.toDate();
+                if (dateStartStr || dateEndStr) {
+                    const d = new Date(msgDateD);
+                    d.setHours(0,0,0,0);
+                    if (dateStartStr) {
+                        const sDate = new Date(dateStartStr);
+                        sDate.setHours(0,0,0,0);
+                        if (d < sDate) return;
+                    }
+                    if (dateEndStr) {
+                        const eDate = new Date(dateEndStr);
+                        eDate.setHours(0,0,0,0);
+                        if (d > eDate) return;
+                    }
+                }
+
+                const currDate = msgDateD.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
                 
                 // Benden Silinmişse atla
                 if (msg.deletedFor && msg.deletedFor[currentUser]) return;
@@ -968,7 +989,6 @@
                     lastDate = currDate;
                 }
 
-                const isMe = msg.sender === currentUser;
                 if (msg.photo) sharedPhotos.push(msg.photo);
                 if (msg.audio) sharedAudios.push(msg.audio);
                 
@@ -986,7 +1006,7 @@
                 // Reaction Selector
                 const reactBar = document.createElement('div');
                 reactBar.className = 'reaction-bar';
-                ['❤️','😂','🥺','🔥','😮','👍'].forEach(emo => {
+                quickEmojis.forEach(emo => {
                     const span = document.createElement('span');
                     span.className = 're-emoji';
                     span.innerText = emo;
@@ -1009,11 +1029,33 @@
                     reactBar.classList.remove('active');
                 };
                 reactBar.appendChild(customBtn);
+                
+                // Edit Emojis Option
+                const editEmojisBtn = document.createElement('span');
+                editEmojisBtn.className = 'custom-emoji-btn';
+                editEmojisBtn.innerText = '✏️';
+                editEmojisBtn.title = "Emojileri Düzenle";
+                editEmojisBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    reactBar.classList.remove('active');
+                    const raw = prompt('Tepki emojilerini virgülle ayırarak gir (max 8):\\nÖrn: ❤️,😍,🥺,🔥,😂,✨', quickEmojis.join(','));
+                    if (!raw) return;
+                    const arr = raw.split(',').map(x => x.trim()).filter(Boolean).slice(0, 8);
+                    if (!arr.length) return;
+                    quickEmojis = arr;
+                    localStorage.setItem(QUICK_EMOJI_KEY, JSON.stringify(quickEmojis));
+                    renderMessages();
+                    showToast('Tepki emojileri güncellendi! ✅');
+                };
+                reactBar.appendChild(editEmojisBtn);
 
                 // Silme butonu ekle
                 const deleteSpan = document.createElement('span');
                 deleteSpan.className = 're-emoji';
                 deleteSpan.innerText = '🗑️';
+                deleteSpan.style.marginLeft = '4px';
+                deleteSpan.style.borderLeft = '1px solid rgba(255,255,255,0.1)';
+                deleteSpan.style.paddingLeft = '8px';
                 deleteSpan.onclick = (e) => {
                     e.stopPropagation();
                     window.showDeleteMenu(id, isMe);
