@@ -777,31 +777,7 @@
             setTimeout(() => t.className = 'toast', 3000);
         };
         function openProfileSheet() {
-            document.getElementById('sheet-avatar').innerText = partnerName[0] || 'P';
-            document.getElementById('sheet-name').innerText = partnerName;
-            sharedMediaGrid.innerHTML = '';
-            if (sharedPhotos.length === 0) {
-                sharedMediaGrid.innerHTML = '<div style="opacity:.6; font-size:.8rem;">Henüz medya yok.</div>';
-            } else {
-                sharedPhotos.slice(0, 24).forEach(url => {
-                    const img = document.createElement('img');
-                    img.src = url;
-                    img.onclick = () => window.zoomImg(url);
-                    sharedMediaGrid.appendChild(img);
-                });
-            }
-            sharedFileList.innerHTML = '';
-            if (sharedAudios.length === 0) {
-                sharedFileList.innerHTML = '<div class="file-item" style="opacity:.7;">Henüz ses dosyası yok.</div>';
-            } else {
-                sharedAudios.slice(0, 20).forEach((url, idx) => {
-                    const row = document.createElement('div');
-                    row.className = 'file-item';
-                    row.innerHTML = `Ses ${idx + 1}<audio src="${url}" controls style="width:100%; margin-top:6px;"></audio>`;
-                    sharedFileList.appendChild(row);
-                });
-            }
-            profileSheet.style.display = 'flex';
+            window.location.href = 'chat-profile.html';
         }
         function applyWallpaper(id) {
             const item = WALLPAPERS.find(w => w.id === id) || WALLPAPERS[0];
@@ -1218,5 +1194,4 @@
     </script>
 </body>
 </html>
-
 
