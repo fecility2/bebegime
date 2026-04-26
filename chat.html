@@ -467,6 +467,7 @@
         const db = getFirestore(app);
 
         const currentUser = localStorage.getItem('active_player') || 'Bilinmeyen';
+        const inventoryRef = doc(db, 'user_inventory', currentUser);
         const partnerName = currentUser === 'Ayşe' ? 'Mert' : 'Ayşe';
         document.getElementById('p-name').innerText = partnerName;
         document.getElementById('p-avatar').innerText = partnerName[0];
@@ -475,6 +476,14 @@
         const ta = document.getElementById('chat-textarea');
         const media = { photo: '', voice: null };
         let activeStream = null;
+
+        onSnapshot(inventoryRef, (snap) => {
+            if (!snap.exists()) return;
+            const theme = snap.data()?.activeCosmetics?.gameTheme;
+            if (theme === 'theme_rose') {
+                document.body.style.background = 'linear-gradient(180deg, #21060f 0%, #12030a 100%)';
+            }
+        });
 
         // --- UI Interactions ---
         ta.oninput = () => {
