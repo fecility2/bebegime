@@ -26,7 +26,7 @@
 </head>
 <body>
   <div id="bg"></div>
-  <a class="back" href="chat.html">← Mesajlara Dön</a>
+  <a class="back" href="#" id="back-btn">← Geri Dön</a>
   <div class="wrap">
     <div class="card">
       <h2 style="margin:0 0 10px;">Mesaj Teması</h2>
@@ -73,6 +73,13 @@
     const db = getFirestore(app);
     const user = localStorage.getItem('active_player');
     if (!user) window.location.href = 'index.html';
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromParam = urlParams.get('from');
+    if (fromParam === 'chatprofile') document.getElementById('back-btn').href = 'chat-profile.html';
+    else if (fromParam === 'chat') document.getElementById('back-btn').href = 'chat.html';
+    else document.getElementById('back-btn').href = 'index.html';
+
     const invRef = doc(db, 'user_inventory', user);
     const msg = document.getElementById('msg');
     const preview = document.getElementById('preview');
