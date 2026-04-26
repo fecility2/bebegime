@@ -179,6 +179,15 @@
                 return;
             }
             const loaded = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(i => i.enabled !== false);
+            
+            const loadedIds = loaded.map(d => d.id);
+            for (const item of DEFAULT_ITEMS) {
+                if (!loadedIds.includes(item.id)) {
+                    await setDoc(doc(db, 'shop_items', item.id), { ...item, enabled: true });
+                    loaded.push({ ...item, enabled: true });
+                }
+            }
+
             for (const item of loaded) {
                 const defaultItem = DEFAULT_ITEMS.find(x => x.id === item.id);
                 if (defaultItem && item.price !== defaultItem.price) {
