@@ -61,6 +61,11 @@
     <div id="status-msg" class="status"></div>
     <div class="photo-market">
         <h2 style="font-family:'Playfair Display',serif; margin: 10px 0 12px; color: var(--primary);">Fotoğraf Pazarı</h2>
+        <div class="tabs" style="margin-bottom:12px;">
+            <button class="tab-btn active" data-photo-tab="all">Tüm İlanlar</button>
+            <button class="tab-btn" data-photo-tab="mine">Kendi İlanlarım</button>
+            <button class="tab-btn" data-photo-tab="purchased">Satın Aldıklarım</button>
+        </div>
         <div class="photo-form">
             <input type="file" id="photo-file" accept="image/*">
             <input type="number" id="photo-price" min="1" placeholder="Fiyat">
@@ -119,6 +124,7 @@
         const inventoryRef = doc(db, 'user_inventory', currentUser);
         const itemsRef = collection(db, 'shop_items');
         const photoItemsRef = collection(db, 'photo_market_items');
+        const activityRef = collection(db, 'activity_logs');
         const statusEl = document.getElementById('status-msg');
         const gridEl = document.getElementById('items-grid');
 
@@ -127,14 +133,24 @@
         let inventory = { cosmetics: {}, consumables: {}, activeCosmetics: {}, purchasedPhotos: {} };
         let shopItems = [];
         let photoItems = [];
+        let selectedPhotoTab = 'all';
 
         document.getElementById('user-name').textContent = currentUser;
-        document.querySelectorAll('.tab-btn').forEach(btn => {
+        document.querySelectorAll('[data-tab]').forEach(btn => {
+            if (btn.dataset.photoTab) return;
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('[data-tab]').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 selectedTab = btn.dataset.tab;
                 renderItems();
+            });
+        });
+        document.querySelectorAll('[data-photo-tab]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-photo-tab]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedPhotoTab = btn.dataset.photoTab;
+                renderPhotos();
             });
         });
 
@@ -200,7 +216,12 @@
         function renderPhotos() {
             const grid = document.getElementById('photo-grid');
             grid.innerHTML = '';
-            photoItems.forEach(item => {
+            const filtered = photoItems.filter(item => {
+                if (selectedPhotoTab === 'mine') return item.seller === currentUser;
+                if (selectedPhotoTab === 'purchased') return !!inventory.purchasedPhotos?.[item.id];
+                return true;
+            });
+            filtered.forEach(item => {
                 const card = document.createElement('div');
                 const downloadable = canDownloadPhoto(item);
                 const isOwn = item.seller === currentUser;
@@ -213,13 +234,29 @@
                         <div style="margin-top:4px;">Fiyat: ${item.price} ❤️</div>
                         <div class="photo-actions">
                             <button class="action-btn buy-photo-btn" ${isOwn ? 'disabled' : ''} data-buy="${item.id}">${isOwn ? 'Kendi ilanın' : 'Satın Al'}</button>
+                            ${isOwn ? `<button class="action-btn dl-btn" data-edit="${item.id}">Düzenle</button>` : ''}
+                            ${isOwn ? `<button class="action-btn dl-btn" data-remove="${item.id}">Kaldır</button>` : ''}
                             ${downloadable ? `<a class="action-btn dl-btn" href="${item.photoUrl}" download="ask-market-${item.id}.jpg" target="_blank" rel="noopener">İndir</a>` : ''}
                         </div>
                     </div>
                 `;
                 const buyBtn = card.querySelector('[data-buy]');
                 if (buyBtn) buyBtn.addEventListener('click', () => buyPhoto(item.id));
+                const editBtn = card.querySelector('[data-edit]');
+                if (editBtn) editBtn.addEventListener('click', () => editPhotoListing(item.id));
+                const removeBtn = card.querySelector('[data-remove]');
+                if (removeBtn) removeBtn.addEventListener('click', () => removePhotoListing(item.id));
                 grid.appendChild(card);
+            });
+        }
+
+        async function logActivity(type, title, meta) {
+            await setDoc(doc(activityRef), {
+                type,
+                title,
+                user: currentUser,
+                meta: meta || {},
+                createdAt: serverTimestamp()
             });
         }
 
@@ -266,6 +303,7 @@
                         createdAt: serverTimestamp()
                     });
                 });
+                await logActivity('market_purchase', 'Marketten ürün alındı', { itemId });
                 statusEl.textContent = 'Satın alma başarılı.';
             } catch (e) {
                 statusEl.textContent = e?.message || 'Satın alma başarısız.';
@@ -302,6 +340,7 @@
                     active: true,
                     createdAt: serverTimestamp()
                 });
+                await logActivity('photo_listed', 'Fotoğraf satışa kondu', { title, price });
                 fileEl.value = '';
                 priceEl.value = '';
                 titleEl.value = '';
@@ -309,6 +348,27 @@
             } catch (e) {
                 statusEl.textContent = e?.message || 'İlan eklenemedi.';
             }
+        }
+
+        async function editPhotoListing(photoId) {
+            const item = photoItems.find(p => p.id === photoId);
+            if (!item) return;
+            const newPrice = parseInt(prompt('Yeni fiyatı gir:', item.price), 10);
+            if (isNaN(newPrice) || newPrice < 1) {
+                statusEl.textContent = 'Geçerli fiyat gir.';
+                return;
+            }
+            const newTitle = prompt('Yeni başlık (boş bırakılabilir):', item.title || '') || '';
+            await setDoc(doc(db, 'photo_market_items', photoId), { price: newPrice, title: newTitle.trim(), updatedAt: serverTimestamp() }, { merge: true });
+            await logActivity('photo_edited', 'Foto ilanı düzenlendi', { photoId, price: newPrice });
+            statusEl.textContent = 'İlan güncellendi.';
+        }
+
+        async function removePhotoListing(photoId) {
+            if (!confirm('Bu ilanı kaldırmak istiyor musun?')) return;
+            await setDoc(doc(db, 'photo_market_items', photoId), { active: false, removedAt: serverTimestamp() }, { merge: true });
+            await logActivity('photo_removed', 'Foto ilanı kaldırıldı', { photoId });
+            statusEl.textContent = 'İlan kaldırıldı.';
         }
 
         async function buyPhoto(photoId) {
@@ -347,6 +407,7 @@
                         createdAt: serverTimestamp()
                     });
                 });
+                await logActivity('photo_purchased', 'Fotoğraf satın alındı', { photoId });
                 statusEl.textContent = 'Fotoğraf satın alındı. Artık indirebilirsin.';
             } catch (e) {
                 statusEl.textContent = e?.message || 'Satın alma başarısız.';

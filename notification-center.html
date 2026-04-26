@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bildirim Merkezi</title>
+  <link rel="stylesheet" href="style.css?v=3">
+  <style>
+    body { font-family: Outfit, sans-serif; margin: 0; padding: 20px; background: #0a0208; color: #fff; }
+    #bg { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, #1a0520 0%, #0a0208 100%); }
+    .back { position: fixed; top: 20px; left: 20px; text-decoration: none; color: #fff; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); padding: 10px 14px; border-radius: 22px; }
+    .wrap { max-width: 900px; margin: 72px auto 0; }
+    h1 { margin: 0 0 14px; color: var(--primary); }
+    .log { background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+    .meta { opacity:.7; font-size:.85rem; margin-top:4px; }
+  </style>
+</head>
+<body>
+  <div id="bg"></div>
+  <a href="index.html#hub" class="back">← Hub'a Dön</a>
+  <div class="wrap">
+    <h1>Bildirim Merkezi</h1>
+    <div id="list"></div>
+  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+    const firebaseConfig = { apiKey:"AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU", authDomain:"ayseye-surpriz.firebaseapp.com", projectId:"ayseye-surpriz", storageBucket:"ayseye-surpriz.firebasestorage.app", messagingSenderId:"531177459988", appId:"1:531177459988:web:09060a95bea0b06f197201" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const list = document.getElementById('list');
+    const q = query(collection(db, 'activity_logs'), orderBy('createdAt', 'desc'), limit(150));
+    onSnapshot(q, (snap) => {
+      list.innerHTML = '';
+      if (snap.empty) { list.innerHTML = '<div class="log">Henüz kayıt yok.</div>'; return; }
+      snap.forEach(d => {
+        const x = d.data();
+        const dt = x.createdAt?.toDate ? x.createdAt.toDate().toLocaleString('tr-TR') : '...';
+        const row = document.createElement('div');
+        row.className = 'log';
+        row.innerHTML = `<div><b>${x.title || x.type || 'Etkinlik'}</b></div><div class="meta">${x.user || '-'} • ${dt}</div>`;
+        list.appendChild(row);
+      });
+    });
+  </script>
+</body>
+</html>

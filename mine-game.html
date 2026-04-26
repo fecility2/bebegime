@@ -127,7 +127,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, updateDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, updateDoc, onSnapshot, runTransaction, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -304,6 +304,13 @@
                     const snap = await getDoc(ecoRef);
                     const curMoney = snap.data()[currentUser];
                     await updateDoc(ecoRef, { [currentUser]: curMoney + finalWin });
+                    await addDoc(collection(db, 'activity_logs'), {
+                        type: 'game_win',
+                        title: 'Kalp Avcısı kazanıldı',
+                        user: currentUser,
+                        meta: { game: 'mine', reward: finalWin },
+                        createdAt: serverTimestamp()
+                    });
                 } catch(e){}
             } else {
                 document.getElementById('cashout-btn').style.display = 'none';

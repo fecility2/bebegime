@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mesaj Tema Editörü</title>
+  <style>
+    body { font-family: Outfit, sans-serif; margin: 0; padding: 20px; color: #fff; background: #0a0208; }
+    #bg { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, #1a0520 0%, #0a0208 100%); }
+    .back { position: fixed; top: 20px; left: 20px; text-decoration:none; color:#fff; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); padding:10px 14px; border-radius:22px; }
+    .wrap { max-width: 920px; margin: 78px auto 0; display: grid; gap: 14px; }
+    .card { background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; }
+    .row { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .preset-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap:10px; }
+    .preset { border:1px solid rgba(255,255,255,.2); border-radius:12px; padding:10px; cursor:pointer; }
+    .swatch { display:flex; gap:6px; margin-top:8px; }
+    .sw { width:24px; height:24px; border-radius:6px; border:1px solid rgba(255,255,255,.2); }
+    input, select, button { width:100%; padding:10px; border-radius: 10px; border:1px solid rgba(255,255,255,.2); background: rgba(0,0,0,.3); color:#fff; }
+    button { background: linear-gradient(45deg,#ff4b72,#ff8c00); border:none; font-weight:700; cursor:pointer; }
+    .preview { border-radius: 14px; padding: 12px; min-height: 220px; transition: .2s; }
+    .msg { max-width: 72%; padding: 8px 12px; border-radius: 14px; margin: 8px 0; font-size: .92rem; }
+    .msg.left { background: rgba(255,255,255,.12); border-top-left-radius: 6px; }
+    .msg.right { background: var(--preview-primary); margin-left: auto; border-top-right-radius: 6px; }
+    @media (max-width: 760px) { .row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div id="bg"></div>
+  <a class="back" href="chat.html">← Mesajlara Dön</a>
+  <div class="wrap">
+    <div class="card">
+      <h2 style="margin:0 0 10px;">Mesaj Teması</h2>
+      <div class="preset-grid" id="preset-grid"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 10px;">Özel Tema Oluştur</h3>
+      <div class="row">
+        <label>Ana Renk <input id="primary" type="color" value="#ff4b72"></label>
+        <label>Arkaplan <input id="bgc" type="color" value="#0a0208"></label>
+      </div>
+      <div class="row">
+        <label>Yüzey Rengi <input id="surface" type="color" value="#1a0520"></label>
+        <label>Yazı Tipi
+          <select id="font">
+            <option value="Outfit, sans-serif">Outfit</option>
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
+          </select>
+        </label>
+      </div>
+      <button id="save">Mesaj Temasını Kaydet</button>
+      <p id="msg"></p>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 10px;">Canlı Önizleme</h3>
+      <div id="preview" class="preview">
+        <div class="msg left">Ayşe: Tema nasıl olmuş?</div>
+        <div class="msg right">Mert: Harika görünüyor.</div>
+        <div class="msg left">Ayşe: Bunu kullanıyorum.</div>
+      </div>
+    </div>
+  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+    const firebaseConfig = { apiKey:"AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU", authDomain:"ayseye-surpriz.firebaseapp.com", projectId:"ayseye-surpriz", storageBucket:"ayseye-surpriz.firebasestorage.app", messagingSenderId:"531177459988", appId:"1:531177459988:web:09060a95bea0b06f197201" };
+    const PRESETS = [
+      { id:'rose', name:'Romantik Gül', primary:'#ff4b72', bg:'#0a0208', surface:'#1a0520', font:'Outfit, sans-serif' },
+      { id:'ocean', name:'Gece Okyanus', primary:'#2b8cff', bg:'#061120', surface:'#0b1f3a', font:"'Trebuchet MS', sans-serif" },
+      { id:'lavender', name:'Lavanta', primary:'#b06cff', bg:'#120a1f', surface:'#24103b', font:'Arial, sans-serif' }
+    ];
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const user = localStorage.getItem('active_player');
+    if (!user) window.location.href = 'index.html';
+    const invRef = doc(db, 'user_inventory', user);
+    const msg = document.getElementById('msg');
+    const preview = document.getElementById('preview');
+    const controls = {
+      primary: document.getElementById('primary'),
+      bg: document.getElementById('bgc'),
+      surface: document.getElementById('surface'),
+      font: document.getElementById('font')
+    };
+    function getCurrentTheme() {
+      return { primary: controls.primary.value, bg: controls.bg.value, surface: controls.surface.value, font: controls.font.value };
+    }
+    function paintPreview(theme) {
+      preview.style.background = `linear-gradient(180deg, ${theme.surface} 0%, ${theme.bg} 100%)`;
+      preview.style.fontFamily = theme.font;
+      preview.style.setProperty('--preview-primary', theme.primary);
+    }
+    function fillControls(theme) {
+      controls.primary.value = theme.primary;
+      controls.bg.value = theme.bg;
+      controls.surface.value = theme.surface;
+      controls.font.value = theme.font;
+      paintPreview(theme);
+    }
+    const presetGrid = document.getElementById('preset-grid');
+    PRESETS.forEach(p => {
+      const el = document.createElement('div');
+      el.className = 'preset';
+      el.innerHTML = `<b>${p.name}</b><div class="swatch"><div class="sw" style="background:${p.primary}"></div><div class="sw" style="background:${p.surface}"></div><div class="sw" style="background:${p.bg}"></div></div>`;
+      el.addEventListener('click', () => fillControls(p));
+      presetGrid.appendChild(el);
+    });
+    Object.values(controls).forEach(el => el.addEventListener('input', () => paintPreview(getCurrentTheme())));
+    const snap = await getDoc(invRef);
+    if (snap.exists()) {
+      const t = snap.data()?.activeCosmetics?.customTheme;
+      if (t) fillControls({ primary: t.primary || '#ff4b72', bg: t.bg || '#0a0208', surface: t.surface || '#1a0520', font: t.font || 'Outfit, sans-serif' });
+      else paintPreview(getCurrentTheme());
+    } else {
+      paintPreview(getCurrentTheme());
+    }
+    document.getElementById('save').addEventListener('click', async () => {
+      const theme = getCurrentTheme();
+      await setDoc(invRef, { activeCosmetics: { customTheme: theme }, updatedAt: serverTimestamp() }, { merge: true });
+      msg.textContent = 'Mesaj teması kaydedildi.';
+    });
+  </script>
+</body>
+</html>

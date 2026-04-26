@@ -204,7 +204,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, updateDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, updateDoc, onSnapshot, runTransaction, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -405,6 +405,13 @@
                     const snap = await getDoc(ecoRef);
                     const curMoney = snap.data()[currentUser];
                     await updateDoc(ecoRef, { [currentUser]: curMoney + winPrize });
+                    await addDoc(collection(db, 'activity_logs'), {
+                        type: 'game_win',
+                        title: 'Aşk Hafızası kazanıldı',
+                        user: currentUser,
+                        meta: { game: 'memory', reward: winPrize },
+                        createdAt: serverTimestamp()
+                    });
                 } catch (e) { }
             } else {
                 timerObj.innerText = `Süre Bitti! 😢`;

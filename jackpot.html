@@ -262,7 +262,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, enableIndexedDbPersistence, doc, updateDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, enableIndexedDbPersistence, doc, updateDoc, onSnapshot, runTransaction, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -409,6 +409,13 @@
             if (results[0] === results[1] && results[1] === results[2]) {
                 const winnings = activeBet * 3;
                 await saveBalance(currentBalance + winnings);
+                await addDoc(collection(db, 'activity_logs'), {
+                    type: 'game_win',
+                    title: 'Aşk Jackpot kazanıldı',
+                    user: currentUser,
+                    meta: { game: 'jackpot', reward: winnings, bet: activeBet },
+                    createdAt: serverTimestamp()
+                });
 
                 msg.innerHTML = winMessages[Math.floor(Math.random() * winMessages.length)] + "<br><span style='color: white;'>Kazanılan: <span style='color: #ffd700; font-size: 1.5rem;'>" + winnings + " ❤️</span></span>";
                 msg.classList.add('visible');

@@ -384,6 +384,170 @@
             border-radius: 20px; color: #fff; font-size: 0.9rem; opacity: 0; transition: 0.4s; z-index: 1000;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .profile-quick-actions {
+            position: absolute;
+            top: 68px;
+            left: 52px;
+            background: rgba(10,10,15,0.92);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px;
+            display: none;
+            z-index: 1200;
+            backdrop-filter: blur(10px);
+        }
+        .profile-quick-actions button {
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .profile-sheet {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(6px);
+            z-index: 2500;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .profile-card {
+            width: 100%;
+            max-width: 680px;
+            max-height: 85vh;
+            overflow: auto;
+            background: #120711;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            border: 1px solid var(--border);
+            padding: 16px;
+        }
+        .profile-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .profile-avatar {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--ayse-color), var(--mert-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            border: 2px solid rgba(255,255,255,0.15);
+        }
+        .sheet-actions { display: flex; gap: 8px; margin-bottom: 12px; }
+        .sheet-btn {
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 0.82rem;
+            cursor: pointer;
+        }
+        .sheet-title { font-size: 0.85rem; opacity: 0.7; margin: 10px 0 8px; letter-spacing: 0.2px; }
+        .search-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .search-input {
+            flex: 1;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #fff;
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 0.82rem;
+        }
+        .toggle-btn {
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .toggle-btn.active { border-color: var(--ayse-color); background: rgba(255,75,114,0.16); }
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 8px;
+        }
+        .media-grid img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        .file-list { display: flex; flex-direction: column; gap: 8px; }
+        .file-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 0.82rem;
+        }
+        .wallpaper-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+            gap: 8px;
+        }
+        .wp-item {
+            aspect-ratio: 1/1;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.15);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .wp-item.active { border-color: var(--ayse-color); }
+        .wp-item span {
+            position: absolute;
+            left: 5px;
+            bottom: 5px;
+            font-size: 0.64rem;
+            background: rgba(0,0,0,0.45);
+            padding: 2px 5px;
+            border-radius: 6px;
+        }
+        .quick-emoji-bar {
+            position: fixed;
+            left: 12px;
+            right: 12px;
+            bottom: 72px;
+            z-index: 1001;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            overflow-x: auto;
+            padding: 6px 8px;
+            background: rgba(15, 5, 10, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            backdrop-filter: blur(14px);
+        }
+        .quick-emoji {
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            min-width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .quick-emoji.manage {
+            min-width: auto;
+            padding: 0 8px;
+            font-size: 0.78rem;
+        }
 
         /* --- Modal Zoom --- */
         #img-modal {
@@ -404,13 +568,14 @@
     <header class="chat-header">
         <a href="index.html#hub" class="back-btn">‹</a>
         <div class="partner-avatar" id="p-avatar">❤️</div>
-        <div class="partner-info">
+        <div class="partner-info" id="partner-info-clickable">
             <span class="partner-name" id="p-name">Zeytinim</span>
             <span class="partner-status" id="p-status">Bağlanıyor...</span>
         </div>
     </header>
 
     <div class="chat-flow" id="chat-flow"></div>
+    <div class="quick-emoji-bar" id="quick-emoji-bar"></div>
 
     <div class="chat-input-bar">
         <div id="previews">
@@ -442,6 +607,32 @@
 
     <div id="img-modal" onclick="this.style.display='none'">
         <img src="" id="modal-img">
+    </div>
+    <div class="profile-sheet" id="profile-sheet">
+        <div class="profile-card">
+            <div class="profile-head">
+                <div class="profile-avatar" id="sheet-avatar">A</div>
+                <div>
+                    <div style="font-weight:700;" id="sheet-name">Profil</div>
+                    <div style="opacity:.7; font-size:.82rem;" id="sheet-sub">Mesajlar, dosyalar, tema</div>
+                </div>
+                <button class="sheet-btn" id="close-sheet" style="margin-left:auto;">Kapat</button>
+            </div>
+            <div class="sheet-actions">
+                <button class="sheet-btn" id="open-theme-editor-btn">Mesaj Teması</button>
+            </div>
+            <div class="sheet-title">Mesaj İçinde Ara</div>
+            <div class="search-row">
+                <input id="msg-search-input" class="search-input" placeholder="Mesaj ara...">
+                <button id="media-filter-btn" class="toggle-btn">Sadece Medya</button>
+            </div>
+            <div class="sheet-title">Sohbet Duvar Kağıdı</div>
+            <div class="wallpaper-grid" id="wallpaper-grid"></div>
+            <div class="sheet-title">Paylaşılan Medyalar</div>
+            <div class="media-grid" id="shared-media-grid"></div>
+            <div class="sheet-title">Dosyalar ve Sesler</div>
+            <div class="file-list" id="shared-file-list"></div>
+        </div>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -476,12 +667,66 @@
         const ta = document.getElementById('chat-textarea');
         const media = { photo: '', voice: null };
         let activeStream = null;
+        const profileSheet = document.getElementById('profile-sheet');
+        const sharedMediaGrid = document.getElementById('shared-media-grid');
+        const sharedFileList = document.getElementById('shared-file-list');
+        const quickEmojiBar = document.getElementById('quick-emoji-bar');
+        const msgSearchInput = document.getElementById('msg-search-input');
+        const mediaFilterBtn = document.getElementById('media-filter-btn');
+        const wallpaperGrid = document.getElementById('wallpaper-grid');
+        let sharedPhotos = [];
+        let sharedAudios = [];
+        let messageCache = [];
+        let searchTerm = '';
+        let mediaOnlyFilter = false;
+        const CHAT_WP_KEY = 'chat_wallpaper_pref';
+        const QUICK_EMOJI_KEY = 'chat_quick_emojis';
+        let quickEmojis = JSON.parse(localStorage.getItem(QUICK_EMOJI_KEY) || '["❤️","😍","🥺","🔥","😂","✨"]');
+        const WALLPAPERS = [
+            { id: 'default', label: 'Default', css: 'radial-gradient(circle at top right, rgba(255, 75, 114, 0.05) 0%, transparent 40%), radial-gradient(circle at bottom left, rgba(79, 172, 254, 0.05) 0%, transparent 40%)' },
+            { id: 'soft', label: 'Soft', css: 'linear-gradient(180deg, #1a0b16 0%, #0d0610 100%)' },
+            { id: 'aurora', label: 'Aurora', css: 'radial-gradient(circle at 20% 20%, rgba(255,75,114,0.2) 0%, transparent 35%), radial-gradient(circle at 80% 80%, rgba(79,172,254,0.22) 0%, transparent 35%), #0b0208' },
+            { id: 'night', label: 'Night', css: 'linear-gradient(180deg, #080a14 0%, #09030d 100%)' }
+        ];
+        const openThemeBtn = document.getElementById('open-theme-editor-btn');
+        [document.getElementById('p-avatar'), document.getElementById('p-name'), document.getElementById('partner-info-clickable')].forEach((el) => {
+            if (!el) return;
+            el.style.cursor = 'pointer';
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openProfileSheet();
+            });
+        });
+        document.getElementById('close-sheet').addEventListener('click', () => profileSheet.style.display = 'none');
+        profileSheet.addEventListener('click', (e) => {
+            if (e.target === profileSheet) profileSheet.style.display = 'none';
+        });
+        openThemeBtn.addEventListener('click', () => {
+            window.location.href = 'theme-editor.html?from=chat';
+        });
+        msgSearchInput.addEventListener('input', () => {
+            searchTerm = msgSearchInput.value.trim().toLowerCase();
+            renderMessages();
+        });
+        mediaFilterBtn.addEventListener('click', () => {
+            mediaOnlyFilter = !mediaOnlyFilter;
+            mediaFilterBtn.classList.toggle('active', mediaOnlyFilter);
+            renderMessages();
+        });
+        initWallpaperUI();
+        renderQuickEmojiBar();
 
         onSnapshot(inventoryRef, (snap) => {
             if (!snap.exists()) return;
             const theme = snap.data()?.activeCosmetics?.gameTheme;
+            const customTheme = snap.data()?.activeCosmetics?.customTheme;
             if (theme === 'theme_rose') {
                 document.body.style.background = 'linear-gradient(180deg, #21060f 0%, #12030a 100%)';
+            }
+            if (customTheme) {
+                document.documentElement.style.setProperty('--primary', customTheme.primary || '#ff4b72');
+                document.body.style.background = customTheme.bg || '#0a0208';
+                document.body.style.fontFamily = customTheme.font || "Outfit, sans-serif";
             }
         });
 
@@ -497,6 +742,79 @@
             t.className = 'toast show';
             setTimeout(() => t.className = 'toast', 3000);
         };
+        function renderQuickEmojiBar() {
+            quickEmojiBar.innerHTML = '';
+            quickEmojis.forEach((emo) => {
+                const b = document.createElement('button');
+                b.className = 'quick-emoji';
+                b.innerText = emo;
+                b.onclick = () => {
+                    ta.value += emo + ' ';
+                    ta.focus();
+                    ta.dispatchEvent(new Event('input'));
+                };
+                quickEmojiBar.appendChild(b);
+            });
+            const manage = document.createElement('button');
+            manage.className = 'quick-emoji manage';
+            manage.innerText = 'Düzenle';
+            manage.onclick = () => {
+                const raw = prompt('Hızlı emojileri virgülle gir (max 8):', quickEmojis.join(','));
+                if (!raw) return;
+                const arr = raw.split(',').map(x => x.trim()).filter(Boolean).slice(0, 8);
+                if (!arr.length) return;
+                quickEmojis = arr;
+                localStorage.setItem(QUICK_EMOJI_KEY, JSON.stringify(quickEmojis));
+                renderQuickEmojiBar();
+            };
+            quickEmojiBar.appendChild(manage);
+        }
+        function openProfileSheet() {
+            document.getElementById('sheet-avatar').innerText = partnerName[0] || 'P';
+            document.getElementById('sheet-name').innerText = partnerName;
+            sharedMediaGrid.innerHTML = '';
+            if (sharedPhotos.length === 0) {
+                sharedMediaGrid.innerHTML = '<div style="opacity:.6; font-size:.8rem;">Henüz medya yok.</div>';
+            } else {
+                sharedPhotos.slice(0, 24).forEach(url => {
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.onclick = () => window.zoomImg(url);
+                    sharedMediaGrid.appendChild(img);
+                });
+            }
+            sharedFileList.innerHTML = '';
+            if (sharedAudios.length === 0) {
+                sharedFileList.innerHTML = '<div class="file-item" style="opacity:.7;">Henüz ses dosyası yok.</div>';
+            } else {
+                sharedAudios.slice(0, 20).forEach((url, idx) => {
+                    const row = document.createElement('div');
+                    row.className = 'file-item';
+                    row.innerHTML = `Ses ${idx + 1}<audio src="${url}" controls style="width:100%; margin-top:6px;"></audio>`;
+                    sharedFileList.appendChild(row);
+                });
+            }
+            profileSheet.style.display = 'flex';
+        }
+        function applyWallpaper(id) {
+            const item = WALLPAPERS.find(w => w.id === id) || WALLPAPERS[0];
+            document.body.style.backgroundImage = item.css;
+            localStorage.setItem(CHAT_WP_KEY, item.id);
+            document.querySelectorAll('.wp-item').forEach(el => el.classList.toggle('active', el.dataset.id === item.id));
+        }
+        function initWallpaperUI() {
+            wallpaperGrid.innerHTML = '';
+            WALLPAPERS.forEach(w => {
+                const el = document.createElement('div');
+                el.className = 'wp-item';
+                el.dataset.id = w.id;
+                el.style.background = w.css;
+                el.innerHTML = `<span>${w.label}</span>`;
+                el.onclick = () => applyWallpaper(w.id);
+                wallpaperGrid.appendChild(el);
+            });
+            applyWallpaper(localStorage.getItem(CHAT_WP_KEY) || 'default');
+        }
 
         // --- Media Handlers ---
         window.handlePhoto = async () => {
@@ -595,6 +913,13 @@
                     reactions: {},
                     timestamp: serverTimestamp()
                 });
+                await addDoc(collection(db, 'activity_logs'), {
+                    type: 'message',
+                    title: 'Yeni mesaj gönderildi',
+                    user: currentUser,
+                    meta: { hasText: !!text, hasPhoto: !!media.photo, hasAudio: !!audioUrl },
+                    createdAt: serverTimestamp()
+                });
 
                 // --- Kapalıyken Giden Push Bildirimi ---
                 if (window.sendLoveNotification && currentUser !== 'Bilinmeyen') {
@@ -616,13 +941,15 @@
         };
 
         // --- Messaging Logic ---
-        onSnapshot(query(collection(db, 'chat_messages'), orderBy('timestamp', 'asc')), (snap) => {
+        function renderMessages() {
             chatFlow.innerHTML = '';
             let lastDate = null;
-
-            snap.forEach(d => {
-                const msg = d.data();
+            sharedPhotos = [];
+            sharedAudios = [];
+            messageCache.forEach(({ id, msg }) => {
                 if (!msg.timestamp) return;
+                if (searchTerm && !(msg.text || '').toLowerCase().includes(searchTerm)) return;
+                if (mediaOnlyFilter && !msg.photo && !msg.audio) return;
 
                 const currDate = msg.timestamp.toDate().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
                 
@@ -642,6 +969,8 @@
                 }
 
                 const isMe = msg.sender === currentUser;
+                if (msg.photo) sharedPhotos.push(msg.photo);
+                if (msg.audio) sharedAudios.push(msg.audio);
                 
                 const wrap = document.createElement('div');
                 wrap.className = `message-wrapper ${isMe ? 'msg-mert' : 'msg-ayse'}`;
@@ -663,7 +992,7 @@
                     span.innerText = emo;
                     span.onclick = (e) => {
                         e.stopPropagation();
-                        addReaction(d.id, emo, msg.reactions);
+                        addReaction(id, emo, msg.reactions);
                         reactBar.classList.remove('active');
                     };
                     reactBar.appendChild(span);
@@ -676,7 +1005,7 @@
                 customBtn.onclick = (e) => {
                     e.stopPropagation();
                     const custom = prompt("Hangi ifadeyi bırakmak istersin sevgilim? ✨");
-                    if (custom) addReaction(d.id, custom, msg.reactions);
+                    if (custom) addReaction(id, custom, msg.reactions);
                     reactBar.classList.remove('active');
                 };
                 reactBar.appendChild(customBtn);
@@ -687,7 +1016,7 @@
                 deleteSpan.innerText = '🗑️';
                 deleteSpan.onclick = (e) => {
                     e.stopPropagation();
-                    window.showDeleteMenu(d.id, isMe);
+                    window.showDeleteMenu(id, isMe);
                     reactBar.classList.remove('active');
                 };
                 reactBar.appendChild(deleteSpan);
@@ -718,6 +1047,10 @@
                 chatFlow.appendChild(wrap);
             });
             chatFlow.scrollTop = chatFlow.scrollHeight;
+        }
+        onSnapshot(query(collection(db, 'chat_messages'), orderBy('timestamp', 'asc')), (snap) => {
+            messageCache = snap.docs.map((d) => ({ id: d.id, msg: d.data() }));
+            renderMessages();
         });
 
         async function addReaction(id, emoji, currentReactions) {

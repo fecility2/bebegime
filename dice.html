@@ -205,7 +205,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, updateDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, enableIndexedDbPersistence, doc, getDoc, updateDoc, onSnapshot, runTransaction, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -315,6 +315,13 @@
             
             // Firebase'e Kaydet
             await updateDoc(ecoRef, { [currentUser]: currentBalance });
+            await addDoc(collection(db, 'activity_logs'), {
+                type: 'game_win',
+                title: 'Şans Zarı oynandı',
+                user: currentUser,
+                meta: { game: 'dice', reward: wonAmount, result: finalResult },
+                createdAt: serverTimestamp()
+            });
 
             walletDisp.innerText = currentUser + ': ' + currentBalance + ' ❤️';
             statusMsg.innerHTML = "Harika! Zar <span class='win-amt'>" + finalResult + "</span> geldi ve <span class='win-amt'>" + wonAmount + " ❤️</span> kazandın! 🎉 Şimdi doğruca Aşk Jackpot oynamaya!";

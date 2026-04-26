@@ -1244,6 +1244,13 @@
                     pendingPhoto: isOfflinePhoto ? true : false,
                     ts: serverTimestamp()
                 });
+                await addDoc(collection(db, 'activity_logs'), {
+                    type: 'diary',
+                    title: 'Günlüğe yeni not eklendi',
+                    user: who === 'ayse' ? 'Ayşe' : 'Mert',
+                    meta: { hasText: !!text, hasPhoto: !!photoUrl, hasAudio: !!audioUrl },
+                    createdAt: serverTimestamp()
+                });
 
                 // --- Kapalıyken Giden Push Bildirimi ---
                 if (window.sendLoveNotification) {
