@@ -27,6 +27,18 @@
         .buy-btn { margin-top: 12px; width: 100%; border: none; border-radius: 12px; padding: 10px 12px; font-weight: 700; cursor: pointer; background: linear-gradient(45deg, #ff4b72, #ff8c00); color: #fff; }
         .buy-btn:disabled { opacity: .5; cursor: not-allowed; }
         .status { max-width: 980px; margin: 12px auto 0; text-align: center; font-weight: 600; min-height: 24px; }
+        .photo-market { max-width: 980px; margin: 30px auto 0; width: 100%; }
+        .photo-form { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 16px; padding: 14px; display: grid; grid-template-columns: 1.1fr 1fr 1fr auto; gap: 10px; align-items: center; }
+        .photo-form input { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.22); border-radius: 10px; color: #fff; padding: 10px; }
+        .photo-grid { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+        .photo-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; overflow: hidden; }
+        .photo-card img { width: 100%; height: 160px; object-fit: cover; display: block; }
+        .photo-meta { padding: 10px; font-size: .88rem; }
+        .photo-actions { display: flex; gap: 8px; margin-top: 8px; }
+        .action-btn { flex: 1; border: none; border-radius: 10px; padding: 8px; cursor: pointer; font-weight: 700; }
+        .buy-photo-btn { background: linear-gradient(45deg, #ff4b72, #ff8c00); color: #fff; }
+        .dl-btn { background: rgba(255,255,255,.12); color: #fff; text-decoration: none; text-align: center; display: inline-block; }
+        @media (max-width: 900px) { .photo-form { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -47,6 +59,16 @@
     </div>
     <div id="items-grid" class="grid"></div>
     <div id="status-msg" class="status"></div>
+    <div class="photo-market">
+        <h2 style="font-family:'Playfair Display',serif; margin: 10px 0 12px; color: var(--primary);">Fotoğraf Pazarı</h2>
+        <div class="photo-form">
+            <input type="file" id="photo-file" accept="image/*">
+            <input type="number" id="photo-price" min="1" placeholder="Fiyat">
+            <input type="text" id="photo-title" maxlength="60" placeholder="Başlık (opsiyonel)">
+            <button class="buy-btn" id="list-photo-btn">Satışa Koy</button>
+        </div>
+        <div id="photo-grid" class="photo-grid"></div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
@@ -60,7 +82,9 @@
             setDoc,
             runTransaction,
             onSnapshot,
-            serverTimestamp
+            serverTimestamp,
+            query,
+            orderBy
         } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -73,14 +97,16 @@
         };
 
         const DEFAULT_ITEMS = [
-            { id: "cos_badge_star", title: "Yıldız Rozet", icon: "⭐", type: "cosmetic", price: 250, effectKey: "badge_star", description: "Profilde yıldız rozeti." },
-            { id: "cos_theme_rose", title: "Gül Teması", icon: "🌹", type: "cosmetic", price: 450, effectKey: "theme_rose", description: "Oyun arka planına gül tonları." },
-            { id: "con_memory_retry", title: "Hafıza İkinci Şans", icon: "🃏", type: "consumable", price: 180, effectKey: "memory_retry", description: "Aşk Hafızası'nda 1 kez +10sn." },
-            { id: "con_mine_shield", title: "Kalp Kalkanı", icon: "🛡️", type: "consumable", price: 220, effectKey: "mine_shield", description: "Kalp Avcısı'nda ilk bombayı bloklar." },
-            { id: "con_dice_insurance", title: "Zar Sigortası", icon: "🎲", type: "consumable", price: 120, effectKey: "dice_insurance", description: "Şans Zarı'nda kötü sonuçta min 100❤️." },
-            { id: "con_jackpot_boost", title: "Jackpot Boost", icon: "🎰", type: "consumable", price: 260, effectKey: "jackpot_boost", description: "Tek turda jackpot şansını artırır." },
-            { id: "con_scratch_extra", title: "Ekstra Kazıma", icon: "🎟️", type: "consumable", price: 150, effectKey: "scratch_extra", description: "Kazı-Kazan'da kaybedersen 1 ek şans." }
+            { id: "cos_badge_star", title: "Yıldız Rozet", icon: "⭐", type: "cosmetic", price: 1250, effectKey: "badge_star", description: "Profilde yıldız rozeti." },
+            { id: "cos_theme_rose", title: "Gül Teması", icon: "🌹", type: "cosmetic", price: 1850, effectKey: "theme_rose", description: "Oyun arka planına gül tonları." },
+            { id: "con_memory_retry", title: "Hafıza İkinci Şans", icon: "🃏", type: "consumable", price: 1350, effectKey: "memory_retry", description: "Aşk Hafızası'nda 1 kez +10sn." },
+            { id: "con_mine_shield", title: "Kalp Kalkanı", icon: "🛡️", type: "consumable", price: 1450, effectKey: "mine_shield", description: "Kalp Avcısı'nda ilk bombayı bloklar." },
+            { id: "con_dice_insurance", title: "Zar Sigortası", icon: "🎲", type: "consumable", price: 1250, effectKey: "dice_insurance", description: "Şans Zarı'nda kötü sonuçta min 100❤️." },
+            { id: "con_jackpot_boost", title: "Jackpot Boost", icon: "🎰", type: "consumable", price: 1650, effectKey: "jackpot_boost", description: "Tek turda jackpot şansını artırır." },
+            { id: "con_scratch_extra", title: "Ekstra Kazıma", icon: "🎟️", type: "consumable", price: 1300, effectKey: "scratch_extra", description: "Kazı-Kazan'da kaybedersen 1 ek şans." }
         ];
+        const MIN_PRICE = 1;
+        const IMGBB_KEY = "7916dd11376f59a547ed252799f1328a";
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -92,13 +118,15 @@
         const economyRef = doc(db, 'economy', 'balances');
         const inventoryRef = doc(db, 'user_inventory', currentUser);
         const itemsRef = collection(db, 'shop_items');
+        const photoItemsRef = collection(db, 'photo_market_items');
         const statusEl = document.getElementById('status-msg');
         const gridEl = document.getElementById('items-grid');
 
         let selectedTab = 'all';
         let userBalance = 0;
-        let inventory = { cosmetics: {}, consumables: {}, activeCosmetics: {} };
+        let inventory = { cosmetics: {}, consumables: {}, activeCosmetics: {}, purchasedPhotos: {} };
         let shopItems = [];
+        let photoItems = [];
 
         document.getElementById('user-name').textContent = currentUser;
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -113,7 +141,7 @@
         async function ensureInventoryDoc() {
             const snap = await getDoc(inventoryRef);
             if (!snap.exists()) {
-                await setDoc(inventoryRef, { cosmetics: {}, consumables: {}, activeCosmetics: {}, updatedAt: serverTimestamp() });
+                await setDoc(inventoryRef, { cosmetics: {}, consumables: {}, activeCosmetics: {}, purchasedPhotos: {}, updatedAt: serverTimestamp() });
             }
         }
 
@@ -126,7 +154,15 @@
                 shopItems = DEFAULT_ITEMS.map(x => ({ ...x, enabled: true }));
                 return;
             }
-            shopItems = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(i => i.enabled !== false);
+            const loaded = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(i => i.enabled !== false);
+            for (const item of loaded) {
+                if ((item.price || 0) < MIN_PRICE) {
+                    const bumped = DEFAULT_ITEMS.find(x => x.id === item.id)?.price || MIN_PRICE;
+                    await setDoc(doc(db, 'shop_items', item.id), { price: bumped }, { merge: true });
+                    item.price = bumped;
+                }
+            }
+            shopItems = loaded;
         }
 
         function getStock(item) {
@@ -153,6 +189,37 @@
                 `;
                 card.querySelector('.buy-btn').addEventListener('click', () => purchaseItem(item.id));
                 gridEl.appendChild(card);
+            });
+        }
+
+        function canDownloadPhoto(item) {
+            if (item.seller === currentUser) return true;
+            return !!inventory.purchasedPhotos?.[item.id];
+        }
+
+        function renderPhotos() {
+            const grid = document.getElementById('photo-grid');
+            grid.innerHTML = '';
+            photoItems.forEach(item => {
+                const card = document.createElement('div');
+                const downloadable = canDownloadPhoto(item);
+                const isOwn = item.seller === currentUser;
+                card.className = 'photo-card';
+                card.innerHTML = `
+                    <img src="${item.photoUrl}" alt="market-photo">
+                    <div class="photo-meta">
+                        <div style="font-weight:700;">${item.title || 'Fotoğraf'}</div>
+                        <div style="opacity:.8;">Satıcı: ${item.seller}</div>
+                        <div style="margin-top:4px;">Fiyat: ${item.price} ❤️</div>
+                        <div class="photo-actions">
+                            <button class="action-btn buy-photo-btn" ${isOwn ? 'disabled' : ''} data-buy="${item.id}">${isOwn ? 'Kendi ilanın' : 'Satın Al'}</button>
+                            ${downloadable ? `<a class="action-btn dl-btn" href="${item.photoUrl}" download="ask-market-${item.id}.jpg" target="_blank" rel="noopener">İndir</a>` : ''}
+                        </div>
+                    </div>
+                `;
+                const buyBtn = card.querySelector('[data-buy]');
+                if (buyBtn) buyBtn.addEventListener('click', () => buyPhoto(item.id));
+                grid.appendChild(card);
             });
         }
 
@@ -205,6 +272,87 @@
             }
         }
 
+        async function uploadPhotoAndGetUrl(file) {
+            const fd = new FormData();
+            fd.append('image', file);
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
+            const json = await res.json();
+            if (!json.success) throw new Error('Foto yükleme başarısız');
+            return json.data.url;
+        }
+
+        async function listPhotoForSale() {
+            const fileEl = document.getElementById('photo-file');
+            const priceEl = document.getElementById('photo-price');
+            const titleEl = document.getElementById('photo-title');
+            const file = fileEl.files[0];
+            const price = parseInt(priceEl.value, 10);
+            const title = (titleEl.value || '').trim();
+            if (!file) { statusEl.textContent = 'Lütfen fotoğraf seç.'; return; }
+            if (isNaN(price) || price < MIN_PRICE) { statusEl.textContent = 'Geçerli bir fiyat gir.'; return; }
+            statusEl.textContent = 'Fotoğraf yükleniyor...';
+            try {
+                const url = await uploadPhotoAndGetUrl(file);
+                const ref = doc(collection(db, 'photo_market_items'));
+                await setDoc(ref, {
+                    seller: currentUser,
+                    photoUrl: url,
+                    price,
+                    title,
+                    active: true,
+                    createdAt: serverTimestamp()
+                });
+                fileEl.value = '';
+                priceEl.value = '';
+                titleEl.value = '';
+                statusEl.textContent = 'Fotoğraf satışa eklendi.';
+            } catch (e) {
+                statusEl.textContent = e?.message || 'İlan eklenemedi.';
+            }
+        }
+
+        async function buyPhoto(photoId) {
+            statusEl.textContent = 'Fotoğraf satın alınıyor...';
+            try {
+                await runTransaction(db, async (tx) => {
+                    const photoRef = doc(db, 'photo_market_items', photoId);
+                    const photoSnap = await tx.get(photoRef);
+                    const ecoSnap = await tx.get(economyRef);
+                    const buyerInvSnap = await tx.get(inventoryRef);
+                    if (!photoSnap.exists() || !ecoSnap.exists()) throw new Error('Veri bulunamadı');
+                    const photo = photoSnap.data();
+                    if (!photo.active) throw new Error('İlan aktif değil');
+                    if (photo.seller === currentUser) throw new Error('Kendi fotoğrafını satın alamazsın');
+                    const eco = ecoSnap.data();
+                    const buyerBalance = eco[currentUser] || 0;
+                    if (buyerBalance < photo.price) throw new Error('Yetersiz bakiye');
+
+                    const sellerRef = doc(db, 'economy', 'balances');
+                    const sellerBalance = eco[photo.seller] || 0;
+                    const buyerInv = buyerInvSnap.exists() ? buyerInvSnap.data() : { purchasedPhotos: {} };
+                    const bought = { ...(buyerInv.purchasedPhotos || {}) };
+                    bought[photoId] = true;
+
+                    tx.update(economyRef, {
+                        [currentUser]: buyerBalance - photo.price,
+                        [photo.seller]: sellerBalance + photo.price
+                    });
+                    tx.set(inventoryRef, { purchasedPhotos: bought, updatedAt: serverTimestamp() }, { merge: true });
+                    tx.set(doc(collection(db, 'shop_transactions')), {
+                        user: currentUser,
+                        seller: photo.seller,
+                        photoId,
+                        type: 'photo_purchase',
+                        price: photo.price,
+                        createdAt: serverTimestamp()
+                    });
+                });
+                statusEl.textContent = 'Fotoğraf satın alındı. Artık indirebilirsin.';
+            } catch (e) {
+                statusEl.textContent = e?.message || 'Satın alma başarısız.';
+            }
+        }
+
         onSnapshot(economyRef, (snap) => {
             if (!snap.exists()) return;
             const data = snap.data();
@@ -216,11 +364,18 @@
             if (!snap.exists()) return;
             inventory = snap.data();
             renderItems();
+            renderPhotos();
+        });
+
+        onSnapshot(query(photoItemsRef, orderBy('createdAt', 'desc')), (snap) => {
+            photoItems = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(x => x.active !== false);
+            renderPhotos();
         });
 
         await ensureInventoryDoc();
         await ensureCatalog();
         renderItems();
+        document.getElementById('list-photo-btn').addEventListener('click', listPhotoForSale);
     </script>
 </body>
 </html>
