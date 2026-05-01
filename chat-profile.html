@@ -3,140 +3,497 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Sohbet Profili & Medyalar</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <title>Sohbet Profili 💬</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg: #0b0208;
+            --bg: #0a0a0a;
+            --surface: rgba(255,255,255,0.05);
+            --surface-hover: rgba(255,255,255,0.08);
             --primary: #ff4b72;
             --secondary: #ff8c00;
-            --border: rgba(255,255,255,0.08);
-            --surface: rgba(255,255,255,0.04);
             --text: #fff;
+            --text-secondary: rgba(255,255,255,0.6);
+            --border: rgba(255,255,255,0.1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 50px; overflow-x: hidden; }
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
+        /* Header */
         .header {
             position: sticky; top: 0; z-index: 100;
-            background: rgba(11, 2, 8, 0.85); backdrop-filter: blur(20px);
-            padding: 15px 20px; padding-top: calc(15px + env(safe-area-inset-top));
-            display: flex; align-items: center; border-bottom: 1px solid var(--border);
+            background: rgba(10,10,10,0.95); backdrop-filter: blur(20px);
+            padding: 12px 16px; padding-top: calc(12px + env(safe-area-inset-top));
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border);
         }
-        .back-btn { font-size: 1.8rem; color: #fff; text-decoration: none; margin-right: 15px; }
-        .page-title { font-size: 1.2rem; font-weight: 600; }
+        .back-btn { 
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--surface); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; font-size: 1.2rem; transition: 0.2s;
+        }
+        .back-btn:hover { background: var(--surface-hover); }
+        .header-title { font-size: 1.1rem; font-weight: 600; }
+        .header-actions { display: flex; gap: 8px; }
+        .header-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--surface); color: #fff; border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.2s;
+        }
+        .header-btn:hover { background: var(--surface-hover); }
 
-        .hero { text-align: center; padding: 40px 20px 20px; position: relative; }
-        .hero::after {
-            content: ''; position: absolute; bottom: 0; left: 10%; right: 10%;
-            height: 1px; background: linear-gradient(90deg, transparent, rgba(255,75,114,0.5), transparent);
+        /* Profile Hero - Instagram Style */
+        .profile-hero {
+            text-align: center; padding: 30px 20px 20px;
+            background: linear-gradient(180deg, rgba(255,75,114,0.08) 0%, transparent 60%);
         }
-        .avatar {
-            width: 100px; height: 100px; border-radius: 50%;
+        .profile-avatar-container {
+            position: relative; display: inline-block; margin-bottom: 15px;
+        }
+        .profile-avatar {
+            width: 120px; height: 120px; border-radius: 50%;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
-            font-size: 3rem; border: 3px solid rgba(255,255,255,0.1);
-            box-shadow: 0 0 30px rgba(255,75,114,0.3);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3.5rem; border: 4px solid var(--bg);
+            box-shadow: 0 0 0 2px var(--primary), 0 10px 30px rgba(255,75,114,0.3);
+            overflow: hidden; position: relative;
         }
-        .partner-name { font-size: 2rem; font-family: 'Playfair Display', serif; }
-        .relationship-status { font-size: 0.9rem; opacity: 0.7; color: var(--primary); font-weight: 600; margin-top: 5px; }
+        .profile-avatar img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .add-story-ring {
+            position: absolute; inset: -6px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            z-index: -1; padding: 3px;
+        }
+        .add-story-ring::before {
+            content: ''; position: absolute; inset: 3px;
+            background: var(--bg); border-radius: 50%;
+        }
+        .camera-btn {
+            position: absolute; bottom: 0; right: 0;
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--primary); color: #fff; border: 3px solid var(--bg);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .profile-name {
+            font-size: 1.8rem; font-weight: 700; display: flex;
+            align-items: center; justify-content: center; gap: 8px;
+        }
+        .verified-badge { color: var(--primary); font-size: 1.2rem; }
+        .profile-status {
+            font-size: 0.9rem; color: var(--text-secondary); margin-top: 4px;
+        }
 
-        .section { max-width: 800px; margin: 30px auto; padding: 0 20px; }
-        .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.9); }
+        /* Quick Actions - Instagram Style */
+        .quick-actions {
+            display: flex; justify-content: center; gap: 30px;
+            padding: 20px; border-bottom: 1px solid var(--border);
+        }
+        .quick-action {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .quick-action:hover { opacity: 0.8; }
+        .quick-action-icon {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: var(--surface); display: flex;
+            align-items: center; justify-content: center;
+            font-size: 1.3rem; color: var(--text);
+        }
+        .quick-action-label {
+            font-size: 0.75rem; color: var(--text-secondary);
+        }
 
-        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px; backdrop-filter: blur(10px); }
-        
-        /* Wallpapers */
-        .wp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
-        .wp-item {
-            aspect-ratio: 1/1; border-radius: 15px; border: 2px solid rgba(255,255,255,0.1);
-            cursor: pointer; position: relative; overflow: hidden; transition: 0.3s;
+        /* Settings List */
+        .settings-list {
+            padding: 10px 0;
         }
-        .wp-item:hover, .wp-item.active { border-color: var(--primary); transform: scale(1.05); box-shadow: 0 5px 15px rgba(255,75,114,0.2); }
-        .wp-item span { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; white-space: nowrap; backdrop-filter: blur(4px); }
-        .custom-upload-btn {
-            display: flex; align-items: center; justify-content: center; text-align: center;
-            background: rgba(255,75,114,0.1); border: 2px dashed rgba(255,75,114,0.4);
-            border-radius: 15px; color: var(--primary); font-weight: 600; cursor: pointer;
-            transition: 0.3s; padding: 15px;
+        .settings-item {
+            display: flex; align-items: center; gap: 15px;
+            padding: 16px 20px; cursor: pointer; transition: 0.2s;
+            border-bottom: 1px solid var(--border);
         }
-        .custom-upload-btn:hover { background: rgba(255,75,114,0.2); }
+        .settings-item:hover { background: var(--surface-hover); }
+        .settings-item:last-child { border-bottom: none; }
+        .settings-icon {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: var(--surface); display: flex;
+            align-items: center; justify-content: center;
+            color: var(--primary); font-size: 1rem;
+        }
+        .settings-content { flex: 1; }
+        .settings-title { font-size: 0.95rem; font-weight: 500; }
+        .settings-subtitle {
+            font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;
+        }
+        .settings-arrow {
+            color: var(--text-secondary); font-size: 0.9rem;
+        }
+
+        /* Theme Section */
+        .section { padding: 20px; }
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .section-title { font-size: 1rem; font-weight: 600; }
+        .section-action {
+            font-size: 0.85rem; color: var(--primary); cursor: pointer;
+        }
+
+        /* Theme Grid */
+        .theme-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+        }
+        @media (min-width: 400px) {
+            .theme-grid { grid-template-columns: repeat(5, 1fr); }
+        }
+        .theme-item {
+            aspect-ratio: 9/16; border-radius: 12px; cursor: pointer;
+            position: relative; overflow: hidden; border: 2px solid transparent;
+            transition: 0.2s;
+        }
+        .theme-item:hover { transform: scale(1.05); }
+        .theme-item.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(255,75,114,0.4);
+        }
+        .theme-item img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .theme-check {
+            position: absolute; top: 6px; right: 6px;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: var(--primary); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem;
+        }
+        .custom-theme-btn {
+            aspect-ratio: 9/16; border-radius: 12px;
+            border: 2px dashed rgba(255,255,255,0.3);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 8px;
+            cursor: pointer; transition: 0.2s; color: var(--text-secondary);
+        }
+        .custom-theme-btn:hover {
+            border-color: var(--primary); color: var(--primary);
+        }
+        .custom-theme-btn i { font-size: 1.5rem; }
+        .custom-theme-btn span { font-size: 0.7rem; }
+
+        /* Emoji Section */
+        .emoji-section { padding: 20px; border-top: 1px solid var(--border); }
+        .emoji-grid {
+            display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px;
+            margin-top: 15px;
+        }
+        .emoji-item {
+            aspect-ratio: 1; border-radius: 12px;
+            background: var(--surface); display: flex;
+            align-items: center; justify-content: center;
+            font-size: 1.5rem; cursor: pointer; transition: 0.15s;
+        }
+        .emoji-item:hover { background: var(--surface-hover); transform: scale(1.1); }
+        .emoji-item.selected {
+            background: rgba(255,75,114,0.2); box-shadow: 0 0 0 2px var(--primary);
+        }
+        .emoji-more {
+            background: transparent; border: 2px dashed rgba(255,255,255,0.3);
+        }
 
         /* Media Gallery */
-        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
-        .media-grid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; cursor: pointer; transition: 0.3s; border: 1px solid rgba(255,255,255,0.1); }
-        .media-grid img:hover { transform: scale(1.03); border-color: rgba(255,255,255,0.3); }
-        .empty-text { opacity: 0.5; font-size: 0.9rem; font-style: italic; text-align: center; padding: 20px; }
+        .media-section { padding: 20px; border-top: 1px solid var(--border); }
+        .media-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px;
+            margin-top: 15px;
+        }
+        .media-item {
+            aspect-ratio: 1; overflow: hidden; cursor: pointer;
+            position: relative;
+        }
+        .media-item img {
+            width: 100%; height: 100%; object-fit: cover; transition: 0.3s;
+        }
+        .media-item:hover img { transform: scale(1.05); }
 
-        /* Actions */
-        .action-row { display: flex; gap: 10px; margin-top: 15px; }
-        .btn { flex: 1; padding: 14px; border-radius: 15px; border: none; font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.3s; }
-        .btn-primary { background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #fff; box-shadow: 0 5px 15px rgba(255,75,114,0.3); }
-        .btn-secondary { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15); }
-        .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+        /* Modals */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px); z-index: 2000;
+            display: none; align-items: flex-end; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-sheet {
+            width: 100%; max-width: 500px;
+            background: #1a1a1a; border-radius: 25px 25px 0 0;
+            max-height: 85vh; overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .modal-header {
+            padding: 20px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-title { font-size: 1.1rem; font-weight: 600; }
+        .modal-close {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: var(--surface); color: #fff; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .modal-content { padding: 20px; }
 
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(255,75,114,0.9); color: #fff; padding: 12px 24px; border-radius: 30px; font-weight: 600; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        /* Emoji Picker Modal */
+        .emoji-picker-grid {
+            display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px;
+            max-height: 300px; overflow-y: auto; padding-right: 10px;
+        }
+        .emoji-picker-item {
+            aspect-ratio: 1; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; cursor: pointer; transition: 0.15s;
+        }
+        .emoji-picker-item:hover { background: var(--surface); }
+
+        /* Toast */
+        #toast {
+            position: fixed; bottom: 100px; left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(255,75,114,0.95); color: #fff;
+            padding: 12px 24px; border-radius: 30px;
+            font-weight: 600; opacity: 0; pointer-events: none;
+            transition: 0.3s; z-index: 3000;
+            backdrop-filter: blur(10px);
+        }
         #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* Modal image zoom */
-        #img-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        #img-modal img { max-width: 100%; max-height: 90vh; border-radius: 15px; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        
-        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        /* Image Modal */
+        #img-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            z-index: 3000; display: none; align-items: center; justify-content: center;
+        }
+        #img-modal img { max-width: 95%; max-height: 90vh; border-radius: 12px; }
     </style>
 </head>
 <body>
-
+    <!-- Header -->
     <header class="header">
-        <a href="chat.html" class="back-btn">‹</a>
-        <div class="page-title">Mesaj Ayarları & Medya</div>
+        <a href="#" class="back-btn" id="back-btn"><i class="fas fa-chevron-left"></i></a>
+        <div class="header-title">Sohbet Profili</div>
+        <div class="header-actions">
+            <button class="header-btn" onclick="openLoveProfile()"><i class="fas fa-heart"></i></button>
+        </div>
     </header>
 
-    <div class="hero">
-        <div class="avatar" id="avatar">👤</div>
-        <div class="partner-name" id="partner-name">...</div>
-        <div class="relationship-status">Senin Biricik Aşkın ✨</div>
-        <div class="action-row" style="max-width: 400px; margin: 20px auto 0;">
-            <button class="btn btn-primary" onclick="window.location.href='theme-editor.html?from=chatprofile'">🎨 Renkleri Değiştir</button>
+    <!-- Profile Hero -->
+    <div class="profile-hero">
+        <div class="profile-avatar-container">
+            <div class="add-story-ring"></div>
+            <div class="profile-avatar" id="partner-avatar" onclick="openPartnerProfile()">
+                <span id="partner-emoji">👤</span>
+            </div>
+        </div>
+        <div class="profile-name">
+            <span id="partner-name">Partner</span>
+            <i class="fas fa-heart verified-badge"></i>
+        </div>
+        <div class="profile-status" id="partner-status">Senin Biricik Aşkın ✨</div>
+    </div>
+
+    <!-- Settings List -->
+    <div class="settings-list">
+        <div class="settings-item" onclick="openThemeModal()">
+            <div class="settings-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);"><i class="fas fa-palette"></i></div>
+            <div class="settings-content">
+                <div class="settings-title">Tema</div>
+                <div class="settings-subtitle" id="current-theme">Soğuk</div>
+            </div>
+            <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
+        </div>
+        <div class="settings-item" onclick="openNicknameModal()">
+            <div class="settings-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);"><i class="fas fa-mask"></i></div>
+            <div class="settings-content">
+                <div class="settings-title">Takma Adlar</div>
+                <div class="settings-subtitle" id="nickname-subtitle">Birbirinize özel isimler</div>
+            </div>
+            <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
         </div>
     </div>
 
-    <div class="section">
-        <div class="section-title">🖼️ Sohbet Duvar Kağıdı</div>
-        <div class="panel">
-            <div class="wp-grid" id="wp-grid">
-                <!-- Javascript will render these -->
+    <!-- Shared Media -->
+    <div class="media-section">
+        <div class="section-header">
+            <div class="section-title">📸 Paylaşılan Fotoğraflar</div>
+            <div class="section-action" onclick="location.href='chat.html'">Tümünü Gör</div>
+        </div>
+        <div class="media-grid" id="media-grid">
+            <!-- JS ile doldurulacak -->
+        </div>
+    </div>
+
+    <!-- Theme Modal -->
+    <div class="modal-overlay" id="theme-modal" onclick="closeThemeModal(event)">
+        <div class="modal-sheet modal-sheet-large" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">🎨 Sohbet Teması</div>
+                <button class="modal-close" onclick="closeThemeModal()"><i class="fas fa-times"></i></button>
             </div>
-            <div style="margin-top: 15px;">
-                <label for="custom-upload" class="custom-upload-btn">
-                    + Kendi Fotoğrafını Yükle
-                </label>
-                <input type="file" id="custom-upload" hidden accept="image/*">
+            <div class="modal-content" style="max-height: 70vh; overflow-y: auto;">
+
+                <!-- Hazır Temalar -->
+                <div style="margin-bottom: 25px;">
+                    <div style="font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-star" style="color: #ffd700;"></i>
+                        Hazır Temalar
+                    </div>
+                    <div class="theme-grid" id="preset-themes-grid" style="grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                        <!-- JS ile doldurulacak -->
+                    </div>
+                </div>
+
+                <!-- Oluşturduğum Temalar -->
+                <div id="my-themes-section" style="margin-bottom: 25px; display: none;">
+                    <div style="font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-heart" style="color: var(--primary);"></i>
+                        Oluşturduğum Temalar
+                    </div>
+                    <div class="theme-grid" id="my-themes-grid" style="grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                        <!-- JS ile doldurulacak -->
+                    </div>
+                </div>
+
+                <!-- Yeni Tema Oluştur -->
+                <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px;">
+                    <div style="font-size: 1rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-magic" style="color: var(--primary);"></i>
+                        Yeni Tema Oluştur
+                    </div>
+
+                    <!-- Arka Plan Seçimi (Resim veya Renk) -->
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 10px;">Arka Plan</div>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <button onclick="setBgType('color')" id="btn-bg-color" style="flex: 1; padding: 10px; border-radius: 10px; border: 2px solid var(--primary); background: rgba(255,75,114,0.2); color: #fff; cursor: pointer;">
+                                <i class="fas fa-paint-brush"></i> Renk
+                            </button>
+                            <button onclick="setBgType('image')" id="btn-bg-image" style="flex: 1; padding: 10px; border-radius: 10px; border: 2px solid transparent; background: rgba(255,255,255,0.1); color: #fff; cursor: pointer;">
+                                <i class="fas fa-image"></i> Resim
+                            </button>
+                        </div>
+
+                        <!-- Renk Seçici -->
+                        <div id="bg-color-picker" style="display: block;">
+                            <input type="color" id="custom-bg-color" value="#1a1a2e" style="width: 100%; height: 50px; border-radius: 12px; border: none; cursor: pointer;">
+                        </div>
+
+                        <!-- Resim Seçici -->
+                        <div id="bg-image-picker" style="display: none;">
+                            <div style="display: flex; gap: 10px;">
+                                <label class="custom-theme-btn" style="flex: 1; aspect-ratio: 16/9; min-height: 60px;">
+                                    <i class="fas fa-upload"></i>
+                                    <span>Resim Yükle</span>
+                                    <input type="file" id="custom-bg-upload" hidden accept="image/*">
+                                </label>
+                                <div id="custom-bg-preview" style="flex: 1; aspect-ratio: 16/9; border-radius: 12px; background: rgba(255,255,255,0.1); display: none; background-size: cover; background-position: center;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mesaj Balonu Renkleri -->
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 10px;">Mesaj Renkleri</div>
+                        <div style="display: flex; gap: 15px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-bottom: 5px;">Benim Mesajlarım</div>
+                                <input type="color" id="my-message-color" value="#4facfe" style="width: 100%; height: 40px; border-radius: 10px; border: none; cursor: pointer;">
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-bottom: 5px;">Partner'in Mesajları</div>
+                                <input type="color" id="partner-message-color" value="#ff4b72" style="width: 100%; height: 40px; border-radius: 10px; border: none; cursor: pointer;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tema İsmi -->
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 8px;">Tema İsmi</div>
+                        <input type="text" id="custom-theme-name" placeholder="Örn: Aşk Temam" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: #fff; font-size: 1rem;">
+                    </div>
+
+                    <!-- Uygula Butonu -->
+                    <button onclick="applyCustomTheme()" style="width: 100%; padding: 14px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; border: none; font-weight: 600; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <i class="fas fa-check"></i>
+                        Temayı Oluştur ve Uygula
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="section">
-        <div class="section-title">📸 Ortak Fotoğraflar</div>
-        <div class="panel">
-            <div class="media-grid" id="media-grid">
-                <div class="empty-text">Medyalar yükleniyor...</div>
+    <!-- Nickname Modal -->
+    <div class="modal-overlay" id="nickname-modal" onclick="closeNicknameModal(event)">
+        <div class="modal-sheet" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">🎭 Takma Adlar</div>
+                <button class="modal-close" onclick="closeNicknameModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-content">
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">💕</div>
+                    <div style="font-size: 1rem; color: rgba(255,255,255,0.8);">
+                        Birbirinize özel takma adlar belirleyin
+                    </div>
+                </div>
+
+                <!-- Partner'in Takma Adı -->
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-user"></i>
+                        <span id="partner-nickname-label">Partner'in Adı</span>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="partner-nickname-input" placeholder="Örn: Bebeğim, Zeytinim..." style="flex: 1; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: #fff; font-size: 1rem;">
+                        <button onclick="savePartnerNickname()" style="padding: 14px 20px; border-radius: 12px; background: var(--primary); color: #fff; border: none; cursor: pointer;">
+                            <i class="fas fa-save"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mevcut Takma Adlar Listesi -->
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-bottom: 15px;">Aktif Takma Ad</div>
+                    <div id="current-nickname-display" style="padding: 15px; background: rgba(255,75,114,0.1); border-radius: 12px; border: 1px solid rgba(255,75,114,0.3); text-align: center;">
+                        Henüz takma ad belirlenmemiş
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- TODO: Optional audio files section could be here too -->
 
     <div id="toast"></div>
-
     <div id="img-modal" onclick="this.style.display='none'">
         <img src="" id="modal-img" onclick="event.stopPropagation()">
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, getDocs, limit, where, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, getDocs, doc, onSnapshot, setDoc, addDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -154,115 +511,529 @@
         const activePlayer = localStorage.getItem('active_player') || 'Ayşe';
         const partner = activePlayer === 'Ayşe' ? 'Mert' : 'Ayşe';
         
+        // DOM Elements
         document.getElementById('partner-name').textContent = partner;
-        document.getElementById('avatar').textContent = partner === 'Mert' ? '🤴🏻' : '👸🏻';
+        document.getElementById('partner-emoji').textContent = partner === 'Mert' ? '🤴🏻' : '👸🏻';
+        document.getElementById('partner-status').textContent = partner === 'Mert' ? 'Seni çok seven erkek 🖤' : 'Seni çok seven kız 💗';
 
-        // Load partner's custom profile picture
+        // Load Profile Pictures
         onSnapshot(doc(db, 'user_stats', partner), (snap) => {
             if (snap.exists() && snap.data().profilePic) {
-                const img = snap.data().profilePic;
-                const av = document.getElementById('avatar');
-                av.style.backgroundImage = `url(${img})`;
-                av.style.backgroundSize = 'cover';
-                av.style.backgroundPosition = 'center';
-                av.textContent = '';
+                const avatar = document.getElementById('partner-avatar');
+                avatar.innerHTML = `<img src="${snap.data().profilePic}" alt="${partner}">`;
             }
         });
 
-        // --- Wallpapers ---
-        const CHAT_WP_KEY = 'chat_wallpaper_pref';
-        const CUSTOM_WP_KEY = 'chat_custom_wallpaper_url';
-        
-        const WALLPAPERS = [
-            { id: 'default', label: 'Varsayılan', css: 'radial-gradient(circle at top right, rgba(255, 75, 114, 0.05) 0%, transparent 40%), radial-gradient(circle at bottom left, rgba(79, 172, 254, 0.05) 0%, transparent 40%)' },
-            { id: 'soft', label: 'Soft Gece', css: 'linear-gradient(180deg, #1a0b16 0%, #0d0610 100%)' },
-            { id: 'aurora', label: 'Aurora', css: 'radial-gradient(circle at 20% 20%, rgba(255,75,114,0.2) 0%, transparent 35%), radial-gradient(circle at 80% 80%, rgba(79,172,254,0.22) 0%, transparent 35%), #0b0208' },
-            { id: 'night', label: 'Karanlık', css: 'linear-gradient(180deg, #080a14 0%, #09030d 100%)' }
+        // HAZIR TEMA - Sadece Gece Gülü
+        const THEMES = [
+            { id: 'midnight_rose', name: 'Gece Gülü', gradient: 'linear-gradient(135deg, #1a0a1a 0%, #2d1b2d 50%, #1a0a1a 100%)', emoji: '🌹', desc: 'Gizemli ve romantik' }
         ];
 
-        function renderWallpapers() {
-            const grid = document.getElementById('wp-grid');
-            grid.innerHTML = '';
-            
-            const customUrl = localStorage.getItem(CUSTOM_WP_KEY);
-            let templates = [...WALLPAPERS];
-            if (customUrl) {
-                templates.push({ id: 'custom_saved', label: 'Özel (Senin)', css: `url(${customUrl}) center/cover no-repeat fixed` });
+        const CHAT_THEME_KEY = 'chat_theme_pref';
+        const CUSTOM_THEME_KEY = 'chat_custom_theme_url';
+
+        const MY_THEMES_KEY = 'my_custom_themes';
+        let currentBgType = 'color'; // 'color' veya 'image'
+
+        function renderThemes() {
+            const currentId = localStorage.getItem(CHAT_THEME_KEY) || 'default';
+            const currentTheme = THEMES.find(t => t.id === currentId);
+            document.getElementById('current-theme').textContent = currentTheme?.name || 'Varsayılan';
+
+            // Hazır Temalar Grid
+            const presetGrid = document.getElementById('preset-themes-grid');
+            if (presetGrid) {
+                presetGrid.innerHTML = THEMES.map(theme => `
+                    <div class="theme-item ${theme.id === currentId ? 'active' : ''}" onclick="applyTheme('${theme.id}')" style="background: ${theme.gradient}; aspect-ratio: 1; border-radius: 12px; position: relative; cursor: pointer;">
+                        <div style="position: absolute; bottom: 6px; left: 6px; font-size: 1rem;">${theme.emoji}</div>
+                        <div style="position: absolute; bottom: 6px; right: 6px; font-size: 0.7rem; color: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">${theme.name}</div>
+                        ${theme.id === currentId ? '<div class="theme-check" style="position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;"><i class="fas fa-check"></i></div>' : ''}
+                    </div>
+                `).join('');
             }
 
-            const currentId = localStorage.getItem(CHAT_WP_KEY) || 'default';
-
-            templates.forEach(wp => {
-                const item = document.createElement('div');
-                item.className = 'wp-item';
-                if (wp.id === currentId) item.classList.add('active');
-                item.style.background = wp.css;
-                item.innerHTML = `<span>${wp.label}</span>`;
-                item.onclick = () => {
-                    localStorage.setItem(CHAT_WP_KEY, wp.id);
-                    renderWallpapers();
-                    showToast('Duvar kağıdı güncellendi! 🌸');
-                };
-                grid.appendChild(item);
-            });
+            // Oluşturduğum Temalar Grid
+            renderMyThemes();
         }
-        renderWallpapers();
 
-        // Custom upload
-        document.getElementById('custom-upload').addEventListener('change', async (e) => {
+        function renderMyThemes() {
+            const myThemes = JSON.parse(localStorage.getItem(MY_THEMES_KEY)) || [];
+            const myThemesSection = document.getElementById('my-themes-section');
+            const myThemesGrid = document.getElementById('my-themes-grid');
+            const currentId = localStorage.getItem(CHAT_THEME_KEY);
+
+            if (myThemes.length > 0 && myThemesSection && myThemesGrid) {
+                myThemesSection.style.display = 'block';
+                myThemesGrid.innerHTML = myThemes.map((theme, index) => `
+                    <div class="theme-item ${theme.id === currentId ? 'active' : ''}" style="background: ${theme.bgUrl ? `url(${theme.bgUrl}) center/cover` : theme.bgColor}; aspect-ratio: 1; border-radius: 12px; position: relative; cursor: pointer; border: 2px solid rgba(255,255,255,0.1);">
+                        <div onclick="applyMyTheme(${index})" style="position: absolute; inset: 0;"></div>
+                        <div style="position: absolute; bottom: 6px; left: 6px; right: 30px; font-size: 0.7rem; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${theme.name}</div>
+                        ${theme.id === currentId ? '<div class="theme-check" style="position: absolute; top: 6px; right: 28px; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;"><i class="fas fa-check"></i></div>' : ''}
+                        <div onclick="deleteMyTheme(${index}); event.stopPropagation();" style="position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; background: rgba(255,75,114,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; cursor: pointer; z-index: 10;">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                `).join('');
+            } else if (myThemesSection) {
+                myThemesSection.style.display = 'none';
+            }
+        }
+
+        // Tema silme fonksiyonu
+        window.deleteMyTheme = function(index) {
+            const myThemes = JSON.parse(localStorage.getItem(MY_THEMES_KEY)) || [];
+            if (index < 0 || index >= myThemes.length) return;
+
+            const themeName = myThemes[index].name;
+            if (!confirm(`"${themeName}" temasını silmek istediğinize emin misiniz?`)) return;
+
+            myThemes.splice(index, 1);
+            localStorage.setItem(MY_THEMES_KEY, JSON.stringify(myThemes));
+            renderMyThemes();
+            showToast(`"${themeName}" teması silindi 🗑️`);
+        };
+
+        // Arka plan tipi seçimi
+        window.setBgType = function(type) {
+            currentBgType = type;
+            document.getElementById('bg-color-picker').style.display = type === 'color' ? 'block' : 'none';
+            document.getElementById('bg-image-picker').style.display = type === 'image' ? 'block' : 'none';
+
+            // Buton stillerini güncelle
+            document.getElementById('btn-bg-color').style.border = type === 'color' ? '2px solid var(--primary)' : '2px solid transparent';
+            document.getElementById('btn-bg-color').style.background = type === 'color' ? 'rgba(255,75,114,0.2)' : 'rgba(255,255,255,0.1)';
+            document.getElementById('btn-bg-image').style.border = type === 'image' ? '2px solid var(--primary)' : '2px solid transparent';
+            document.getElementById('btn-bg-image').style.background = type === 'image' ? 'rgba(255,75,114,0.2)' : 'rgba(255,255,255,0.1)';
+        };
+
+        window.applyTheme = async (themeId) => {
+            const theme = THEMES.find(t => t.id === themeId);
+            if (!theme) {
+                console.error('[applyTheme] Tema bulunamadı:', themeId);
+                return;
+            }
+
+            try {
+                console.log('[applyTheme] Tema uygulanıyor:', theme.name);
+                localStorage.setItem(CHAT_THEME_KEY, themeId);
+
+                // Firestore'a kaydet (partner de görsün)
+                await setDoc(doc(db, 'chat_themes', 'shared'), {
+                    themeId: themeId,
+                    themeName: theme.name,
+                    emoji: theme.emoji,
+                    updatedBy: activePlayer,
+                    updatedAt: serverTimestamp()
+                });
+
+                // Bildirim gönder
+                await addDoc(collection(db, 'theme_updates'), {
+                    from: activePlayer,
+                    to: partner,
+                    type: 'theme',
+                    message: `${activePlayer} sohbet temasını "${theme.name}" yaptı! ${theme.emoji}`,
+                    timestamp: serverTimestamp()
+                });
+
+                renderThemes();
+                showToast(`Tema uygulandı: ${theme.name} ${theme.emoji}`);
+                console.log('[applyTheme] Tema başarıyla uygulandı');
+                closeThemeModal();
+            } catch (e) {
+                console.error('[applyTheme] Hata:', e);
+                showToast('Tema uygulanırken hata oluştu 😔');
+            }
+        };
+
+        // Custom Theme Upload
+        document.getElementById('theme-upload')?.addEventListener('change', async (e) => {
             const file = e.target.files[0];
-            if(!file) return;
-            showToast('Fotoğraf yükleniyor... Lütfen bekle ⏳');
+            if (!file) return;
+            
+            showToast('Tema yükleniyor... ⏳');
             try {
                 const base64 = await new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = reject;
                     reader.readAsDataURL(file);
                 });
+                
                 const fd = new FormData();
                 fd.append('image', base64);
+                
                 const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
                 const json = await res.json();
                 
                 if (json.success) {
-                    const url = json.data.url;
-                    localStorage.setItem(CUSTOM_WP_KEY, url);
-                    localStorage.setItem(CHAT_WP_KEY, 'custom_saved');
-                    renderWallpapers();
-                    showToast('Harika! Duvar kağıdın değişti ✨');
+                    localStorage.setItem(CUSTOM_THEME_KEY, json.data.url);
+                    localStorage.setItem(CHAT_THEME_KEY, 'custom');
+                    
+                    await setDoc(doc(db, 'chat_themes', 'shared'), {
+                        themeId: 'custom',
+                        customUrl: json.data.url,
+                        updatedBy: activePlayer,
+                        updatedAt: serverTimestamp()
+                    });
+                    
+                    await addDoc(collection(db, 'theme_updates'), {
+                        from: activePlayer,
+                        to: partner,
+                        type: 'custom_theme',
+                        message: `${activePlayer} kendi fotoğrafıyla özel bir tema oluşturdu! 📸`,
+                        timestamp: serverTimestamp()
+                    });
+                    
+                    showToast('Özel teman oluşturuldu! ✨');
+                    renderThemes();
                 }
-            } catch (err) {
-                showToast('Hım, bir hata oldu 🥺 Yüklenemedi.');
+            } catch (e) {
+                showToast('Yükleme hatası! 😔');
             }
         });
 
-        // --- Fetch Media via query ---
-        async function fetchMedia() {
-            const qPhotos = query(collection(db, 'messages'), orderBy('createdAt', 'desc'), limit(100));
-            const snap = await getDocs(qPhotos);
-            const urls = [];
-            snap.forEach(doc => {
-                const d = doc.data();
-                if (d.imageUrl) urls.push(d.imageUrl);
-            });
+        // Listen for theme changes
+        onSnapshot(doc(db, 'chat_themes', 'shared'), (snap) => {
+            if (snap.exists()) {
+                const data = snap.data();
+                if (data.updatedBy !== activePlayer) {
+                    showToast(`${partner} temayı "${data.themeName}" yaptı! 💕`);
+                }
+            }
+        });
 
-            const grid = document.getElementById('media-grid');
-            if (urls.length === 0) {
-                grid.innerHTML = `<div class="empty-text" style="grid-column: 1/-1;">Henüz hiç fotoğraf paylaşmadınız. Hadi sohbette ilk fotoğrafı sen gönder! 📷</div>`;
+        // MEDIA
+        async function loadMedia() {
+            try {
+                const q = query(collection(db, 'chat_messages'), orderBy('timestamp', 'desc'));
+                const snap = await getDocs(q);
+                const photos = [];
+                
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    if (data.photo) photos.push(data.photo);
+                });
+                
+                const grid = document.getElementById('media-grid');
+                if (photos.length === 0) {
+                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">Henüz fotoğraf paylaşmadınız 📸</div>';
+                    return;
+                }
+                
+                grid.innerHTML = photos.slice(0, 9).map(url => `
+                    <div class="media-item" onclick="viewImage('${url}')">
+                        <img src="${url}" loading="lazy">
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('Media load error:', e);
+            }
+        }
+
+        window.viewImage = (url) => {
+            document.getElementById('modal-img').src = url;
+            document.getElementById('img-modal').style.display = 'flex';
+        };
+
+        // Kendi aşk profiline git (kalp butonu)
+        window.openLoveProfile = () => {
+            location.href = 'profile.html?from=chat-profile';
+        };
+
+        // Partner'in aşk profiline git (avatar tıklama)
+        window.openPartnerProfile = () => {
+            // Profil fotoğrafı varsa büyük göster, yoksa profile git
+            const avatar = document.getElementById('partner-avatar');
+            const hasImage = avatar.querySelector('img');
+            if (hasImage) {
+                viewImage(hasImage.src);
+            } else {
+                showToast(`${partner}'in profili yükleniyor... 💕`);
+                setTimeout(() => location.href = 'profile.html?view=partner&from=chat-profile', 500);
+            }
+        };
+
+        // Partner'in aşk profiline git (hızlı aksiyon)
+        window.openPartnerLoveProfile = () => {
+            showToast(`${partner}'in profili yükleniyor... 💕`);
+            setTimeout(() => location.href = 'profile.html?view=partner&from=chat-profile', 500);
+        };
+
+        // Geri dönüş butonu - referrer'a göre
+        document.getElementById('back-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            const referrer = document.referrer;
+            if (referrer.includes('chat.html')) {
+                location.href = 'chat.html';
+            } else if (referrer.includes('profile.html') || referrer.includes('index.html')) {
+                location.href = 'profile.html';
+            } else {
+                // Varsayılan olarak chat'e dön
+                location.href = 'chat.html';
+            }
+        });
+
+        // Modal Functions
+        window.openThemeModal = () => {
+            document.getElementById('theme-modal').classList.add('active');
+        };
+
+        window.closeThemeModal = (e) => {
+            if (!e || e.target === document.getElementById('theme-modal')) {
+                document.getElementById('theme-modal').classList.remove('active');
+            }
+        };
+
+        window.toggleMute = () => {
+            const icon = document.getElementById('mute-icon');
+            const label = document.getElementById('mute-label');
+            const isMuted = icon.innerHTML.includes('slash');
+            
+            if (isMuted) {
+                icon.innerHTML = '<i class="fas fa-bell"></i>';
+                label.textContent = 'Sessize Al';
+                showToast('Bildirimler açıldı 🔔');
+            } else {
+                icon.innerHTML = '<i class="fas fa-bell-slash"></i>';
+                label.textContent = 'Sessizde';
+                showToast('Bildirimler sessize alındı 🔕');
+            }
+        };
+
+        // --- TEMA ÖZELLEŞTİRME FONKSİYONLARI ---
+        let customBgUrl = null;
+
+        // Özel arka plan resmi yükleme
+        document.getElementById('custom-bg-upload')?.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            showToast('Resim yükleniyor... ⏳');
+
+            try {
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('key', '7916dd11376f59a547ed252799f1328a');
+
+                const res = await fetch('https://api.imgbb.com/1/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const json = await res.json();
+
+                if (json.success) {
+                    customBgUrl = json.data.url;
+                    const preview = document.getElementById('custom-bg-preview');
+                    preview.style.display = 'block';
+                    preview.style.backgroundImage = `url(${customBgUrl})`;
+                    showToast('Arka plan resmi yüklendi! ✨');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Resim yükleme hatası! 😔');
+            }
+        });
+
+        // Özel temayı uygula
+        window.applyCustomTheme = async function() {
+            const themeName = document.getElementById('custom-theme-name').value || 'Özel Temam';
+            const myColor = document.getElementById('my-message-color').value;
+            const partnerColor = document.getElementById('partner-message-color').value;
+            const bgColor = document.getElementById('custom-bg-color')?.value || '#1a1a2e';
+
+            // Benzersiz tema ID'si oluştur
+            const themeId = 'custom_' + Date.now();
+
+            // Tema verisi
+            const themeData = {
+                themeId: themeId,
+                themeName: themeName,
+                customUrl: currentBgType === 'image' ? customBgUrl : null,
+                bgColor: currentBgType === 'color' ? bgColor : null,
+                myMessageColor: myColor,
+                partnerMessageColor: partnerColor,
+                updatedBy: activePlayer,
+                updatedAt: serverTimestamp()
+            };
+
+            try {
+                // Temayı Firestore'a kaydet (aktif tema olarak)
+                await setDoc(doc(db, 'chat_themes', 'shared'), themeData);
+
+                // Temayı localStorage'a kaydet (kullanıcının temaları listesine)
+                const myThemes = JSON.parse(localStorage.getItem(MY_THEMES_KEY)) || [];
+                myThemes.push({
+                    id: themeId,
+                    name: themeName,
+                    bgUrl: currentBgType === 'image' ? customBgUrl : null,
+                    bgColor: currentBgType === 'color' ? bgColor : null,
+                    myMessageColor: myColor,
+                    partnerMessageColor: partnerColor
+                });
+                localStorage.setItem(MY_THEMES_KEY, JSON.stringify(myThemes));
+
+                // Bildirim gönder
+                await addDoc(collection(db, 'theme_updates'), {
+                    from: activePlayer,
+                    to: partner,
+                    type: 'theme',
+                    message: `${activePlayer} "${themeName}" temasını uyguladı! 🎨`,
+                    timestamp: serverTimestamp()
+                });
+
+                // Aktif tema anahtarını güncelle
+                localStorage.setItem(CHAT_THEME_KEY, themeId);
+
+                showToast(`"${themeName}" teması oluşturuldu ve uygulandı! 🎨`);
+
+                // Temaları yeniden render et
+                renderThemes();
+                renderMyThemes();
+
+                closeThemeModal();
+
+                // Önizlemeyi temizle
+                customBgUrl = null;
+                document.getElementById('custom-bg-preview').style.display = 'none';
+                document.getElementById('custom-theme-name').value = '';
+                setBgType('color');
+            } catch (e) {
+                console.error(e);
+                showToast('Tema uygulama hatası! 😔');
+            }
+        };
+
+        // Oluşturduğum temayı uygula
+        window.applyMyTheme = async function(index) {
+            const myThemes = JSON.parse(localStorage.getItem(MY_THEMES_KEY)) || [];
+            const theme = myThemes[index];
+            if (!theme) return;
+
+            const themeData = {
+                themeId: theme.id,
+                themeName: theme.name,
+                customUrl: theme.bgUrl,
+                bgColor: theme.bgColor,
+                myMessageColor: theme.myMessageColor,
+                partnerMessageColor: theme.partnerMessageColor,
+                updatedBy: activePlayer,
+                updatedAt: serverTimestamp()
+            };
+
+            try {
+                await setDoc(doc(db, 'chat_themes', 'shared'), themeData);
+                localStorage.setItem(CHAT_THEME_KEY, theme.id);
+
+                await addDoc(collection(db, 'theme_updates'), {
+                    from: activePlayer,
+                    to: partner,
+                    type: 'theme',
+                    message: `${activePlayer} "${theme.name}" temasını uyguladı! 🎨`,
+                    timestamp: serverTimestamp()
+                });
+
+                showToast(`"${theme.name}" teması uygulandı! 🎨`);
+                renderThemes();
+                renderMyThemes();
+                closeThemeModal();
+            } catch (e) {
+                console.error(e);
+                showToast('Tema uygulama hatası! 😔');
+            }
+        };
+
+        // --- TAKMA AD FONKSİYONLARI ---
+        const NICKNAMES_KEY = 'chat_nicknames_v2';
+
+        window.openNicknameModal = () => {
+            document.getElementById('nickname-modal').classList.add('active');
+            document.getElementById('partner-nickname-label').textContent = `${partner}'in Takma Adı`;
+            loadCurrentNickname();
+        };
+
+        window.closeNicknameModal = (e) => {
+            if (!e || e.target === document.getElementById('nickname-modal')) {
+                document.getElementById('nickname-modal').classList.remove('active');
+            }
+        };
+
+        function loadCurrentNickname() {
+            const nicknames = JSON.parse(localStorage.getItem(NICKNAMES_KEY)) || {};
+            const currentNickname = nicknames[partner];
+
+            if (currentNickname) {
+                document.getElementById('partner-nickname-input').value = currentNickname;
+                document.getElementById('current-nickname-display').innerHTML = `
+                    <div style="font-size: 1.2rem; color: var(--primary);">${currentNickname}</div>
+                    <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 5px;">${partner} için belirlenen takma ad</div>
+                `;
+                document.getElementById('nickname-subtitle').textContent = currentNickname;
+            } else {
+                document.getElementById('current-nickname-display').innerHTML = 'Henüz takma ad belirlenmemiş';
+                document.getElementById('nickname-subtitle').textContent = 'Birbirinize özel isimler';
+            }
+        }
+
+        window.savePartnerNickname = async function() {
+            const nickname = document.getElementById('partner-nickname-input').value.trim();
+            if (!nickname) {
+                showToast('Lütfen bir takma ad girin! 🎭');
                 return;
             }
-            grid.innerHTML = '';
-            urls.forEach(url => {
-                const img = document.createElement('img');
-                img.src = url;
-                img.loading = "lazy";
-                img.onclick = () => {
-                    document.getElementById('modal-img').src = url;
-                    document.getElementById('img-modal').style.display = 'flex';
-                };
-                grid.appendChild(img);
+
+            const nicknames = JSON.parse(localStorage.getItem(NICKNAMES_KEY)) || {};
+            nicknames[partner] = nickname;
+            localStorage.setItem(NICKNAMES_KEY, JSON.stringify(nicknames));
+
+            // Firestore'a kaydet (bulut senkronizasyonu)
+            await setDoc(doc(db, 'chat_settings', activePlayer), {
+                nicknames: nicknames,
+                updatedAt: serverTimestamp()
+            }, { merge: true });
+
+            // Bildirim gönder
+            await addDoc(collection(db, 'theme_updates'), {
+                from: activePlayer,
+                to: partner,
+                type: 'nickname',
+                message: `${activePlayer} seni "${nickname}" olarak kaydetti! 💕`,
+                timestamp: serverTimestamp()
             });
+
+            loadCurrentNickname();
+            showToast(`${partner} artık "${nickname}" olarak gözükecek! �`);
+        };
+
+        // Firestore'dan takma adları senkronize et
+        onSnapshot(doc(db, 'chat_settings', activePlayer), (snap) => {
+            if (snap.exists() && snap.data().nicknames) {
+                localStorage.setItem(NICKNAMES_KEY, JSON.stringify(snap.data().nicknames));
+                loadCurrentNickname();
+            }
+        });
+
+        // Başlangıçta takma adı yükle
+        loadCurrentNickname();
+
+        // --- Aktivite Kaydetme (Geçirilen Süreye Dahil) ---
+        async function recordActivity(type) {
+            const today = new Date().toISOString().split('T')[0];
+            const statsRef = doc(db, 'user_stats', activePlayer);
+            try {
+                await setDoc(statsRef, {
+                    timeSpent: { [today]: increment(1) },
+                    lastActivity: type,
+                    lastActivityAt: serverTimestamp()
+                }, { merge: true });
+                console.log('[Activity] Kaydedildi:', type);
+            } catch(e) {
+                console.error('[Activity] Hata:', e);
+            }
         }
+
+        // Sayfa görüntülendiğinde aktivite kaydet
+        recordActivity('chat_profile_view');
 
         function showToast(msg) {
             const t = document.getElementById('toast');
@@ -271,9 +1042,11 @@
             setTimeout(() => t.classList.remove('show'), 3000);
         }
 
-        fetchMedia();
-
+        // Init
+        renderThemes();
+        loadMedia();
     </script>
-<script type="module" src="time-tracker.js"></script>
+    <script type="module" src="time-tracker.js"></script>
+    <script type="module" src="presence.js"></script>
 </body>
 </html>

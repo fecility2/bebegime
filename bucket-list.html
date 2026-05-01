@@ -558,15 +558,6 @@
             document.getElementById('photo-modal').classList.remove('show');
         };
 
-        // --- SESSİZ GLOBAL DURUM TAKİBİ (Chat'te her zaman online görünmek için) ---
-        const userPresenceRef = doc(db, 'online_status', localStorage.getItem('active_player') || 'Bilinmeyen');
-        async function updateStatus(isOnline) {
-            try { await updateDoc(userPresenceRef, { last_seen: serverTimestamp(), online: isOnline }); } catch(e) {}
-        }
-        updateStatus(true);
-        setInterval(() => { if (!document.hidden) updateStatus(true); }, 10000);
-        document.addEventListener('visibilitychange', () => updateStatus(!document.hidden));
-
         // ========== OFFLİNE FOTOĞRAF KUYRUĞU (Bucket List) ==========
         const PENDING_STORE = 'pendingBucketPhotos';
 
@@ -692,6 +683,7 @@
         };
     </script>
 <script type="module" src="time-tracker.js"></script>
+<script type="module" src="presence.js"></script>
 </body>
 
 </html>

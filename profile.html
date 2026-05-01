@@ -76,7 +76,7 @@
 </head>
 <body>
     <div id="background-canvas"></div>
-    <a href="index.html#hub" class="back-nav">← Ana Sayfaya Dön</a>
+    <a href="#" class="back-nav" id="back-nav">← Geri Dön</a>
     
     <div class="header animate-pop">
         <h1>Aşk Profili ✨</h1>
@@ -108,8 +108,8 @@
             </div>
         </div>
         
-        <!-- Sağ Panel: Achievements -->
-        <div class="panel animate-pop" style="animation-delay: 0.2s;">
+        <!-- Sağ Panel: Achievements (Sadece kendi profilinde göster) -->
+        <div class="panel animate-pop" id="achievements-panel" style="animation-delay: 0.2s;">
             <div class="panel-title">🏆 Başarımlar</div>
             <div class="achievements-grid" id="achi-grid">
                 <!-- Javascript will populate -->
@@ -148,18 +148,59 @@
         const currentUser = localStorage.getItem('active_player');
         if (!currentUser) window.location.href = 'index.html';
 
-        document.getElementById('user-name').textContent = currentUser;
-        
-        // Define Custom Avatar per user
-        if (currentUser === "Ayşe") {
-            document.getElementById('user-avatar').textContent = "👸🏻";
-        } else if (currentUser === "Mert") {
-            document.getElementById('user-avatar').textContent = "🤴🏻";
+        // URL parametrelerini kontrol et
+        const urlParams = new URLSearchParams(window.location.search);
+        const viewMode = urlParams.get('view'); // 'partner' veya null
+        const fromPage = urlParams.get('from'); // 'chat' veya 'chat-profile'
+
+        // Partner belirleme
+        const partner = currentUser === 'Ayşe' ? 'Mert' : 'Ayşe';
+        const displayUser = viewMode === 'partner' ? partner : currentUser;
+
+        // Geri dönüş butonunu ayarla
+        document.getElementById('back-nav').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (fromPage === 'chat') {
+                window.location.href = 'chat.html';
+            } else if (fromPage === 'chat-profile') {
+                window.location.href = 'chat-profile.html';
+            } else {
+                window.location.href = 'index.html#hub';
+            }
+        });
+
+        // Header'ı güncelle
+        if (viewMode === 'partner') {
+            document.querySelector('.header h1').textContent = partner + 'nin Profili 💕';
+            document.getElementById('user-name').textContent = partner;
+            // Avatar'ı partner'e göre ayarla
+            if (partner === "Ayşe") {
+                document.getElementById('user-avatar').textContent = "👸🏻";
+            } else {
+                document.getElementById('user-avatar').textContent = "🤴🏻";
+            }
+            // Avatar upload'u gizle (partner profilinde değiştirilemez)
+            document.querySelector('.avatar-wrap').style.pointerEvents = 'none';
+            document.querySelector('.avatar-wrap').style.opacity = '0.8';
+            // Başarımlar panelini gizle (partner'inkileri gösterme)
+            document.getElementById('achievements-panel').style.display = 'none';
+            // Günlük ödül butonunu gizle
+            document.querySelector('.daily-reward-box').style.display = 'none';
+            // İstatistik butonunu gizle
+            document.querySelector('button[onclick="window.location.href=\'time-stats.html\'"]').style.display = 'none';
+            // Envanter başlığını değiştir
+            document.querySelector('.panel-title').textContent = '🎁 Kuponlarım ve Eşyalarım';
+        } else {
+            document.getElementById('user-name').textContent = currentUser;
         }
 
         const ecoRef = doc(db, 'economy', 'balances');
+        // Partner görünümünde KENDİ envanterini göster (ortaklanmasın diye)
         const inventoryRef = doc(db, 'user_inventory', currentUser);
-        const userStatsRef = doc(db, 'user_stats', currentUser); // New document for login dates and achievements
+        // Partner görünümünde KENDİ stats'larını göster (ortaklanmasın diye)
+        const userStatsRef = doc(db, 'user_stats', currentUser);
+        // Partner'in sadece görünüm bilgileri (resim vs)
+        const partnerStatsRef = doc(db, 'user_stats', partner);
 
         const statusToast = document.getElementById('status-toast');
         let toastTimeout;
@@ -246,24 +287,41 @@
             checkAchievements(); // Inventory might trigger an achi
         });
 
-        // LISTEN TO STATS
+        // LISTEN TO STATS (Kendi stats'larım)
         onSnapshot(userStatsRef, (snap) => {
             if (!snap.exists()) return;
             statsData = snap.data();
             renderAchievements();
             checkDailyStatus();
-            
-            if (statsData.profilePic) {
-                document.getElementById('user-avatar').style.backgroundImage = `url(${statsData.profilePic})`;
-                document.getElementById('user-avatar').textContent = "";
-            }
 
-            // Calc Level based on login count + unlocked achi
-            const unlockedCount = Object.keys(statsData.achievements || {}).length;
-            const logins = statsData.loginCount || 1;
-            const level = Math.floor((unlockedCount * 2 + logins * 0.5) / 3) + 1;
-            document.getElementById('level-badge').textContent = level > 99 ? 99 : level;
+            // Calc Level based on login count + unlocked achi (sadece kendi profilinde göster)
+            if (viewMode !== 'partner') {
+                const unlockedCount = Object.keys(statsData.achievements || {}).length;
+                const logins = statsData.loginCount || 1;
+                const level = Math.floor((unlockedCount * 2 + logins * 0.5) / 3) + 1;
+                document.getElementById('level-badge').textContent = level > 99 ? 99 : level;
+            }
         });
+
+        // Partner görünümünde partner'in profil resmini çek
+        if (viewMode === 'partner') {
+            onSnapshot(partnerStatsRef, (snap) => {
+                if (snap.exists() && snap.data().profilePic) {
+                    document.getElementById('user-avatar').style.backgroundImage = `url(${snap.data().profilePic})`;
+                    document.getElementById('user-avatar').textContent = "";
+                }
+            });
+            // Partner görünümünde level badge'i gizle (ortaklanmasın)
+            document.getElementById('level-badge').style.display = 'none';
+        } else {
+            // Kendi profilimde benim profil resmim
+            onSnapshot(userStatsRef, (snap) => {
+                if (snap.exists() && snap.data().profilePic) {
+                    document.getElementById('user-avatar').style.backgroundImage = `url(${snap.data().profilePic})`;
+                    document.getElementById('user-avatar').textContent = "";
+                }
+            });
+        }
 
         const IMGBB_KEY = "7916dd11376f59a547ed252799f1328a";
 
@@ -451,5 +509,6 @@
 
     </script>
 <script type="module" src="time-tracker.js"></script>
+<script type="module" src="presence.js"></script>
 </body>
 </html>

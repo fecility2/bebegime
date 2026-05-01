@@ -21,6 +21,7 @@ const db = getFirestore(app);
 
 const currentUser = localStorage.getItem('active_player');
 if (currentUser === 'Ayşe' || currentUser === 'Mert') {
+    console.log('[TimeTracker] Başlatıldı:', currentUser);
     const statsRef = doc(db, 'user_stats', currentUser);
 
     setInterval(async () => {
@@ -29,6 +30,11 @@ if (currentUser === 'Ayşe' || currentUser === 'Mert') {
             await setDoc(statsRef, {
                 timeSpent: { [today]: increment(1) }
             }, { merge: true });
-        } catch(e) { /* sessizce geç */ }
+            console.log('[TimeTracker] Süre kaydedildi:', today, '+1 dk');
+        } catch(e) {
+            console.error('[TimeTracker] Hata:', e);
+        }
     }, 60000); // Her 60 saniyede +1 dakika
+} else {
+    console.log('[TimeTracker] Aktif kullanıcı bulunamadı:', currentUser);
 }

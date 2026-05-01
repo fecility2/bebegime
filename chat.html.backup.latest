@@ -87,16 +87,13 @@
         .chat-flow {
             flex: 1;
             overflow-y: auto;
-            padding: 15px 8px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
+            gap: 16px;
             scroll-behavior: smooth;
-            position: relative;
-            padding-bottom: 80px;
-            background: transparent;
+            padding-bottom: 100px; /* Space for the fixed input bar */
             -webkit-overflow-scrolling: touch;
-            width: 100%;
-            box-sizing: border-box;
         }
 
         .chat-flow::before {
@@ -109,38 +106,25 @@
         .message-wrapper { 
             display: flex; 
             flex-direction: column; 
-            width: 100%;
+            max-width: 82%; 
             position: relative;
-            margin-bottom: 8px;
-            cursor: pointer;
-            align-items: flex-start;
-        }
-        .message-wrapper.msg-mert {
-            align-items: flex-end;
+            animation: fadeIn 0.3s ease-out;
         }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .msg-ayse { 
-            align-self: flex-start;
-            margin-left: 5px;
-        }
-        .msg-mert { 
-            align-self: flex-end;
-            margin-right: 5px;
-        }
+        .msg-ayse { align-self: flex-start; }
+        .msg-mert { align-self: flex-end; }
 
         .bubble {
-            padding: 12px 16px;
-            border-radius: 20px;
+            padding: 10px 14px;
+            border-radius: 18px;
             font-size: 0.95rem;
-            line-height: 1.4;
+            line-height: 1.5;
             position: relative;
-            transition: transform 0.1s;
-            word-wrap: break-word;
-            max-width: 80%;
-            min-width: 60px;
-            width: fit-content;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
         }
 
         .bubble:active { transform: scale(0.98); }
@@ -871,358 +855,6 @@
         .sticky-date-header.visible {
             opacity: 1;
         }
-
-        /* Instagram Style Message Menu */
-        .message-menu-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 2500;
-            display: none;
-            align-items: flex-end;
-            justify-content: center;
-        }
-        .message-menu-overlay.active { display: flex; }
-
-        /* Instagram Style Emoji Reaction Bar */
-        .ig-reaction-bar {
-            position: absolute;
-            bottom: calc(100% - 22px);
-            left: 50%;
-            transform: translateX(-50%) scale(0.8);
-            width: fit-content;
-            max-width: 240px;
-            background: linear-gradient(135deg, rgba(30,30,45,0.98), rgba(20,20,35,0.98));
-            border-radius: 25px;
-            padding: 8px 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1000;
-        }
-        .ig-reaction-bar.active {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateX(-50%) scale(1);
-        }
-        .ig-reaction-bar .re-emoji {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.6rem;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            background: transparent;
-        }
-        .ig-reaction-bar .re-emoji:hover {
-            transform: scale(1.3) translateY(-5px);
-            background: rgba(255,255,255,0.1);
-        }
-        .ig-reaction-bar .re-more {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            font-weight: bold;
-            cursor: pointer;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: #fff;
-            transition: all 0.2s;
-            border: 2px solid rgba(255,255,255,0.3);
-            line-height: 1;
-        }
-        .ig-reaction-bar .re-more:hover {
-            transform: scale(1.15);
-            box-shadow: 0 4px 15px rgba(255,75,114,0.4);
-        }
-        .message-wrapper { position: relative; }
-
-        /* Emoji bar mesaj balonunun üstünde ve hizasına göre konumlu */
-        .message-wrapper.msg-ayse .ig-reaction-bar {
-            left: 20%;
-            transform: translateX(-50%) scale(0.8);
-        }
-        .message-wrapper.msg-ayse .ig-reaction-bar.active {
-            transform: translateX(-50%) scale(1);
-        }
-        .message-wrapper.msg-mert .ig-reaction-bar {
-            left: 80%;
-            transform: translateX(-50%) scale(0.8);
-        }
-        .message-wrapper.msg-mert .ig-reaction-bar.active {
-            transform: translateX(-50%) scale(1);
-        }
-
-        /* Emoji Düzenleme Modal */
-        .emoji-edit-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 3000;
-            align-items: center;
-            justify-content: center;
-        }
-        .emoji-edit-overlay.active { display: flex; }
-        .emoji-edit-modal {
-            width: 90%;
-            max-width: 400px;
-            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
-            border-radius: 20px;
-            padding: 24px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .emoji-edit-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .emoji-edit-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-        .emoji-edit-close {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: rgba(255,75,114,0.4);
-            border: 2px solid rgba(255,75,114,0.6);
-            color: #fff;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-        .emoji-edit-close:hover {
-            background: rgba(255,75,114,0.7);
-            border-color: var(--primary);
-            transform: scale(1.05);
-        }
-        .emoji-edit-close::before {
-            content: '✕';
-        }
-        .emoji-edit-current {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-        }
-        .emoji-edit-item {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: rgba(255,75,114,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.6rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .emoji-edit-item:hover {
-            background: rgba(255,75,114,0.4);
-            transform: scale(1.1);
-        }
-        .emoji-edit-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            max-height: 280px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding-right: 5px;
-        }
-        .emoji-edit-grid::-webkit-scrollbar {
-            width: 4px;
-        }
-        .emoji-edit-grid::-webkit-scrollbar-thumb {
-            background: rgba(255,75,114,0.5);
-            border-radius: 4px;
-        }
-        .emoji-edit-option {
-            aspect-ratio: 1;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .emoji-edit-option:hover {
-            background: rgba(255,75,114,0.3);
-        }
-        .emoji-edit-option.selected {
-            background: var(--primary);
-        }
-
-        .message-menu {
-            width: 100%;
-            max-width: 600px;
-            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
-            border-top-left-radius: 25px;
-            border-top-right-radius: 25px;
-            border: 1px solid rgba(255,255,255,0.1);
-            overflow: hidden;
-            animation: slideUpMenu 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes slideUpMenu {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        .message-menu-header {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-        .message-menu-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #fff;
-        }
-
-        .message-menu-actions {
-            padding: 10px 0;
-        }
-        .message-menu-item {
-            padding: 16px 24px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .message-menu-item:hover {
-            background: rgba(255,255,255,0.05);
-        }
-        .message-menu-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-        .message-menu-text {
-            flex: 1;
-            font-size: 1rem;
-            color: #fff;
-        }
-        .message-menu-text.danger {
-            color: #ff4b72;
-        }
-
-        /* Quick Emoji Editor in Message Menu */
-        .emoji-editor-section {
-            padding: 20px;
-            border-top: 1px solid rgba(255,255,255,0.08);
-        }
-        .emoji-editor-title {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.6);
-            margin-bottom: 12px;
-        }
-        .current-emojis {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-        .current-emoji {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: 0.2s;
-            border: 2px solid transparent;
-        }
-        .current-emoji:hover {
-            background: rgba(255,75,114,0.2);
-            border-color: var(--primary);
-            transform: scale(1.1);
-        }
-        .emoji-grid-small {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .emoji-option {
-            aspect-ratio: 1;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .emoji-option:hover {
-            background: rgba(255,75,114,0.3);
-            transform: scale(1.15);
-        }
-        .emoji-option.selected {
-            background: var(--primary);
-        }
-
-        /* Add button on messages */
-        .message-add-btn {
-            position: absolute;
-            right: -30px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: rgba(255,75,114,0.3);
-            border: 1px solid rgba(255,75,114,0.5);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            cursor: pointer;
-            opacity: 0;
-            transition: 0.2s;
-            z-index: 10;
-        }
-        .message-wrapper:hover .message-add-btn,
-        .message-add-btn:active {
-            opacity: 1;
-        }
-        .message-wrapper.sent .message-add-btn {
-            left: -35px;
-            right: auto;
-        }
     </style>
 </head>
 <body>
@@ -1269,49 +901,53 @@
     <div id="img-modal" onclick="this.style.display='none'">
         <img src="" id="modal-img">
     </div>
+    <!-- Instagram Style Theme Modal -->
+    <div class="theme-modal-overlay" id="theme-modal">
+        <div class="theme-modal">
+            <div class="theme-modal-header">
+                <div class="theme-modal-title">
+                    🎨 Sohbet Teması
+                </div>
+                <button class="theme-modal-close" onclick="closeThemeModal()">✕</button>
+            </div>
+            
+            <!-- Color Themes -->
+            <div class="theme-section">
+                <div class="theme-section-title">Renk Teması</div>
+                <div class="color-theme-grid" id="color-theme-grid">
+                    <!-- Generated by JS -->
+                </div>
+            </div>
+            
+            <!-- Wallpapers -->
+            <div class="theme-section">
+                <div class="theme-section-title">Duvar Kağıdı</div>
+                <div class="wallpaper-grid-modern" id="wallpaper-grid-modern">
+                    <!-- Generated by JS -->
+                </div>
+                <label for="custom-wp-upload" class="custom-upload-area">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">Kendi Fotoğrafını Yükle</div>
+                </label>
+                <input type="file" id="custom-wp-upload" hidden accept="image/*">
+            </div>
+            
+            <!-- Shared Media -->
+            <div class="theme-section">
+                <div class="theme-section-title">Paylaşılan Fotoğraflar</div>
+                <div class="media-grid" id="shared-media-grid"></div>
+            </div>
+        </div>
+    </div>
 
     <div class="toast" id="toast"></div>
 
     <!-- Sticky Date Header -->
     <div class="sticky-date-header" id="sticky-date-header"></div>
 
-    <!-- Message Menu Modal (Instagram Style - Sadece Silme) -->
-    <div class="message-menu-overlay" id="message-menu-overlay" onclick="closeMessageMenu()">
-        <div class="message-menu" onclick="event.stopPropagation()">
-            <div class="message-menu-header">
-                <div class="message-menu-title">Mesaj Seçenekleri</div>
-            </div>
-            <div class="message-menu-actions">
-                <div class="message-menu-item" onclick="deleteForMe()">
-                    <div class="message-menu-icon" style="background: rgba(255,75,114,0.2);">🗑️</div>
-                    <div class="message-menu-text danger">Benden Sil</div>
-                </div>
-                <div class="message-menu-item" onclick="deleteForAll()">
-                    <div class="message-menu-icon" style="background: rgba(255,59,48,0.2);">🗑️</div>
-                    <div class="message-menu-text danger">Herkesten Sil</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Emoji Edit Modal -->
-    <div class="emoji-edit-overlay" id="emoji-edit-overlay" onclick="closeEmojiEditModal()">
-        <div class="emoji-edit-modal" onclick="event.stopPropagation()">
-            <div class="emoji-edit-header">
-                <div class="emoji-edit-title">⚡ Hızlı İfadeleri Düzenle</div>
-                <button class="emoji-edit-close" onclick="closeEmojiEditModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 12px;">
-                Mesaja dokununca gözükecek emojiler (Maks. 8)
-            </div>
-            <div class="emoji-edit-current" id="emoji-edit-current"></div>
-            <div class="emoji-edit-grid" id="emoji-edit-grid"></div>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, updateDoc, doc, onSnapshot, query, orderBy, serverTimestamp, increment, setDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, updateDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -1355,22 +991,60 @@
         const media = { photo: '', voice: null };
         let activeStream = null;
         let dateDividers = []; // For sticky date header
+        const msgSearchInput = document.getElementById('msg-search-input');
+        const mediaFilterBtn = document.getElementById('media-filter-btn');
         let sharedPhotos = [];
         let sharedAudios = [];
         let messageCache = [];
+        let searchTerm = '';
+        let mediaOnlyFilter = false;
         const CHAT_WP_KEY = 'chat_wallpaper_pref';
         const CUSTOM_WP_KEY = 'chat_custom_wallpaper_url';
 
-        // Header'a tıklayınca chat profil sayfasına git (Instagram tarzı UI)
+        // Header'a tıklayınca yeni tema modal aç
         [document.getElementById('p-avatar'), document.getElementById('p-name'), document.getElementById('partner-info-clickable')].forEach((el) => {
             if (!el) return;
             el.style.cursor = 'pointer';
             el.addEventListener('click', (e) => {
                 e.stopPropagation();
-                location.href = 'chat-profile.html';
+                openThemeModal();
             });
         });
-        // Search ve filter özellikleri şimdilik devre dışı
+        msgSearchInput.addEventListener('input', () => {
+            searchTerm = msgSearchInput.value.trim().toLowerCase();
+            renderMessages();
+        });
+        mediaFilterBtn.addEventListener('click', () => {
+            mediaOnlyFilter = !mediaOnlyFilter;
+            mediaFilterBtn.classList.toggle('active', mediaOnlyFilter);
+            renderMessages();
+        });
+        // Theme modal custom upload
+        document.getElementById('custom-wp-upload')?.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            showToast('Duvar kağıdı yükleniyor... ⏳');
+            try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                });
+                const fd = new FormData();
+                fd.append('image', base64);
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
+                const json = await res.json();
+                if (json.success) {
+                    const url = json.data.url;
+                    localStorage.setItem(CUSTOM_WP_KEY, url);
+                    initModernWallpapers();
+                    showToast('Duvar kağıdı güncellendi! ✅');
+                }
+            } catch (err) {
+                showToast('Yükleme hatası 😔');
+            }
+        });
 
         onSnapshot(inventoryRef, (snap) => {
             if (!snap.exists()) return;
@@ -1384,135 +1058,6 @@
                 document.body.style.background = customTheme.bg || '#0a0208';
                 document.body.style.fontFamily = customTheme.font || "Outfit, sans-serif";
             }
-        });
-
-        // --- Tema Senkronizasyonu (Partnerin temasını gör) ---
-        const THEMES = {
-            'default': 'linear-gradient(135deg, #1a1a2e, #16213e)',
-            'love': 'linear-gradient(135deg, #ff4b72, #ff8c00)',
-            'ocean': 'linear-gradient(135deg, #4facfe, #00f2fe)',
-            'forest': 'linear-gradient(135deg, #43e97b, #38f9d7)',
-            'sunset': 'linear-gradient(135deg, #fa709a, #fee140)',
-            'royal': 'linear-gradient(135deg, #667eea, #764ba2)',
-            'midnight': 'linear-gradient(135deg, #0f0c29, #302b63)',
-            'cherry': 'linear-gradient(135deg, #eb3349, #f45c43)',
-            'mint': 'linear-gradient(135deg, #11998e, #38ef7d)',
-            'coffee': 'linear-gradient(135deg, #4b3621, #8b6914)',
-            'rose': 'linear-gradient(135deg, #e91e63, #f48fb1)',
-            'lavender': 'linear-gradient(135deg, #9c27b0, #ce93d8)',
-            'gold': 'linear-gradient(135deg, #ffd700, #ffaa00)',
-            'silver': 'linear-gradient(135deg, #c0c0c0, #808080)',
-            'aurora': 'linear-gradient(135deg, #00b894, #00cec9, #0984e3)'
-        };
-
-        onSnapshot(doc(db, 'chat_themes', 'shared'), (snap) => {
-            if (snap.exists()) {
-                const data = snap.data();
-
-                // Özel tema (resimli)
-                if (data.themeId?.startsWith('custom_') && data.customUrl) {
-                    document.body.style.background = `url(${data.customUrl}) center/cover no-repeat fixed`;
-                }
-                // Özel tema (renkli)
-                else if (data.themeId?.startsWith('custom_') && data.bgColor) {
-                    document.body.style.background = data.bgColor;
-                }
-                // Hazır tema
-                else if (THEMES[data.themeId]) {
-                    document.body.style.background = THEMES[data.themeId];
-                }
-
-                // Bildirim göster (başkası değiştirdiyse)
-                if (data.updatedBy !== currentUser && data.themeName) {
-                    showToast(`${partner} temayı "${data.themeName}" yaptı! ${data.emoji || '💕'}`);
-                }
-
-                // Özel mesaj renklerini uygula
-                if (data.myMessageColor || data.partnerMessageColor) {
-                    const isAyse = currentUser === 'Ayşe';
-                    const myColor = data.myMessageColor || (isAyse ? '#ff4b72' : '#4facfe');
-                    const partnerColor = data.partnerMessageColor || (isAyse ? '#4facfe' : '#ff4b72');
-
-                    // CSS değişkenlerini güncelle
-                    document.documentElement.style.setProperty('--mert-bubble', myColor);
-                    document.documentElement.style.setProperty('--ayse-bubble', partnerColor);
-                }
-            }
-        });
-
-        // --- Emoji Senkronizasyonu ---
-        // Önce localStorage'dan oku, yoksa varsayılanları kullan
-        let quickEmojis = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['❤️','😍','😂','😮','😢','👏','🔥','🎉'];
-
-        // Firestore'dan da senkronize et (farklı cihazlar için) - ANINDA GÜNCELLEME
-        onSnapshot(doc(db, 'chat_settings', currentUser), (snap) => {
-            if (snap.exists()) {
-                const data = snap.data();
-
-                // Emoji güncellemesi
-                if (data.quickEmojis) {
-                    const oldEmojis = JSON.stringify(quickEmojis);
-                    quickEmojis = data.quickEmojis;
-                    localStorage.setItem('chat_quick_emojis', JSON.stringify(quickEmojis));
-
-                    // Emoji değiştiyse mesajları yeniden render et
-                    if (oldEmojis !== JSON.stringify(quickEmojis)) {
-                        renderMessages();
-                    }
-                }
-            }
-        });
-
-        // --- Takma Ad Senkronizasyonu ---
-        const NICKNAMES_KEY = 'chat_nicknames_v2';
-
-        function loadPartnerNickname() {
-            const nicknames = JSON.parse(localStorage.getItem(NICKNAMES_KEY)) || {};
-            const partnerNickname = nicknames[partnerName];
-            if (partnerNickname) {
-                document.getElementById('p-name').innerText = partnerNickname;
-            }
-        }
-
-        // Firestore'dan takma adları senkronize et - ANINDA GÜNCELLEME
-        onSnapshot(doc(db, 'chat_settings', currentUser), (snap) => {
-            if (snap.exists() && snap.data().nicknames) {
-                localStorage.setItem(NICKNAMES_KEY, JSON.stringify(snap.data().nicknames));
-                loadPartnerNickname();
-            }
-        });
-
-        // Başlangıçta takma adı yükle
-        loadPartnerNickname();
-
-        // --- Aktivite Kaydetme (Geçirilen Süreye Dahil) ---
-        async function recordActivity(type) {
-            const today = new Date().toISOString().split('T')[0];
-            const statsRef = doc(db, 'user_stats', currentUser);
-            try {
-                await setDoc(statsRef, {
-                    timeSpent: { [today]: increment(1) },
-                    lastActivity: type,
-                    lastActivityAt: serverTimestamp()
-                }, { merge: true });
-                console.log('[Activity] Kaydedildi:', type);
-            } catch(e) {
-                console.error('[Activity] Hata:', e);
-            }
-        }
-
-        // --- Tema Bildirimleri ---
-        const themeQuery = query(collection(db, 'theme_updates'), orderBy('timestamp', 'desc'));
-        onSnapshot(themeQuery, (snap) => {
-            snap.docChanges().forEach(change => {
-                if (change.type === 'added') {
-                    const data = change.doc.data();
-                    // Bildirim bana geldi mi ve başkasından mı geldi?
-                    if (data.to === currentUser && data.from !== currentUser) {
-                        showToast(data.message);
-                    }
-                }
-            });
         });
 
         // --- UI Interactions ---
@@ -1639,9 +1184,6 @@
                     createdAt: serverTimestamp()
                 });
 
-                // Aktivite sayacını artır (geçirilen süreye dahil)
-                await recordActivity('message');
-
                 // --- Kapalıyken Giden Push Bildirimi ---
                 if (window.sendLoveNotification && currentUser !== 'Bilinmeyen') {
                     let notifMsg = text;
@@ -1657,11 +1199,7 @@
                 ta.value = '';
                 ta.style.height = 'auto';
                 cancelMedia();
-                showToast('Mesaj gönderildi! 💌');
-            } catch (e) {
-                console.error('[SendMessage] Hata:', e);
-                showToast('Mesaj gönderilemedi: ' + (e.message || 'Bilinmeyen hata') + ' 😔');
-            }
+            } catch (e) { showToast('Hata oluştu 😔'); }
             finally { btn.disabled = false; btn.innerText = '🚀'; }
         };
 
@@ -1689,6 +1227,8 @@
             let lastDate = null;
             sharedPhotos = [];
             sharedAudios = [];
+            const stickyHeader = document.getElementById('sticky-date-header');
+            const datePositions = []; // Track date divider positions for sticky header
             
             if (messageCache.length === 0) {
                 chatFlow.innerHTML = '<div style="text-align:center;padding:40px;opacity:0.5;">Henüz mesaj yok<br>İlk mesajı sen gönder! 💌</div>';
@@ -1697,10 +1237,28 @@
             
             messageCache.forEach(({ id, msg }) => {
                 if (!msg.timestamp) return;
+                if (searchTerm && !(msg.text || '').toLowerCase().includes(searchTerm)) return;
+                if (mediaOnlyFilter && !msg.photo && !msg.audio) return;
 
                 const isMe = msg.sender === currentUser;
+                if (senderFilter === 'me' && !isMe) return;
+                if (senderFilter === 'partner' && isMe) return;
 
                 const msgDateD = msg.timestamp.toDate();
+                if (dateStartStr || dateEndStr) {
+                    const d = new Date(msgDateD);
+                    d.setHours(0,0,0,0);
+                    if (dateStartStr) {
+                        const sDate = new Date(dateStartStr);
+                        sDate.setHours(0,0,0,0);
+                        if (d < sDate) return;
+                    }
+                    if (dateEndStr) {
+                        const eDate = new Date(dateEndStr);
+                        eDate.setHours(0,0,0,0);
+                        if (d > eDate) return;
+                    }
+                }
 
                 const currDate = msgDateD.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
                 
@@ -1729,15 +1287,15 @@
                 if (msg.audio) sharedAudios.push(msg.audio);
                 
                 const wrap = document.createElement('div');
-                wrap.className = `message-wrapper ${isMe ? 'msg-mert sent' : 'msg-ayse'}`;
-
+                wrap.className = `message-wrapper ${isMe ? 'msg-mert' : 'msg-ayse'}`;
+                
                 let content = `<div class="bubble">`;
-                if (msg.photo) content += `<img src="${msg.photo}" class="msg-photo" onclick="event.stopPropagation(); zoomImg('${msg.photo}')">`;
+                if (msg.photo) content += `<img src="${msg.photo}" class="msg-photo" onclick="zoomImg('${msg.photo}')">`;
                 if (msg.text) content += `<div style="padding-top:4px;">${msg.text.replace(/\\n/g, '<br>')}</div>`;
                 if (msg.audio) content += `<audio src="${msg.audio}" controls style="margin-top:8px;"></audio>`;
-
+                
                 const time = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '...';
-
+                
                 // Okundu bilgisi (sadece kendi mesajlarımda göster)
                 let readReceipt = '';
                 if (isMe) {
@@ -1746,82 +1304,59 @@
                     const readStatusClass = isRead ? 'read' : 'delivered';
                     readReceipt = `<span class="read-status ${readStatusClass}"><span class="tick"></span></span>`;
                 }
-
+                
                 content += `<div class="msg-info">${time}${readReceipt}</div></div>`;
 
-                // Instagram Style Reaction Bar (Mesaj üstüne tıklayınca çıkar)
-                const reactionBar = document.createElement('div');
-                reactionBar.className = 'ig-reaction-bar';
-                reactionBar.id = `reaction-bar-${id}`;
-
-                // Kullanıcının hızlı ifadeleri
-                const quickEmojis = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['❤️','😍','😂','😮','😢','👏','🔥','🎉'];
-
-                quickEmojis.forEach(emoji => {
+                // Instagram Style Reaction Bar
+                const reactBar = document.createElement('div');
+                reactBar.className = 'reaction-bar';
+                
+                // Instagram popüler emojileri
+                const POPULAR_EMOJIS = ['❤️', '😍', '😂', '😮', '😢', '👏', '🔥', '🎉'];
+                
+                POPULAR_EMOJIS.forEach(emo => {
                     const span = document.createElement('span');
                     span.className = 're-emoji';
-                    span.innerText = emoji;
+                    span.innerText = emo;
                     span.onclick = (e) => {
                         e.stopPropagation();
-                        addReaction(id, emoji, msg.reactions);
-                        reactionBar.classList.remove('active');
+                        addReaction(id, emo, msg.reactions);
+                        reactBar.classList.remove('active');
                     };
-                    reactionBar.appendChild(span);
+                    reactBar.appendChild(span);
                 });
-
-                // "+" butonu - emoji düzenleme modalını açar
-                const moreBtn = document.createElement('span');
-                moreBtn.className = 're-more';
-                moreBtn.innerHTML = '+';
-                moreBtn.onclick = (e) => {
+                
+                // Emoji seçici buton
+                const emojiPickerBtn = document.createElement('span');
+                emojiPickerBtn.className = 'emoji-picker-btn';
+                emojiPickerBtn.innerHTML = '➕ <span style="font-size:0.75rem;">Daha</span>';
+                emojiPickerBtn.onclick = (e) => {
                     e.stopPropagation();
-                    reactionBar.classList.remove('active');
-                    openEmojiEditModal();
+                    showEmojiPicker(id, msg.reactions, reactBar);
                 };
-                reactionBar.appendChild(moreBtn);
+                reactBar.appendChild(emojiPickerBtn);
 
-                // Message add button (sadece silme menüsü)
-                const addBtn = document.createElement('div');
-                addBtn.className = 'message-add-btn';
-                addBtn.innerHTML = '➕';
-                addBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    openMessageMenu(id, msg);
-                };
-
-                wrap.innerHTML = content;
-
-                // Reaksiyonları mesaj balonunun Dışına ekle (Instagram tarzı - balonu genişletmez)
-                if (msg.reactions && Object.keys(msg.reactions).length > 0) {
-                    const reactionPills = Object.entries(msg.reactions)
-                        .filter(([user, emoji]) => emoji !== null)
-                        .map(([user, emoji]) => `<span class="react-pill">${emoji}</span>`)
-                        .join('');
-                    if (reactionPills) {
-                        const reactionsDiv = document.createElement('div');
-                        reactionsDiv.className = 'msg-reactions';
-                        reactionsDiv.innerHTML = reactionPills;
-                        wrap.appendChild(reactionsDiv);
+                // Reactions Display (WP-Style: One reaction per user)
+                let reactDisplay = '<div class="msg-reactions">';
+                if (msg.reactions) {
+                    const uniqueReactions = {}; // { emoji: count }
+                    Object.values(msg.reactions).forEach(emo => {
+                        if (emo) uniqueReactions[emo] = (uniqueReactions[emo] || 0) + 1;
+                    });
+                    
+                    for (const [emo, count] of Object.entries(uniqueReactions)) {
+                        reactDisplay += `<div class="react-pill">${emo} ${count > 1 ? count : ''}</div>`;
                     }
                 }
+                reactDisplay += '</div>';
 
-                wrap.appendChild(reactionBar);
-                wrap.appendChild(addBtn);
+                wrap.innerHTML = content + reactDisplay;
+                wrap.appendChild(reactBar);
 
-                // Mesaj üstüne tıklayınca reaksiyon barı göster
                 wrap.onclick = function(e) {
                     e.stopPropagation();
-                    // Diğer tüm reaksiyon barlarını kapat
-                    document.querySelectorAll('.ig-reaction-bar').forEach(bar => bar.classList.remove('active'));
-                    // Bu mesajın reaksiyon barını aç
-                    reactionBar.classList.add('active');
-                };
-
-                // Çift tıklama: Mesaj menüsü aç (silme)
-                wrap.ondblclick = function(e) {
-                    e.stopPropagation();
-                    reactionBar.classList.remove('active');
-                    openMessageMenu(id, msg);
+                    document.querySelectorAll('.reaction-bar').forEach(function(b) { b.classList.remove('active'); });
+                    reactBar.classList.add('active');
                 };
 
                 chatFlow.appendChild(wrap);
@@ -1963,6 +1498,101 @@
             };
         };
 
+        // --- Instagram Style Theme Modal Functions ---
+        const COLOR_THEMES = [
+            { id: 'love', color: '#ff4b72', gradient: 'linear-gradient(135deg, #ff4b72, #ff8c00)', name: 'Aşk' },
+            { id: 'ocean', color: '#4facfe', gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)', name: 'Okyanus' },
+            { id: 'forest', color: '#43e97b', gradient: 'linear-gradient(135deg, #43e97b, #38f9d7)', name: 'Orman' },
+            { id: 'sunset', color: '#fa709a', gradient: 'linear-gradient(135deg, #fa709a, #fee140)', name: 'Gün Batımı' },
+            { id: 'royal', color: '#667eea', gradient: 'linear-gradient(135deg, #667eea, #764ba2)', name: 'Kraliyet' },
+            { id: 'midnight', color: '#2c3e50', gradient: 'linear-gradient(135deg, #2c3e50, #3498db)', name: 'Gece' },
+            { id: 'cherry', color: '#eb3349', gradient: 'linear-gradient(135deg, #eb3349, #f45c43)', name: 'Kiraz' },
+            { id: 'mint', color: '#11998e', gradient: 'linear-gradient(135deg, #11998e, #38ef7d)', name: 'Nane' }
+        ];
+        
+        window.openThemeModal = function() {
+            document.getElementById('theme-modal').classList.add('active');
+            initColorThemes();
+            initModernWallpapers();
+        };
+        
+        window.closeThemeModal = function() {
+            document.getElementById('theme-modal').classList.remove('active');
+        };
+        
+        function initColorThemes() {
+            const grid = document.getElementById('color-theme-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            const activeColor = localStorage.getItem('chat_color_theme') || 'love';
+            
+            COLOR_THEMES.forEach(theme => {
+                const item = document.createElement('div');
+                item.className = `color-theme-item ${theme.id === activeColor ? 'active' : ''}`;
+                item.style.background = theme.gradient;
+                item.innerHTML = theme.id === activeColor ? '<div class="theme-check">✓</div>' : '';
+                item.onclick = () => {
+                    applyColorTheme(theme);
+                    initColorThemes(); // Re-render
+                };
+                grid.appendChild(item);
+            });
+        }
+        
+        function applyColorTheme(theme) {
+            localStorage.setItem('chat_color_theme', theme.id);
+            document.documentElement.style.setProperty('--primary', theme.color);
+            document.documentElement.style.setProperty('--ayse-color', theme.color);
+            showToast(`${theme.name} teması uygulandı! ✨`);
+        }
+        
+        function initModernWallpapers() {
+            const grid = document.getElementById('wallpaper-grid-modern');
+            if (!grid) return;
+            grid.innerHTML = '';
+            
+            const WALLPAPERS_MODERN = [
+                { id: 'gradient1', type: 'gradient', css: 'linear-gradient(180deg, #1a0520 0%, #0a0208 100%)', label: 'Karanlık Gül', preview: 'linear-gradient(180deg, #1a0520, #0a0208)' },
+                { id: 'gradient2', type: 'gradient', css: 'radial-gradient(circle at 30% 20%, rgba(255,75,114,0.15) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(79,172,254,0.15) 0%, transparent 50%), #0a0208', label: 'Aurora', preview: 'radial-gradient(circle at 30% 20%, rgba(255,75,114,0.3), rgba(79,172,254,0.3))' },
+                { id: 'gradient3', type: 'gradient', css: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)', label: 'Gece Mavisi', preview: 'linear-gradient(135deg, #1a1a2e, #0f3460)' },
+                { id: 'gradient4', type: 'gradient', css: 'linear-gradient(180deg, #0f0c29 0%, #302b63 50%, #24243e 100%)', label: 'Mor Gece', preview: 'linear-gradient(180deg, #0f0c29, #302b63)' },
+                { id: 'solid1', type: 'solid', css: '#0a0208', label: 'Saf Siyah', preview: '#0a0208' },
+                { id: 'solid2', type: 'solid', css: '#1a0b16', label: 'Bordo', preview: '#1a0b16' }
+            ];
+            
+            const customUrl = localStorage.getItem(CUSTOM_WP_KEY);
+            if (customUrl) {
+                WALLPAPERS_MODERN.unshift({ id: 'custom', type: 'custom', css: `url(${customUrl}) center/cover no-repeat fixed`, label: 'Kendi Fotoğrafım', preview: `url(${customUrl})`, isCustom: true });
+            }
+            
+            const currentId = localStorage.getItem(CHAT_WP_KEY) || 'gradient1';
+            
+            WALLPAPERS_MODERN.forEach(wp => {
+                const item = document.createElement('div');
+                item.className = `wallpaper-item ${wp.id === currentId ? 'active' : ''}`;
+                item.dataset.id = wp.id;
+                
+                if (wp.isCustom) {
+                    item.innerHTML = `<img src="${customUrl}" alt="custom"><div class="wp-label">${wp.label}</div>${wp.id === currentId ? '<div class="wp-check">✓</div>' : ''}`;
+                } else {
+                    item.style.background = wp.preview;
+                    item.innerHTML = `<div class="wp-label">${wp.label}</div>${wp.id === currentId ? '<div class="wp-check">✓</div>' : ''}`;
+                }
+                
+                item.onclick = () => {
+                    applyModernWallpaper(wp);
+                    initModernWallpapers(); // Re-render
+                };
+                grid.appendChild(item);
+            });
+        }
+        
+        function applyModernWallpaper(wp) {
+            document.body.style.background = wp.css;
+            localStorage.setItem(CHAT_WP_KEY, wp.id);
+            showToast(`${wp.label} duvar kağıdı uygulandı! 🎨`);
+        }
+        
         // --- Presence Sync (Global Online Status) - shared with presence.js ---
 
         // Partner durum dinleme (realtime)
@@ -2012,264 +1642,6 @@
                 return dateStr + ' ' + timeStr;
             }
         }
-
-        // --- Message Menu Functions (Instagram Style) ---
-        let selectedMessageId = null;
-        let selectedMessageData = null;
-
-        window.openMessageMenu = function(msgId, msg) {
-            selectedMessageId = msgId;
-            selectedMessageData = msg;
-            document.getElementById('message-menu-overlay').classList.add('active');
-            // Emoji editor'ı gizle başlangıçta
-            document.getElementById('emoji-editor-section').style.display = 'none';
-        };
-
-        window.closeMessageMenu = function() {
-            document.getElementById('message-menu-overlay').classList.remove('active');
-            document.getElementById('emoji-editor-section').style.display = 'none';
-            selectedMessageId = null;
-            selectedMessageData = null;
-        };
-
-        window.editQuickEmojis = function() {
-            // Emoji editor'ı göster
-            document.getElementById('emoji-editor-section').style.display = 'block';
-            renderEmojiEditor();
-        };
-
-        window.copyMessage = function() {
-            if (selectedMessageData && selectedMessageData.text) {
-                navigator.clipboard.writeText(selectedMessageData.text);
-                showToast('Mesaj kopyalandı! 📋');
-            }
-            closeMessageMenu();
-        };
-
-        window.deleteForMe = async function() {
-            if (!selectedMessageId) return;
-            try {
-                await updateDoc(doc(db, 'chat_messages', selectedMessageId), {
-                    [`deletedFor.${currentUser}`]: true
-                });
-                showToast('Mesaj senden silindi 🗑️');
-            } catch (e) {
-                console.error(e);
-            }
-            closeMessageMenu();
-        };
-
-        window.deleteForAll = async function() {
-            if (!selectedMessageId) return;
-            if (!confirm('Bu mesaj herkesten silinecek. Emin misin? 🥺')) {
-                closeMessageMenu();
-                return;
-            }
-            try {
-                await updateDoc(doc(db, 'chat_messages', selectedMessageId), {
-                    deletedForAll: true,
-                    text: '🗑️ Bu mesaj silindi',
-                    photo: null,
-                    audio: null
-                });
-                showToast('Mesaj herkesten silindi 🗑️');
-            } catch (e) {
-                console.error(e);
-            }
-            closeMessageMenu();
-        };
-
-        // --- Quick Emoji Editor ---
-        let quickEmojisList = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['❤️','😍','😂','😮','😢','👏','🔥','🎉'];
-
-        function renderEmojiEditor() {
-            const display = document.getElementById('current-emojis-display');
-            const grid = document.getElementById('emoji-selection-grid');
-            
-            // Mevcut emojileri göster
-            display.innerHTML = quickEmojisList.map(emo => 
-                `<div class="current-emoji" onclick="removeQuickEmoji('${emo}')">${emo}</div>`
-            ).join('');
-            
-            // Tüm emojileri göster
-            const ALL_EMOJIS = [
-                '❤️','💙','💜','🖤','💚','💛','🧡','🤍','🤎','💗','💖','💝',
-                '😍','🥰','😘','😻','💋','🫶','💕','💞','💓','💘','❣️',
-                '😂','🤣','😅','😆','😄','😃','😁','🙂','😊','☺️','😉',
-                '😢','😭','😥','😰','😓','🥺','😦','😧','😨','😩',
-                '😮','😲','😱','🤯','😳','🥵','🥶','😶‍🌫️',
-                '👏','🙌','👍','👎','👌','✌️','🤞','🫰','🤟','🤘',
-                '🔥','💯','⭐','✨','🌟','💫','🎉','🎊','🎁','🎈',
-                '🥳','🤩','😎','🤓','🧐','🤔','🤨','😏','😒','🙄',
-                '🌹','🌸','🌺','🌷','🌻','💐','🍫','🍬','🍭','🧁',
-                '🌙','☀️','⭐','🌈','☁️','⛅','🌤️','🌦️','🌧️',
-                '🍎','🍓','🍒','🍑','🍊','🍋','🍌','🍉','🍇',
-                '🐱','🐶','🐰','🦊','🐻','🐼','🐨','🐯','🦁',
-                '🎵','🎶','🎤','🎧','🎸','🎹','🎺','🎻','🥁'
-            ];
-            
-            grid.innerHTML = ALL_EMOJIS.map(emo => {
-                const isSelected = quickEmojisList.includes(emo);
-                return `<div class="emoji-option ${isSelected ? 'selected' : ''}" onclick="toggleQuickEmoji('${emo}')">${emo}</div>`;
-            }).join('');
-        }
-
-        window.toggleQuickEmoji = function(emoji) {
-            const index = quickEmojisList.indexOf(emoji);
-            if (index > -1) {
-                // Kaldır
-                quickEmojisList.splice(index, 1);
-            } else {
-                // Ekle (max 16)
-                if (quickEmojisList.length < 16) {
-                    quickEmojisList.push(emoji);
-                } else {
-                    showToast('Maksimum 16 emoji ekleyebilirsin! 😅');
-                    return;
-                }
-            }
-            localStorage.setItem('chat_quick_emojis', JSON.stringify(quickEmojisList));
-            renderEmojiEditor();
-        };
-
-        window.removeQuickEmoji = function(emoji) {
-            const index = quickEmojisList.indexOf(emoji);
-            if (index > -1) {
-                quickEmojisList.splice(index, 1);
-                localStorage.setItem('chat_quick_emojis', JSON.stringify(quickEmojisList));
-                renderEmojiEditor();
-            }
-        };
-
-        // --- Instagram Style Emoji Edit Modal Functions ---
-        const ALL_EMOJIS = [
-            '❤️','😍','😂','😮','😢','👏','🔥','🎉','🥺','✨','💕','🌹','🎁','🤗','😘','🥰',
-            '💙','💜','🖤','💚','💛','🧡','🤍','🤎','💗','💖','💝','💋','🫶','💞','💓','💘','❣️',
-            '🤣','😅','😆','😄','😃','😁','🙂','😊','☺️','😉','😌','😋','😛','😝','😜','🤪',
-            '😭','😥','😰','😓','😦','😧','😨','😩','🥵','🥶','😶‍🌫️','😱','🤯','😳',
-            '🙌','👍','👎','👌','✌️','🤞','🫰','🤟','🤘','👊','🤝','🙏','💪','🤲',
-            '💯','⭐','🌟','💫','🌈','☀️','🌙','☁️','⛅','🌤️','🌧️','⛈️','❄️','🌊',
-            '🥳','🤩','😎','🤓','🧐','🤔','🤨','😏','😒','🙄','😬','😮‍💨','🤥',
-            '🌸','🌺','🌷','🌻','💐','🍫','🍬','🍭','🧁','🍰','🎂','🍷','🍾','🥂',
-            '🐱','🐶','🐻','🦊','🐼','🐨','🐯','🦁','🐷','🐸','🦄','🐙','🦋','🐝',
-            '🎵','🎶','🎼','🎸','🎹','🎺','🎻','🥁','📻','🎧','🎤','🎬','🎮','🎯',
-            '🚀','🛸','🌍','🌎','🌏','🌕','🌑','⭐','🌠','🌌','☄️','🎆','🎇','✨',
-            '👑','💍','💎','🔮','🧿','🪬','🧸','🎀','🎊','🎋','🎍','🎎','🎏','🎐',
-            '💌','📨','📬','📭','📪','📫','📮','📯','📜','📃','📄','📑','🧾','📊','📈','📉'
-        ];
-
-        window.openEmojiEditModal = function() {
-            document.getElementById('emoji-edit-overlay').classList.add('active');
-            renderEmojiEditGrid();
-        };
-
-        window.closeEmojiEditModal = function() {
-            document.getElementById('emoji-edit-overlay').classList.remove('active');
-        };
-
-        function renderEmojiEditGrid() {
-            const current = document.getElementById('emoji-edit-current');
-            const grid = document.getElementById('emoji-edit-grid');
-            const quickEmojis = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['❤️','😍','😂','😮','😢','👏','🔥','🎉'];
-
-            // Mevcut emojileri göster
-            current.innerHTML = quickEmojis.map(emoji =>
-                `<div class="emoji-edit-item" onclick="removeEmojiFromQuick('${emoji}')">${emoji}</div>`
-            ).join('');
-
-            // Tüm emojileri göster
-            grid.innerHTML = ALL_EMOJIS.map(emoji => {
-                const isSelected = quickEmojis.includes(emoji);
-                return `<div class="emoji-edit-option ${isSelected ? 'selected' : ''}" onclick="toggleEmojiQuick('${emoji}')">${emoji}</div>`;
-            }).join('');
-        }
-
-        window.toggleEmojiQuick = async function(emoji) {
-            let quickEmojis = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['❤️','😍','😂','😮','😢','👏','🔥','🎉'];
-            const index = quickEmojis.indexOf(emoji);
-
-            if (index > -1) {
-                // Kaldır
-                quickEmojis.splice(index, 1);
-            } else {
-                // Ekle (max 8)
-                if (quickEmojis.length < 8) {
-                    quickEmojis.push(emoji);
-                } else {
-                    showToast('Maksimum 8 emoji ekleyebilirsin! 😅');
-                    return;
-                }
-            }
-
-            localStorage.setItem('chat_quick_emojis', JSON.stringify(quickEmojis));
-
-            // Firestore'a da kaydet (senkronizasyon için)
-            await setDoc(doc(db, 'chat_settings', currentUser), {
-                quickEmojis: quickEmojis,
-                updatedAt: serverTimestamp()
-            }, { merge: true });
-
-            // ANINDA MESAJLARI YENİDEN RENDER ET
-            renderMessages();
-
-            renderEmojiEditGrid();
-            showToast('Hızlı ifadeler güncellendi! ⚡');
-        };
-
-        window.removeEmojiFromQuick = function(emoji) {
-            let quickEmojis = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['❤️','😍','😂','😮','😢','👏','🔥','🎉'];
-            const index = quickEmojis.indexOf(emoji);
-            if (index > -1) {
-                quickEmojis.splice(index, 1);
-                localStorage.setItem('chat_quick_emojis', JSON.stringify(quickEmojis));
-                renderEmojiEditGrid();
-            }
-        };
-
-        // --- Takma Ad Fonksiyonları ---
-        // NICKNAMES_KEY yukarıda tanımlandı (chat_nicknames_v2)
-
-        // Partner'in takma adını al
-        function getPartnerNickname() {
-            const nicknames = JSON.parse(localStorage.getItem(NICKNAMES_KEY)) || {};
-            return nicknames[partner] || partner;
-        }
-
-        // Takma adı ayarla
-        window.setPartnerNickname = async function(nickname) {
-            const nicknames = JSON.parse(localStorage.getItem(NICKNAMES_KEY)) || {};
-            nicknames[partner] = nickname;
-            localStorage.setItem(NICKNAMES_KEY, JSON.stringify(nicknames));
-
-            // Firestore'a kaydet (bulut senkronizasyonu)
-            await setDoc(doc(db, 'chat_settings', currentUser), {
-                nicknames: nicknames,
-                updatedAt: serverTimestamp()
-            }, { merge: true });
-
-            // Header'ı güncelle
-            document.getElementById('p-name').textContent = nickname;
-            showToast(`${partner} artık "${nickname}" olarak gözükecek! 💕`);
-        };
-
-        // Takma adı yükle
-        function loadNickname() {
-            const nicknames = JSON.parse(localStorage.getItem(NICKNAMES_KEY)) || {};
-            if (nicknames[partner]) {
-                document.getElementById('p-name').textContent = nicknames[partner];
-            }
-        }
-
-        // Firestore'dan takma adları senkronize et
-        onSnapshot(doc(db, 'chat_settings', currentUser), (snap) => {
-            if (snap.exists() && snap.data().nicknames) {
-                localStorage.setItem(NICKNAMES_KEY, JSON.stringify(snap.data().nicknames));
-                loadNickname();
-            }
-        });
-
-        // Başlangıçta takma adı yükle
-        loadNickname();
 
         // Mobile Scroll Optimization
         if (window.visualViewport) {
