@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Liderlik Ekranı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary:#ff4b72; --gold:#ffd166; --border:rgba(255,255,255,.12); }
+        * { box-sizing:border-box; }
+        body { margin:0; min-height:100vh; font-family:Outfit,sans-serif; color:#fff; background:radial-gradient(circle at 20% 0, rgba(255,75,114,.18), transparent 34%), radial-gradient(circle at 80% 10%, rgba(255,209,102,.13), transparent 30%), #0a0208; padding:22px; }
+        .back { position:fixed; top:18px; left:18px; color:#fff; text-decoration:none; background:rgba(255,255,255,.07); border:1px solid var(--border); border-radius:999px; padding:10px 15px; }
+        header { text-align:center; margin:64px auto 28px; }
+        h1 { margin:0; color:var(--primary); font-family:'Playfair Display',serif; font-size:2.7rem; }
+        .board { max-width:980px; margin:0 auto; display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:16px; }
+        .card { background:rgba(255,255,255,.055); border:1px solid var(--border); border-radius:16px; padding:18px; }
+        .player { font-size:1.35rem; font-weight:800; margin-bottom:12px; color:var(--gold); }
+        .stat { display:flex; justify-content:space-between; gap:12px; border-top:1px solid rgba(255,255,255,.08); padding:10px 0; }
+        .stat:first-of-type { border-top:0; }
+        .winner { margin-top:12px; padding:10px; border-radius:12px; background:rgba(255,209,102,.12); border:1px solid rgba(255,209,102,.25); text-align:center; font-weight:800; }
+        @media (max-width:760px){ .board{grid-template-columns:1fr} h1{font-size:2.2rem} }
+    </style>
+    <script src="app-bootstrap.js?v=1" defer></script>
+</head>
+<body>
+    <a class="back" href="games.html">← Oyunlara Dön</a>
+    <header>
+        <h1>Liderlik Ekranı 🏆</h1>
+        <p style="opacity:.76">Oyun, doğru cevap, kazanç ve harcama rekabeti.</p>
+    </header>
+    <main class="board" id="board"></main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey:"AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU", authDomain:"ayseye-surpriz.firebaseapp.com", projectId:"ayseye-surpriz", storageBucket:"ayseye-surpriz.firebasestorage.app", messagingSenderId:"531177459988", appId:"1:531177459988:web:09060a95bea0b06f197201" };
+        const db = getFirestore(initializeApp(firebaseConfig));
+        const players = ['Ayşe', 'Mert'];
+        let logs = [];
+        let txs = [];
+
+        function emptyStats() {
+            return { games:0, correct:0, earned:0, spent:0, gifts:0, messages:0 };
+        }
+
+        function calculate() {
+            const stats = Object.fromEntries(players.map(p => [p, emptyStats()]));
+            logs.forEach(log => {
+                const user = log.user;
+                if (!stats[user]) return;
+                if (['love_quiz','word_puzzle','heart_rhythm','memory_game','mine_game','scratch_game','jackpot','dice'].includes(log.type)) {
+                    stats[user].games++;
+                    stats[user].correct += Number(log.score || 0);
+                    stats[user].earned += Number(log.reward || 0);
+                }
+                if (log.type === 'gift_sent') stats[user].gifts++;
+                if (log.type === 'message') stats[user].messages++;
+            });
+            txs.forEach(tx => {
+                if (stats[tx.user]) stats[tx.user].spent += Number(tx.price || 0);
+            });
+            return stats;
+        }
+
+        function leaderFor(stats, key) {
+            const sorted = [...players].sort((a,b) => stats[b][key] - stats[a][key]);
+            if (stats[sorted[0]][key] === stats[sorted[1]][key]) return 'Berabere';
+            return sorted[0];
+        }
+
+        function render() {
+            const stats = calculate();
+            document.getElementById('board').innerHTML = players.map(player => `
+                <section class="card">
+                    <div class="player">${player}</div>
+                    <div class="stat"><span>Oynanan oyun</span><strong>${stats[player].games}</strong></div>
+                    <div class="stat"><span>Doğru/puan toplamı</span><strong>${stats[player].correct}</strong></div>
+                    <div class="stat"><span>Kazanılan kalp</span><strong>${stats[player].earned} ❤️</strong></div>
+                    <div class="stat"><span>Harcanan kalp</span><strong>${stats[player].spent} ❤️</strong></div>
+                    <div class="stat"><span>Gönderilen hediye</span><strong>${stats[player].gifts}</strong></div>
+                    <div class="stat"><span>Mesaj sayısı</span><strong>${stats[player].messages}</strong></div>
+                </section>
+            `).join('') + `
+                <section class="card" style="grid-column:1/-1">
+                    <div class="player">Özet</div>
+                    <div class="winner">En çok oynayan: ${leaderFor(stats, 'games')}</div>
+                    <div class="winner">En çok doğru/puan: ${leaderFor(stats, 'correct')}</div>
+                    <div class="winner">En çok kazanan: ${leaderFor(stats, 'earned')}</div>
+                    <div class="winner">En çok harcayan: ${leaderFor(stats, 'spent')}</div>
+                </section>`;
+        }
+
+        onSnapshot(collection(db, 'activity_logs'), snap => {
+            logs = snap.docs.map(d => d.data());
+            render();
+        });
+        onSnapshot(query(collection(db, 'shop_transactions'), orderBy('createdAt', 'desc')), snap => {
+            txs = snap.docs.map(d => d.data());
+            render();
+        });
+    </script>
+<script type="module" src="time-tracker.js"></script>
+<script type="module" src="presence.js"></script>
+</body>
+</html>

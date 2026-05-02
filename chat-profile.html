@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <title>Sohbet Profili 💬</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -24,7 +30,12 @@
             background: var(--bg); 
             color: var(--text); 
             min-height: 100vh;
+            min-height: 100dvh;
             overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         /* Header */
@@ -97,11 +108,35 @@
         .profile-status {
             font-size: 0.9rem; color: var(--text-secondary); margin-top: 4px;
         }
+        .chat-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 0 20px 18px;
+        }
+        .chat-stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px 8px;
+            text-align: center;
+        }
+        .chat-stat strong {
+            display: block;
+            font-size: 1.15rem;
+            color: #fff;
+            margin-bottom: 3px;
+        }
+        .chat-stat span {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
 
         /* Quick Actions - Instagram Style */
         .quick-actions {
-            display: flex; justify-content: center; gap: 30px;
+            display: flex; justify-content: center; gap: 18px;
             padding: 20px; border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
         }
         .quick-action {
             display: flex; flex-direction: column; align-items: center; gap: 6px;
@@ -289,7 +324,230 @@
             z-index: 3000; display: none; align-items: center; justify-content: center;
         }
         #img-modal img { max-width: 95%; max-height: 90vh; border-radius: 12px; }
+
+        /* --- Refined profile UI --- */
+        body {
+            background:
+                radial-gradient(circle at 16% -8%, rgba(255,75,114,0.18), transparent 32%),
+                radial-gradient(circle at 92% 10%, rgba(79,172,254,0.13), transparent 30%),
+                linear-gradient(180deg, #100811 0%, #080809 42%, #0b0b0c 100%);
+        }
+        .header {
+            background: rgba(9, 7, 10, 0.78);
+            box-shadow: 0 14px 42px rgba(0,0,0,0.28);
+        }
+        .back-btn,
+        .header-btn {
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
+        }
+        .profile-hero {
+            position: relative;
+            padding: 38px 20px 24px;
+            overflow: hidden;
+            background:
+                linear-gradient(180deg, rgba(255,75,114,0.16) 0%, rgba(255,140,0,0.06) 48%, transparent 100%);
+        }
+        .profile-hero::before {
+            content: '';
+            position: absolute;
+            inset: 14px 18px auto;
+            height: 118px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.015));
+            border: 1px solid rgba(255,255,255,0.07);
+            pointer-events: none;
+        }
+        .profile-avatar-container,
+        .profile-name,
+        .profile-status {
+            position: relative;
+            z-index: 1;
+        }
+        .profile-avatar {
+            width: 128px;
+            height: 128px;
+            border-width: 5px;
+            box-shadow:
+                0 0 0 2px rgba(255,75,114,0.92),
+                0 14px 38px rgba(255,75,114,0.26),
+                0 0 60px rgba(79,172,254,0.16);
+        }
+        .profile-avatar::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 48%);
+            pointer-events: none;
+        }
+        .profile-name {
+            margin-top: 2px;
+            letter-spacing: 0;
+        }
+        .verified-badge {
+            filter: drop-shadow(0 0 12px rgba(255,75,114,0.45));
+        }
+        .profile-status {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            margin-top: 8px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.74);
+        }
+        .profile-status::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #48c78e;
+            box-shadow: 0 0 14px rgba(72,199,142,0.85);
+        }
+        body.presence-online .profile-status::before {
+            background: #48c78e;
+            box-shadow: 0 0 14px rgba(72,199,142,0.85);
+        }
+        body.presence-offline .profile-status::before,
+        body:not(.presence-online) .profile-status::before {
+            background: #ff4b5f;
+            box-shadow: 0 0 14px rgba(255,75,95,0.72);
+        }
+        .chat-stats {
+            max-width: 620px;
+            margin: 0 auto;
+            padding: 0 18px 20px;
+        }
+        .chat-stat {
+            border-radius: 16px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.035)),
+                var(--surface);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .chat-stat strong {
+            font-size: 1.28rem;
+        }
+        .quick-actions {
+            max-width: 620px;
+            margin: 0 auto;
+            border-bottom: 0;
+            gap: 14px;
+            padding-top: 14px;
+        }
+        .quick-action {
+            min-width: 68px;
+        }
+        .quick-action-icon {
+            width: 54px;
+            height: 54px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.04)),
+                var(--surface);
+            border: 1px solid rgba(255,255,255,0.09);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .quick-action:active .quick-action-icon {
+            transform: scale(0.94);
+        }
+        .settings-list,
+        .media-section,
+        .emoji-section,
+        .section {
+            max-width: 680px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .settings-list {
+            margin-top: 8px;
+            padding: 8px 14px;
+        }
+        .settings-item {
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            background: rgba(255,255,255,0.045);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .settings-item:last-child {
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .settings-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+        }
+        .settings-title,
+        .section-title {
+            letter-spacing: 0;
+        }
+        .section-action {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(255,75,114,0.1);
+        }
+        .media-section {
+            padding: 18px 20px 28px;
+        }
+        .media-grid {
+            gap: 6px;
+            border-radius: 18px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            padding: 6px;
+        }
+        .media-item {
+            border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+        }
+        .media-item img {
+            border-radius: 12px;
+        }
+        .modal-sheet {
+            background:
+                linear-gradient(180deg, rgba(36,24,34,0.98), rgba(18,18,18,0.98)),
+                #1a1a1a;
+            border: 1px solid rgba(255,255,255,0.09);
+            box-shadow: 0 -24px 70px rgba(0,0,0,0.58), inset 0 1px 0 rgba(255,255,255,0.07);
+        }
+        .theme-item,
+        .custom-theme-btn,
+        .emoji-item {
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 10px 24px rgba(0,0,0,0.2);
+        }
+        #toast {
+            box-shadow: 0 12px 30px rgba(255,75,114,0.28);
+        }
+
+        /* === MOBİL OPTİMİZASYONLAR === */
+        @media (max-width: 480px) {
+            .header { padding: 10px 12px; }
+            .header-title { font-size: 1rem; }
+            .profile-section { padding: 20px 16px; }
+            .partner-avatar { width: 80px; height: 80px; font-size: 2.5rem; }
+            .partner-name { font-size: 1.3rem; }
+            .settings-item { padding: 12px; }
+            .modal-sheet { width: 95%; max-height: 85vh; }
+        }
+
+        /* Touch cihazlar için */
+        @media (hover: none) and (pointer: coarse) {
+            .settings-item:hover, .theme-option:hover, .custom-theme-card:hover {
+                transform: none;
+                background: var(--surface);
+            }
+            .settings-item:active, .theme-option:active, .custom-theme-card:active {
+                background: var(--surface-hover);
+                opacity: 0.9;
+            }
+        }
     </style>
+    <script src="app-bootstrap.js?v=1" defer></script>
 </head>
 <body>
     <!-- Header -->
@@ -316,6 +574,44 @@
         <div class="profile-status" id="partner-status">Senin Biricik Aşkın ✨</div>
     </div>
 
+    <div class="chat-stats">
+        <div class="chat-stat">
+            <strong id="stat-messages">0</strong>
+            <span>Mesaj</span>
+        </div>
+        <div class="chat-stat">
+            <strong id="stat-photos">0</strong>
+            <span>Fotoğraf</span>
+        </div>
+        <div class="chat-stat">
+            <strong id="stat-audios">0</strong>
+            <span>Ses</span>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <div class="quick-action" onclick="location.href='chat.html'">
+            <div class="quick-action-icon"><i class="fas fa-comment-dots"></i></div>
+            <div class="quick-action-label">Mesaj</div>
+        </div>
+        <div class="quick-action" onclick="location.href='chat.html?search=1'">
+            <div class="quick-action-icon"><i class="fas fa-magnifying-glass"></i></div>
+            <div class="quick-action-label">Ara</div>
+        </div>
+        <div class="quick-action" onclick="document.getElementById('media-grid').scrollIntoView({behavior:'smooth', block:'center'})">
+            <div class="quick-action-icon"><i class="fas fa-images"></i></div>
+            <div class="quick-action-label">Medya</div>
+        </div>
+        <div class="quick-action" onclick="openThemeModal()">
+            <div class="quick-action-icon"><i class="fas fa-palette"></i></div>
+            <div class="quick-action-label">Tema</div>
+        </div>
+        <div class="quick-action" onclick="location.href='starred-messages.html'">
+            <div class="quick-action-icon"><i class="fas fa-star"></i></div>
+            <div class="quick-action-label">Yıldızlı</div>
+        </div>
+    </div>
+
     <!-- Settings List -->
     <div class="settings-list">
         <div class="settings-item" onclick="openThemeModal()">
@@ -331,6 +627,14 @@
             <div class="settings-content">
                 <div class="settings-title">Takma Adlar</div>
                 <div class="settings-subtitle" id="nickname-subtitle">Birbirinize özel isimler</div>
+            </div>
+            <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
+        </div>
+        <div class="settings-item" onclick="location.href='starred-messages.html'">
+            <div class="settings-icon" style="background: linear-gradient(135deg, #ffd166, #ff8c00);"><i class="fas fa-star"></i></div>
+            <div class="settings-content">
+                <div class="settings-title">Yıldızlı Mesajlar</div>
+                <div class="settings-subtitle">Sakladığınız özel mesajlar</div>
             </div>
             <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
         </div>
@@ -516,6 +820,22 @@
         document.getElementById('partner-emoji').textContent = partner === 'Mert' ? '🤴🏻' : '👸🏻';
         document.getElementById('partner-status').textContent = partner === 'Mert' ? 'Seni çok seven erkek 🖤' : 'Seni çok seven kız 💗';
 
+        function setPartnerPresence(isOnline) {
+            document.body.classList.toggle('presence-online', isOnline);
+            document.body.classList.toggle('presence-offline', !isOnline);
+        }
+
+        onSnapshot(doc(db, 'online_status', partner), (snap) => {
+            if (!snap.exists() || !snap.data().last_seen) {
+                setPartnerPresence(false);
+                return;
+            }
+
+            const data = snap.data();
+            const diffSecs = (Date.now() - data.last_seen.toDate().getTime()) / 1000;
+            setPartnerPresence(data.online === true && diffSecs < 60);
+        });
+
         // Load Profile Pictures
         onSnapshot(doc(db, 'user_stats', partner), (snap) => {
             if (snap.exists() && snap.data().profilePic) {
@@ -650,7 +970,6 @@
             const file = e.target.files[0];
             if (!file) return;
             
-            showToast('Tema yükleniyor... ⏳');
             try {
                 const base64 = await new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -688,16 +1007,28 @@
                     renderThemes();
                 }
             } catch (e) {
+                console.error('[CustomTheme] Yükleme hatası:', e);
                 showToast('Yükleme hatası! 😔');
             }
         });
 
-        // Listen for theme changes
+        // Listen for theme changes (Sadece 1 kere göster, sadece yeni olanlar)
+        let lastShownTheme = null;
+        const profileLoadTime = Date.now();
         onSnapshot(doc(db, 'chat_themes', 'shared'), (snap) => {
             if (snap.exists()) {
                 const data = snap.data();
                 if (data.updatedBy !== activePlayer) {
-                    showToast(`${partner} temayı "${data.themeName}" yaptı! 💕`);
+                    // Sadece sayfa açıldıktan sonraki değişiklikleri göster
+                    const updateTime = data.updatedAt?.toDate?.() || new Date();
+                    if (updateTime.getTime() > profileLoadTime - 5000) { // 5 saniye tolerans
+                        // Aynı tema sadece 1 kere göster
+                        const themeKey = `${data.themeId}_${data.updatedBy}`;
+                        if (lastShownTheme !== themeKey) {
+                            lastShownTheme = themeKey;
+                            showToast(`${partner} temayı "${data.themeName}" yaptı! 💕`);
+                        }
+                    }
                 }
             }
         });
@@ -708,11 +1039,20 @@
                 const q = query(collection(db, 'chat_messages'), orderBy('timestamp', 'desc'));
                 const snap = await getDocs(q);
                 const photos = [];
+                let messageCount = 0;
+                let audioCount = 0;
                 
                 snap.forEach(doc => {
                     const data = doc.data();
+                    if (data.deletedForAll) return;
+                    messageCount++;
                     if (data.photo) photos.push(data.photo);
+                    if (data.audio) audioCount++;
                 });
+
+                document.getElementById('stat-messages').textContent = messageCount;
+                document.getElementById('stat-photos').textContent = photos.length;
+                document.getElementById('stat-audios').textContent = audioCount;
                 
                 const grid = document.getElementById('media-grid');
                 if (photos.length === 0) {
@@ -808,8 +1148,7 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            showToast('Resim yükleniyor... ⏳');
-
+            showToast('Tema yükleniyor... ⏳');
             try {
                 const formData = new FormData();
                 formData.append('image', file);
@@ -1002,7 +1341,7 @@
             });
 
             loadCurrentNickname();
-            showToast(`${partner} artık "${nickname}" olarak gözükecek! �`);
+            showToast(`${partner} artık "${nickname}" olarak gözükecek! 💕`);
         };
 
         // Firestore'dan takma adları senkronize et

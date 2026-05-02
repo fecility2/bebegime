@@ -236,25 +236,96 @@ window.startExperience = function () {
     }
 };
 
-window.checkPassword = function () {
-    const val = document.getElementById('love-password').value.trim();
-    // Şifre: 25.02.2026 (ve alternatifler)
-    if (['25.02.2026', '25022026', '25/02/2026', '25.02.26'].includes(val)) {
-        document.getElementById('password-step').style.display = 'none';
-        document.getElementById('name-selection-step').style.display = 'block';
-    } else {
-        var err = document.getElementById('password-error');
-        if (err) {
-            err.style.opacity = '1';
-            setTimeout(function() { err.style.opacity = '0'; }, 3000);
-        }
+const ACCOUNT_PASSWORDS = {
+    'Ayşe': ['25.02.2026', '25022026', '25/02/2026', '25.02.26'],
+    'Mert': ['25.02.2026', '25022026', '25/02/2026', '25.02.26']
+};
+let selectedLoginAccount = localStorage.getItem('remembered_account') || localStorage.getItem('active_player') || '';
+
+function showLoginError(message) {
+    var err = document.getElementById('password-error');
+    if (err) {
+        err.textContent = message;
+        err.style.opacity = '1';
+        setTimeout(function() { err.style.opacity = '0'; }, 3000);
     }
+}
+
+function updateAccountButtons() {
+    document.querySelectorAll('.account-choice').forEach(function (btn) {
+        btn.classList.toggle('active', btn.dataset.account === selectedLoginAccount);
+    });
+}
+
+window.selectLoginAccount = function (name) {
+    selectedLoginAccount = name;
+    updateAccountButtons();
 };
 
-window.selectUserName = function (name) {
+function refreshActiveAccountLabel() {
+    var current = localStorage.getItem('active_player');
+    var btn = document.getElementById('account-status-btn');
+    var label = document.getElementById('active-account-label');
+    if (!btn || !label) return;
+    if (current) {
+        label.textContent = current + ' hesabı';
+        btn.style.display = 'flex';
+    } else {
+        btn.style.display = 'none';
+    }
+}
+
+function openAccountLogin() {
+    var intro = document.getElementById('intro-screen');
+    var pass = document.getElementById('password-screen');
+    var main = document.getElementById('main-content');
+    if (intro) intro.style.display = 'none';
+    if (main) {
+        main.classList.remove('visible');
+        main.style.opacity = '0';
+        main.style.display = 'none';
+    }
+    if (pass) {
+        pass.style.display = 'flex';
+        pass.style.opacity = '1';
+    }
+    updateAccountButtons();
+    refreshActiveAccountLabel();
+}
+
+window.switchAccount = function () {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('active_player');
+    sessionStorage.removeItem('isLoggedIn');
+    if (window.OneSignalDeferred) {
+        window.OneSignalDeferred.push(async function (OneSignal) {
+            if (OneSignal.logout) await OneSignal.logout();
+        });
+    }
+    openAccountLogin();
+};
+
+function getSafeNextPage() {
+    var next = new URLSearchParams(window.location.search).get('next');
+    if (!next || next.indexOf('://') !== -1 || next.indexOf('//') === 0) return '';
+    if (!/^[\w./?=&%#-]+$/.test(next)) return '';
+    return next;
+}
+
+function completeLogin(name) {
     localStorage.setItem('active_player', name);
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('remembered_account', name);
     sessionStorage.setItem('isLoggedIn', 'true');
-    if (window.syncOneSignalUserTag) window.syncOneSignalUserTag();
+    selectedLoginAccount = name;
+    updateAccountButtons();
+    if (window.syncOneSignalUserTag) window.syncOneSignalUserTag({ requestPermission: true });
+
+    var nextPage = getSafeNextPage();
+    if (nextPage) {
+        window.location.replace(nextPage);
+        return;
+    }
     
     // Kesintisiz geçiş: Sayfayı yenilemiyoruz
     var pass = document.getElementById('password-screen');
@@ -265,6 +336,29 @@ window.selectUserName = function (name) {
             showMainDashboard();
         }, 800);
     }
+}
+
+window.loginAccount = function () {
+    const val = document.getElementById('love-password').value.trim();
+    if (!selectedLoginAccount || !ACCOUNT_PASSWORDS[selectedLoginAccount]) {
+        showLoginError('Önce Ayşe ya da Mert hesabını seçmelisin.');
+        return;
+    }
+    if (!ACCOUNT_PASSWORDS[selectedLoginAccount].includes(val)) {
+        showLoginError('Şifre yanlış meleğim, lütfen tekrar dene 🥺');
+        return;
+    }
+    completeLogin(selectedLoginAccount);
+};
+
+window.checkPassword = function () {
+    window.loginAccount();
+};
+
+window.selectUserName = function (name) {
+    selectedLoginAccount = name;
+    updateAccountButtons();
+    completeLogin(name);
 };
 
 function showMainDashboard() {
@@ -281,6 +375,7 @@ function showMainDashboard() {
         if (el) el.style.display = 'flex';
     });
     if (window.initEffects) window.initEffects();
+    refreshActiveAccountLabel();
 }
 
 window.toggleHub = function () {
@@ -389,12 +484,24 @@ window.initMouseStars = function() {
 // BAŞLANGIÇ KONTROLÜ
 // ===========================================================================
 document.addEventListener('DOMContentLoaded', function() {
-    if (sessionStorage.getItem('isLoggedIn') === 'true') {
+    selectedLoginAccount = localStorage.getItem('remembered_account') || localStorage.getItem('active_player') || selectedLoginAccount;
+    updateAccountButtons();
+    refreshActiveAccountLabel();
+
+    var passwordInput = document.getElementById('love-password');
+    if (passwordInput) {
+        passwordInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') window.loginAccount();
+        });
+    }
+
+    if (localStorage.getItem('isLoggedIn') === 'true' && localStorage.getItem('active_player')) {
         var intro = document.getElementById('intro-screen');
         var pass = document.getElementById('password-screen');
         if (intro) intro.style.display = 'none';
         if (pass) pass.style.display = 'none';
         showMainDashboard();
+        if (window.syncOneSignalUserTag) window.syncOneSignalUserTag();
         if (window.initEffects) window.initEffects();
     }
 });

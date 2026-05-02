@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Bizim Albümümüz 📸</title>
+    
+    <!-- Fontlar -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    
+    <style>
+        :root {
+            --bg-primary: #0a0208;
+            --bg-secondary: #1a0f14;
+            --accent-pink: #ff4b72;
+            --accent-purple: #b44fff;
+            --text-primary: #fce4ec;
+            --text-secondary: #f8bbd0;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        html {
+            height: -webkit-fill-available;
+        }
+
+        /* Arka Plan */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 75, 114, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(180, 79, 255, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            z-index: -1;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(26, 15, 20, 0.9);
+            backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            padding-top: calc(15px + env(safe-area-inset-top));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 75, 114, 0.2);
+            transform: translateX(-2px);
+        }
+
+        .header-title {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Ana İçerik */
+        .content {
+            padding: 30px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-style: italic;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff, var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-family: 'Caveat', cursive;
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        /* Fotoğraf Ekleme Bölümü */
+        .add-photo-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 40px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .add-photo-section:hover {
+            border-color: var(--accent-pink);
+            background: rgba(255, 75, 114, 0.1);
+        }
+
+        .add-photo-btn {
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .add-photo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 75, 114, 0.3);
+        }
+
+        #photo-input {
+            display: none;
+        }
+
+        /* Polaroid Albüm Grid */
+        .album-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* Polaroid Kart */
+        .polaroid-card {
+            background: #1a1a1a;
+            padding: 15px 15px 60px 15px;
+            border-radius: 2px;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            transform: rotate(-1deg);
+        }
+
+        .polaroid-card:nth-child(even) {
+            transform: rotate(1deg);
+        }
+
+        .polaroid-card:hover {
+            transform: rotate(0deg) scale(1.05);
+            z-index: 10;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 0 2px var(--accent-pink);
+        }
+
+        .polaroid-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 2px;
+            background: #f5f5f5;
+        }
+
+        .polaroid-caption {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #fff;
+            text-align: center;
+            line-height: 1.3;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        .polaroid-date {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .delete-photo {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 75, 114, 0.9);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+            font-size: 1.2rem;
+        }
+
+        .polaroid-card:hover .delete-photo {
+            opacity: 1;
+        }
+
+        .delete-photo:hover {
+            background: #ff1744;
+            transform: scale(1.1);
+        }
+
+        /* Boş Albüm Durumu */
+        .empty-album {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .empty-subtext {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            text-align: center;
+            position: relative;
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        .modal-content img {
+            max-height: 60vh;
+            object-fit: contain;
+            width: 100%;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .modal-close:hover {
+            background: var(--accent-pink);
+        }
+
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Caveat', cursive;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn-primary {
+            background: var(--accent-pink);
+            color: #fff;
+        }
+
+        .modal-btn-primary:hover {
+            background: #ff1744;
+        }
+
+        .modal-btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .modal-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Mobil Optimizasyon */
+        @media (max-width: 480px) {
+            .modal {
+                padding: 10px;
+            }
+
+            .modal-content {
+                max-height: 95vh;
+                padding: 20px;
+                margin: 0;
+            }
+
+            .modal-content img {
+                max-height: 50vh;
+            }
+
+            .album-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .polaroid-image {
+                height: 150px;
+            }
+
+            .content {
+                padding: 15px 10px;
+            }
+
+            .header-title {
+                font-size: 1.4rem;
+            }
+
+            .polaroid-card {
+                padding: 10px 10px 40px 10px;
+            }
+
+            .polaroid-caption {
+                font-size: 0.85rem;
+                font-weight: 600;
+            }
+
+            .modal-content {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .add-photo-section {
+                padding: 20px;
+            }
+        }
+
+        /* iPhone X+ Safe Area */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            .header {
+                padding-top: calc(15px + env(safe-area-inset-top));
+            }
+            .content {
+                padding-top: calc(30px + env(safe-area-inset-top));
+            }
+        }
+
+        /* Bildirim Stili */
+        .photo-notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 300px;
+            font-size: 0.9rem;
+        }
+
+        .photo-notification.show {
+            transform: translateX(0);
+        }
+
+        .photo-notification-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .photo-notification-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: #fff;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Safe Area */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            .header {
+                padding-top: calc(15px + env(safe-area-inset-top));
+            }
+        }
+
+        /* Touch Cihazlar */
+        @media (hover: none) and (pointer: coarse) {
+            .polaroid-card:active {
+                transform: rotate(0deg) scale(1.05);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <a href="index.html#hub" class="back-btn">‹ Geri</a>
+        <h1 class="header-title">Bizim Albümümüz</h1>
+        <div style="width: 60px;"></div>
+    </header>
+
+    <!-- Ana İçerik -->
+    <main class="content">
+        <!-- Hero -->
+        <section class="hero-section">
+            <h2 class="hero-title">Anılarımız</h2>
+            <p class="hero-subtitle">Her fotoğraf bir hikaye anlatır 💕</p>
+        </section>
+
+        <!-- Fotoğraf Ekleme -->
+        <section class="add-photo-section" onclick="document.getElementById('photo-input').click()">
+            <button class="add-photo-btn">
+                <span>📸</span>
+                <span>Fotoğraf Ekle</span>
+            </button>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Ya da buraya fotoğraf sürükle</p>
+            <input type="file" id="photo-input" accept="image/*" multiple onchange="handlePhotoUpload(event)">
+        </section>
+
+        <!-- Polaroid Albüm -->
+        <section class="album-grid" id="album-grid">
+            <!-- Fotoğraflar JavaScript ile yüklenecek -->
+        </section>
+
+        <!-- Boş Albüm -->
+        <section class="empty-album" id="empty-album">
+            <div class="empty-icon">📷</div>
+            <div class="empty-text">Henüz fotoğraf yok</div>
+            <div class="empty-subtext">İlk anınızı ekleyerek başlayın!</div>
+        </section>
+    </main>
+
+    <!-- Modal (Fotoğraf Detay) -->
+    <div class="modal" id="photo-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <h3 class="modal-title">Fotoğraf Detayı</h3>
+            <div style="overflow-y: auto; max-height: 60vh; margin-bottom: 20px;">
+                <img id="modal-image" style="width: 100%; border-radius: 10px;">
+            </div>
+            <input type="text" class="modal-input" id="modal-caption" placeholder="Bu fotoğraf hakkında ne düşünüyorsun?">
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-primary" onclick="savePhotoDetails()">Kaydet</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal()">İptal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fotoğraf Bildirimi -->
+    <div class="photo-notification" id="photo-notification">
+        <button class="photo-notification-close" onclick="hidePhotoNotification()">✕</button>
+        <div class="photo-notification-title">Yeni Fotoğraf Eklendi! 📸</div>
+        <div id="photo-notification-message">Albümünüze yeni bir anı eklendi.</div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2k_vXyq2hB8Q4J2mW6xY7z9a1b2c3d4e",
+            authDomain: "love-app-123.firebaseapp.com",
+            projectId: "love-app-123",
+            storageBucket: "love-app-123.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const { getFirestore, doc, getDoc, setDoc, serverTimestamp } = firebase.firestore();
+        const { getStorage, ref, uploadBytes, getDownloadURL } = firebase.storage();
+
+        // Global değişkenler
+        let photos = [];
+        let currentPhotoIndex = -1;
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPhotos();
+            updateAlbumDisplay();
+        });
+
+        // Fotoğrafları yükle
+        async function loadPhotos() {
+            const currentUser = localStorage.getItem('active_player');
+            
+            // Önce LocalStorage'dan yükle (hızlı yükleme için)
+            const saved = localStorage.getItem('couple_album_photos');
+            if (saved) {
+                try {
+                    photos = JSON.parse(saved);
+                    updateAlbumDisplay();
+                } catch (e) {
+                    console.error('LocalStorage parse hatası:', e);
+                }
+            }
+            
+            // Kullanıcı yoksa varsayılanları yükle
+            if (!currentUser) {
+                if (photos.length === 0) loadDefaultPhotos();
+                return;
+            }
+
+            // Firestore'dan senkronize et (buluttan gelen son değişiklikler için)
+            try {
+                const db = getFirestore();
+                const albumRef = doc(db, 'couple_album', currentUser);
+                const albumSnap = await getDoc(albumRef);
+
+                if (albumSnap.exists()) {
+                    const albumData = albumSnap.data();
+                    const cloudPhotos = albumData.photos || [];
+                    
+                    // Eğer bulutta fotoğraf varsa veya daha güncelse kullan
+                    if (cloudPhotos.length > 0) {
+                        photos = cloudPhotos;
+                        // LocalStorage'ı da güncelle
+                        localStorage.setItem('couple_album_photos', JSON.stringify(photos));
+                        updateAlbumDisplay();
+                    }
+                }
+                
+                // Hiç fotoğraf yoksa varsayılanları yükle
+                if (photos.length === 0) {
+                    loadDefaultPhotos();
+                }
+            } catch (error) {
+                console.error('Firestore yüklenemedi:', error);
+                // Firestore çalışmazsa LocalStorage'daki verilerle devam et
+                if (photos.length === 0) loadDefaultPhotos();
+            }
+        }
+
+        // Varsayılan fotoğrafları yükle
+        function loadDefaultPhotos() {
+            photos = [
+                {
+                    id: 'default_1',
+                    url: 'r1.jpg',
+                    caption: 'sürpriz',
+                    date: '2024-02-14T10:00:00Z',
+                    isMarketPhoto: true,
+                    seller: 'Aşk Marketi',
+                    title: 'İlk anımız'
+                },
+                {
+                    id: 'default_2',
+                    url: 'r2.jpg',
+                    caption: 'BENDEN ALDIĞIN O 1000 TLYİ HATIRLARSIN UMARIM',
+                    date: '2024-02-20T19:30:00Z',
+                    isMarketPhoto: true,
+                    seller: 'Aşk Marketi',
+                    title: 'Romantik akşam'
+                },
+                {
+                    id: 'default_3',
+                    url: 'r3.jpg',
+                    caption: 'PARAM YOK',
+                    date: '2024-03-01T16:45:00Z',
+                    isMarketPhoto: true,
+                    seller: 'Aşk Marketi',
+                    title: 'Sahildeki anımız'
+                }
+            ];
+            savePhotos();
+        }
+
+        // Fotoğrafları Firebase'e kaydet
+        async function savePhotos() {
+            try {
+                const db = getFirestore();
+                const currentUser = localStorage.getItem('active_player');
+                if (!currentUser) return;
+
+                const albumRef = doc(db, 'couple_album', currentUser);
+                await setDoc(albumRef, {
+                    photos: photos,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+
+                // LocalStorage'da da tut (offline için)
+                localStorage.setItem('couple_album_photos', JSON.stringify(photos));
+            } catch (error) {
+                console.error('Albüm kaydedilemedi:', error);
+                // Firebase çalışmazsa localStorage'a kaydet
+                localStorage.setItem('couple_album_photos', JSON.stringify(photos));
+            }
+        }
+
+        
+        // Albüm görüntüsünü güncelle
+        function updateAlbumDisplay() {
+            const grid = document.getElementById('album-grid');
+            const empty = document.getElementById('empty-album');
+            
+            if (photos.length === 0) {
+                grid.style.display = 'none';
+                empty.style.display = 'block';
+            } else {
+                grid.style.display = 'grid';
+                empty.style.display = 'none';
+                
+                grid.innerHTML = photos.map((photo, index) => `
+                    <div class="polaroid-card" onclick="openPhotoModal(${index})">
+                        <img src="${photo.url}" alt="${photo.caption}" class="polaroid-image">
+                        <div class="polaroid-date">${formatDate(photo.date)}</div>
+                        <div class="polaroid-caption">${photo.caption}</div>
+                        ${!photo.isMarketPhoto ? `<button class="delete-photo" onclick="deletePhoto(event, ${index})">✕</button>` : ''}
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Bildirim göster
+        function showPhotoNotification(title, message) {
+            const notification = document.getElementById('photo-notification');
+            const titleEl = notification.querySelector('.photo-notification-title');
+            const messageEl = document.getElementById('photo-notification-message');
+            
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            
+            notification.classList.add('show');
+            
+            // 5 saniye sonra otomatik kapat
+            setTimeout(() => {
+                hidePhotoNotification();
+            }, 5000);
+        }
+
+        // Bildirim gizle
+        function hidePhotoNotification() {
+            const notification = document.getElementById('photo-notification');
+            notification.classList.remove('show');
+        }
+
+        // Fotoğraf yükleme
+        async function handlePhotoUpload(event) {
+            const files = event.target.files;
+            
+            for (let file of files) {
+                if (file.type.startsWith('image/')) {
+                    try {
+                        // Önce local preview göster
+                        const reader = new FileReader();
+                        reader.onload = async function(e) {
+                            const photoId = Date.now() + Math.random();
+                            const newPhoto = {
+                                id: photoId,
+                                url: e.target.result, // geçici local URL
+                                caption: 'Yeni anı 📸',
+                                date: new Date().toISOString(),
+                                isMarketPhoto: false,
+                                isUploading: true
+                            };
+                            photos.unshift(newPhoto);
+                            updateAlbumDisplay();
+                            
+                            // Firebase Storage'a yükle
+                            try {
+                                const storage = getStorage();
+                                const currentUser = localStorage.getItem('active_player');
+                                const storageRef = ref(storage, `album_photos/${currentUser}/${photoId}_${file.name}`);
+                                
+                                // Fotoğrafı yükle
+                                await uploadBytes(storageRef, file);
+                                const downloadURL = await getDownloadURL(storageRef);
+                                
+                                // URL'yi güncelle
+                                const photoIndex = photos.findIndex(p => p.id === photoId);
+                                if (photoIndex !== -1) {
+                                    photos[photoIndex].url = downloadURL;
+                                    photos[photoIndex].isUploading = false;
+                                    photos[photoIndex].fileName = file.name;
+                                    
+                                    await savePhotos();
+                                    updateAlbumDisplay();
+                                    
+                                    // Bildirim göster
+                                    showPhotoNotification('Yeni Fotoğraf Eklendi! 📸', 'Albümünüze yeni bir anı eklendi ve buluta kaydedildi.');
+                                    
+                                    // Modal aç
+                                    currentPhotoIndex = 0;
+                                    openPhotoModal(0);
+                                }
+                            } catch (uploadError) {
+                                console.error('Fotoğraf yüklenemedi:', uploadError);
+                                // Yükleme başarısız olursa local'de kalsın
+                                const photoIndex = photos.findIndex(p => p.id === photoId);
+                                if (photoIndex !== -1) {
+                                    photos[photoIndex].isUploading = false;
+                                    photos[photoIndex].uploadError = true;
+                                }
+                                updateAlbumDisplay();
+                                showPhotoNotification('Fotoğraf Yükleme Hatası', 'Fotoğraf sadece cihazda kaydedildi.');
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    } catch (error) {
+                        console.error('İşlem hatası:', error);
+                        showPhotoNotification('Hata', 'Fotoğraf yüklenemedi.');
+                    }
+                }
+            }
+            
+            // Input'u temizle
+            event.target.value = '';
+        }
+
+        // Fotoğraf modalını aç
+        function openPhotoModal(index) {
+            currentPhotoIndex = index;
+            const photo = photos[index];
+            const modal = document.getElementById('photo-modal');
+            const modalImage = document.getElementById('modal-image');
+            const modalCaption = document.getElementById('modal-caption');
+            
+            modalImage.src = photo.url;
+            modalCaption.value = photo.caption;
+            modal.classList.add('active');
+        }
+
+        // Modalı kapat
+        function closeModal() {
+            const modal = document.getElementById('photo-modal');
+            modal.classList.remove('active');
+            currentPhotoIndex = -1;
+        }
+
+        // Fotoğraf detaylarını kaydet
+        async function savePhotoDetails() {
+            if (currentPhotoIndex >= 0) {
+                const modalCaption = document.getElementById('modal-caption');
+                const newCaption = modalCaption.value || 'Anılarımız 💕';
+                
+                // Önce diziyi güncelle
+                photos[currentPhotoIndex].caption = newCaption;
+                photos[currentPhotoIndex].updatedAt = new Date().toISOString();
+                
+                console.log('Caption güncelleniyor:', newCaption);
+                
+                try {
+                    // LocalStorage'a kaydet
+                    localStorage.setItem('couple_album_photos', JSON.stringify(photos));
+                    
+                    // Firestore'a kaydet
+                    await savePhotos();
+                    
+                    // Görüntüyü güncelle
+                    updateAlbumDisplay();
+                    closeModal();
+                    
+                    showPhotoNotification('Fotoğraf Güncellendi ✏️', 'Açıklama buluta kaydedildi.');
+                } catch (error) {
+                    console.error('Kaydetme hatası:', error);
+                    showPhotoNotification('Hata', 'Kaydetme başarısız oldu.');
+                }
+            }
+        }
+
+        // Fotoğraf sil
+        async function deletePhoto(event, index) {
+            event.stopPropagation();
+            
+            if (confirm('Bu fotoğrafı silmek istediğinizden emin misiniz?')) {
+                photos.splice(index, 1);
+                await savePhotos();
+                updateAlbumDisplay();
+                
+                showPhotoNotification('Fotoğraf Silindi 🗑️', 'Albümden kaldırıldı ve buluttan silindi.');
+            }
+        }
+
+        // Tarih formatla
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { day: 'numeric', month: 'short' };
+            return date.toLocaleDateString('tr-TR', options);
+        }
+
+        // Drag and drop
+        const addSection = document.querySelector('.add-photo-section');
+        
+        addSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            addSection.style.borderColor = 'var(--accent-pink)';
+            addSection.style.background = 'rgba(255, 75, 114, 0.1)';
+        });
+
+        addSection.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            addSection.style.borderColor = 'var(--border-color)';
+            addSection.style.background = 'rgba(255, 255, 255, 0.05)';
+        });
+
+        addSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            addSection.style.borderColor = 'var(--border-color)';
+            addSection.style.background = 'rgba(255, 255, 255, 0.05)';
+            
+            const files = e.dataTransfer.files;
+            const fakeEvent = { target: { files } };
+            handlePhotoUpload(fakeEvent);
+        });
+
+        // Modal dışına tıklayınca kapat
+        document.getElementById('photo-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

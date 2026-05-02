@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Kalp Ritmi 💓</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg:#0a0208; --primary:#ff4b72; --gold:#ffd166; --border:rgba(255,255,255,.1); }
+        * { box-sizing:border-box; }
+        body { margin:0; min-height:100vh; font-family:'Outfit',sans-serif; color:#fff; background:radial-gradient(circle at 50% -10%, rgba(255,75,114,.2), transparent 36%), #0a0208; padding:20px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+        .back { position:fixed; top:20px; left:20px; color:#fff; text-decoration:none; background:rgba(255,255,255,.07); border:1px solid var(--border); border-radius:24px; padding:10px 16px; }
+        .wallet { position:fixed; top:20px; right:20px; color:var(--gold); background:rgba(255,209,102,.12); border:1px solid rgba(255,209,102,.4); border-radius:24px; padding:10px 16px; font-weight:700; }
+        .game { width:min(620px,100%); background:rgba(255,255,255,.055); border:1px solid var(--border); border-radius:22px; padding:24px; box-shadow:0 20px 55px rgba(0,0,0,.38); text-align:center; }
+        h1 { font-family:'Playfair Display',serif; color:var(--primary); font-size:2.4rem; margin:0 0 8px; }
+        .heart-zone { height:260px; display:flex; align-items:center; justify-content:center; position:relative; }
+        .heart { width:132px; height:132px; border:0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:4.5rem; cursor:pointer; background:rgba(255,75,114,.12); box-shadow:0 0 0 0 rgba(255,75,114,.35); transform:scale(1); transition:transform .08s linear, box-shadow .08s linear; }
+        .target-ring { position:absolute; width:170px; height:170px; border:2px dashed rgba(255,209,102,.55); border-radius:50%; pointer-events:none; }
+        .meter { height:10px; background:rgba(255,255,255,.08); border-radius:99px; overflow:hidden; margin:10px 0 14px; }
+        .meter > div { height:100%; width:0%; background:linear-gradient(90deg,#ff4b72,#ffd166); transition:.2s; }
+        .actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px; }
+        .btn { border:0; border-radius:999px; padding:12px 18px; font-weight:700; color:#fff; background:linear-gradient(45deg,#ff4b72,#ff8c00); cursor:pointer; }
+        .btn.alt { background:rgba(255,255,255,.09); border:1px solid var(--border); }
+        .meta,.status { color:rgba(255,255,255,.72); }
+        .status { min-height:24px; margin-top:12px; }
+        @media (max-width:640px){ body{align-items:flex-start;padding-top:86px}.wallet{top:auto;bottom:18px;right:18px}.game{padding:18px}.heart-zone{height:230px} }
+    </style>
+    <script src="app-bootstrap.js?v=1" defer></script>
+</head>
+<body>
+    <a class="back" href="games.html">← Oyunlara Dön</a>
+    <div class="wallet" id="wallet">0 ❤️</div>
+    <main class="game">
+        <h1>Kalp Ritmi 💓</h1>
+        <div class="meta">Giriş: 70 ❤️ | 5 dokunuşta isabet oranına göre ödül</div>
+        <section id="panel">
+            <p>Kalp hedef halkaya en yakın boyuttayken dokun. Sakin Kalp bir tur ritmi yavaşlatır.</p>
+            <button class="btn" onclick="startGame()">70 ❤️ Oyna</button>
+        </section>
+        <div class="status" id="status"></div>
+    </main>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, setDoc, addDoc, collection, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        const firebaseConfig = { apiKey:"AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU", authDomain:"ayseye-surpriz.firebaseapp.com", projectId:"ayseye-surpriz", storageBucket:"ayseye-surpriz.firebasestorage.app", messagingSenderId:"531177459988", appId:"1:531177459988:web:09060a95bea0b06f197201" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const currentUser = localStorage.getItem('active_player');
+        if (!currentUser) location.href = 'index.html';
+        const ecoRef = doc(db, 'economy', 'balances');
+        const invRef = doc(db, 'user_inventory', currentUser);
+        let balance=0, slowStock=0, playing=false, taps=0, total=0, raf=0, started=0, slow=false;
+        onSnapshot(ecoRef, s => { balance = s.data()?.[currentUser] || 0; document.getElementById('wallet').textContent = `${balance} ❤️`; });
+        onSnapshot(invRef, s => { slowStock = s.data()?.consumables?.rhythm_slow || 0; });
+        async function changeBalance(delta){ await setDoc(ecoRef, { [currentUser]: increment(delta) }, { merge:true }); }
+        async function consumeSlow(){
+            let ok=false;
+            await runTransaction(db, async tx => {
+                const snap=await tx.get(invRef); const data=snap.exists()?snap.data():{}; const cur=data.consumables?.rhythm_slow||0;
+                if(cur<=0) return;
+                tx.set(invRef,{ consumables:{ ...(data.consumables||{}), rhythm_slow:cur-1 }, updatedAt:serverTimestamp() },{ merge:true });
+                ok=true;
+            });
+            return ok;
+        }
+        window.startGame = async function(){
+            if(balance < 70){ status('Yetersiz bakiye 🥺'); return; }
+            await changeBalance(-70);
+            slow=false; taps=0; total=0; playing=true;
+            document.getElementById('panel').innerHTML = `
+                <div class="meta">Dokunuş: <span id="tap-count">0</span>/5</div>
+                <div class="heart-zone"><div class="target-ring"></div><button class="heart" id="heart" onclick="tapHeart()">💗</button></div>
+                <div class="meter"><div id="meter-fill"></div></div>
+                <div class="actions"><button class="btn alt" onclick="useSlow()">💓 Sakin Kalp (${slowStock})</button></div>
+            `;
+            started = performance.now();
+            animate();
+        };
+        window.useSlow = async function(){
+            if(slow) return;
+            if(!(await consumeSlow())){ status('Sakin Kalp yok. Marketten alabilirsin.'); return; }
+            slow=true; status('Ritim yavaşladı 💓');
+        };
+        function currentScale(now){
+            const speed = slow ? 850 : 560;
+            return 1 + Math.abs(Math.sin((now-started)/speed)) * .46;
+        }
+        function animate(now=performance.now()){
+            if(!playing) return;
+            const scale=currentScale(now);
+            const heart=document.getElementById('heart');
+            heart.style.transform=`scale(${scale})`;
+            heart.style.boxShadow=`0 0 ${Math.round(scale*28)}px rgba(255,75,114,.42)`;
+            raf=requestAnimationFrame(animate);
+        }
+        window.tapHeart = function(){
+            if(!playing) return;
+            const scale=currentScale(performance.now());
+            const accuracy=Math.max(0, 100 - Math.abs(scale - 1.28) * 220);
+            total += Math.round(accuracy);
+            taps++;
+            document.getElementById('tap-count').textContent=taps;
+            document.getElementById('meter-fill').style.width=`${Math.min(100,total/5)}%`;
+            status(`İsabet: ${Math.round(accuracy)}%`);
+            if(taps >= 5) finish();
+        };
+        async function finish(){
+            playing=false; cancelAnimationFrame(raf);
+            const avg=Math.round(total/5);
+            const reward=avg>=90?430:avg>=78?260:avg>=62?130:0;
+            if(reward) await changeBalance(reward);
+            await addDoc(collection(db,'activity_logs'), { type:'heart_rhythm', user:currentUser, score:avg, reward, timestamp:serverTimestamp() });
+            document.getElementById('panel').innerHTML=`<h2>Ortalama İsabet: ${avg}%</h2><p>${reward ? `${reward} ❤️ kazandın!` : 'Kalpler bu tur biraz hızlı attı.'}</p><button class="btn" onclick="startGame()">Tekrar Oyna</button>`;
+        }
+        function status(t){ document.getElementById('status').textContent=t; setTimeout(()=>document.getElementById('status').textContent='',1800); }
+    </script>
+<script type="module" src="time-tracker.js"></script>
+<script type="module" src="presence.js"></script>
+</body>
+</html>

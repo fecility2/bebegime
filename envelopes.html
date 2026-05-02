@@ -2,7 +2,13 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <title>Sürpriz Zarflar 💌</title>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     
@@ -113,6 +119,18 @@
             box-sizing: border-box;
             color-scheme: dark;
         }
+        input[type="text"] {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 12px 15px;
+            border-radius: 15px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
 
         .btn-seal {
             background: linear-gradient(45deg, #ff4b72, #ff8c00);
@@ -133,130 +151,11 @@
             box-shadow: 0 10px 25px rgba(255,75,114,0.5);
         }
 
-        .envelopes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            width: 100%;
-            max-width: 900px;
-            padding-bottom: 50px;
-        }
-
-        .envelope-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 25px;
-            text-align: center;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .envelope-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255,255,255,0.3);
-        }
-
-        .env-icon {
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-        }
-
-        .env-meta {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-bottom: 15px;
-        }
-
-        .env-status {
-            font-size: 0.95rem;
-            font-weight: 600;
-            padding: 8px 15px;
-            border-radius: 15px;
-            display: inline-block;
-        }
-
-        .status-locked {
-            color: #ff8c00;
-            background: rgba(255, 140, 0, 0.1);
-            border: 1px solid rgba(255, 140, 0, 0.3);
-            cursor: pointer;
-        }
-
-        .status-open {
-            color: #1ed760;
-            background: rgba(30, 215, 96, 0.1);
-            border: 1px solid rgba(30, 215, 96, 0.3);
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(30, 215, 96, 0.2);
-            animation: glow 2s infinite alternate;
-        }
-
-        @keyframes glow {
-            from { box-shadow: 0 0 5px rgba(30,215,96,0.2); }
-            to { box-shadow: 0 0 20px rgba(30,215,96,0.5); }
-        }
-
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10,2,8,0.9); z-index: 1000;
-            display: none; align-items: center; justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .modal-content {
-            background: linear-gradient(135deg, #1a0a14 0%, #0d0208 100%);
-            padding: 50px 45px; border-radius: 30px;
-            width: 90%; max-width: 620px; position: relative;
-            border: 1.5px solid rgba(255, 75, 114, 0.4);
-            text-align: center;
-            box-shadow: 0 0 60px rgba(255, 75, 114, 0.25), inset 0 0 30px rgba(255, 75, 114, 0.05);
-            max-height: 85vh; overflow-y: auto;
-        }
-
-        .letter-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        .modal-content h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 25px;
-            opacity: 0.9;
-        }
-
-        .modal-content p {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.15rem;
-            line-height: 1.9;
-            white-space: pre-wrap;
-            margin-top: 15px;
-            color: rgba(255, 255, 255, 0.92);
-            text-align: left;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 25px 30px;
-            border-radius: 20px;
-            border-left: 3px solid var(--primary);
-            letter-spacing: 0.02em;
-        }
-
-        .close-btn {
-            position: absolute; top: 15px; right: 20px;
-            font-size: 30px; cursor: pointer; color: #fff;
-            opacity: 0.7; transition: 0.3s;
-        }
-
-        .close-btn:hover { opacity: 1; color: var(--primary); }
-
         @media (max-width: 768px) {
             .header h1 { font-size: 2.5rem; }
-            .envelopes-grid { grid-template-columns: 1fr; }
         }
     </style>
+    <script src="app-bootstrap.js?v=1" defer></script>
 </head>
 <body>
 
@@ -274,6 +173,7 @@
         <p style="opacity: 0.8; font-size: 0.95rem; margin-bottom: 15px; text-align: left;">
             Yazdığın mektup mühürlenecek ve seçtiğin tarihe kadar asla açılamayacak.
         </p>
+        <input type="text" id="env-title" placeholder="Zarf başlığı (opsiyonel)">
         <textarea id="env-message" placeholder="Gelecekteki ona söylemek istediklerin..."></textarea>
         <label style="display: block; margin-bottom: 8px; opacity: 0.9; font-size: 0.9rem; text-align: left;">Ne zaman açılsın?</label>
         <input type="datetime-local" id="env-time">
@@ -283,7 +183,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, enableIndexedDbPersistence, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, enableIndexedDbPersistence, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -309,6 +209,7 @@
         var receiverUser = (currentUser === 'Ayşe' ? 'Mert' : 'Ayşe');
 
         window.sendEnvelope = async function() {
+            var titleObj = document.getElementById('env-title');
             var msgObj = document.getElementById('env-message');
             var timeObj = document.getElementById('env-time');
             var btn = document.getElementById('btn-seal');
@@ -333,6 +234,7 @@
             await addDoc(envRef, {
                 sender: currentUser,
                 receiver: receiverUser,
+                title: titleObj.value.trim(),
                 message: msg,
                 unlock_date: unlockDate,
                 created_at: serverTimestamp()
@@ -342,6 +244,7 @@
                 window.sendLoveNotification("Geleceğe Bir Zarf Mühürlendi! 💌", currentUser + " sana ileride açman için sihirli bir zarf gönderdi...");
             }
 
+            titleObj.value = "";
             msgObj.value = "";
             timeObj.value = "";
             btn.innerText = "Mühürle ve Geleceğe Gönder ✨";

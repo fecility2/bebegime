@@ -2,7 +2,13 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    <link rel="apple-touch-icon" href="icon-192.png">
   <title>Mesaj Tema Editörü</title>
   <style>
     body { font-family: Outfit, sans-serif; margin: 0; padding: 20px; color: #fff; background: #0a0208; }
@@ -23,6 +29,7 @@
     .msg.right { background: var(--preview-primary); margin-left: auto; border-top-right-radius: 6px; }
     @media (max-width: 760px) { .row { grid-template-columns: 1fr; } }
   </style>
+    <script src="app-bootstrap.js?v=1" defer></script>
 </head>
 <body>
   <div id="bg"></div>

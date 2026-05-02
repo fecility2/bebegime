@@ -2,7 +2,13 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <title>Oyun Dünyamız 🎮</title>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=3">
@@ -146,6 +152,7 @@
             .dual-badge { flex-direction: column; gap: 15px; }
         }
     </style>
+    <script src="app-bootstrap.js?v=1" defer></script>
 </head>
 <body>
 
@@ -195,10 +202,30 @@
             <div class="game-title">Aşk Kazı-Kazan</div>
             <div class="game-desc">Gümüş alanı kazı, altındaki sürpriz ikramiyeyi anında hesabına al!</div>
         </a>
+        <a href="love-quiz.html" class="game-card">
+            <span class="game-icon">💌</span>
+            <div class="game-title">Bizi Bil Bakalım</div>
+            <div class="game-desc">Romantik soruları doğru cevapla, kalpleri topla. Zorlanırsan ipucu kullan!</div>
+        </a>
+        <a href="word-puzzle.html" class="game-card">
+            <span class="game-icon">🔤</span>
+            <div class="game-title">Aşk Kelimeleri</div>
+            <div class="game-desc">Karışmış romantik kelimeleri çöz, seri yaptıkça ödülünü büyüt.</div>
+        </a>
+        <a href="heart-rhythm.html" class="game-card">
+            <span class="game-icon">💓</span>
+            <div class="game-title">Kalp Ritmi</div>
+            <div class="game-desc">Kalp tam parladığında dokun. Ne kadar isabetliysen ödül o kadar tatlı!</div>
+        </a>
         <a href="market.html" class="game-card">
             <span class="game-icon">🛍️</span>
             <div class="game-title">Aşk Marketi</div>
             <div class="game-desc">Aşk Paralarını kozmetiklere ve tek kullanımlık güçlere dönüştür.</div>
+        </a>
+        <a href="leaderboard.html" class="game-card">
+            <span class="game-icon">🏆</span>
+            <div class="game-title">Liderlik Ekranı</div>
+            <div class="game-desc">Kim daha çok kazandı, bildi, oynadı ve harcadı? Tatlı rekabet burada.</div>
         </a>
     </div>
 
@@ -260,6 +287,10 @@
                 const activeTheme = snap.data()?.activeCosmetics?.gameTheme;
                 if (activeTheme === 'theme_rose') {
                     document.getElementById('background-canvas').style.background = "radial-gradient(circle at center, #2b0715 0%, #12040a 100%)";
+                } else if (activeTheme === 'theme_gold') {
+                    document.getElementById('background-canvas').style.background = "radial-gradient(circle at center, #2a1b05 0%, #0c0702 100%)";
+                } else if (activeTheme === 'theme_blue') {
+                    document.getElementById('background-canvas').style.background = "radial-gradient(circle at center, #061b2c 0%, #02070d 100%)";
                 }
             });
         }
@@ -268,4 +299,3 @@
 <script type="module" src="presence.js"></script>
 </body>
 </html>
-

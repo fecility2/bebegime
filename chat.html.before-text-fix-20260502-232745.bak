@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="OurStory">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <title>Sizin Mesajlarınız 💬</title>
+    <title>Sizin MesajlarÄ±nÄ±z ğŸ’¬</title>
     
     <!-- OneSignal Push Notification SDK -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -338,7 +338,7 @@
             left: 4px;
         }
 
-        /* --- Input Bar (Mobil için optimize edilmiş) --- */
+        /* --- Input Bar (Mobil iÃ§in optimize edilmiÅŸ) --- */
         .chat-input-bar {
             background: rgba(15, 5, 10, 0.98);
             backdrop-filter: blur(25px);
@@ -426,7 +426,6 @@
 
         .input-container {
             flex: 1;
-            position: relative;
             background: rgba(255, 255, 255, 0.06);
             border-radius: 24px;
             display: flex;
@@ -494,92 +493,6 @@
         .gift-actions { display:flex; gap:10px; margin-top:12px; }
         .gift-actions button { flex:1; border:0; border-radius:12px; padding:11px; color:#fff; background:linear-gradient(45deg,#ff4b72,#ff8c00); font-weight:800; cursor:pointer; }
         .gift-actions .alt { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); }
-        .message-effects {
-            display:none;
-            position:absolute;
-            left:10px;
-            bottom:62px;
-            z-index:30;
-            min-width:210px;
-            flex-direction:column;
-            gap:8px;
-            padding:10px;
-            border:1px solid rgba(255,255,255,.14);
-            border-radius:16px;
-            background:rgba(18,7,17,.98);
-            box-shadow:0 18px 38px rgba(0,0,0,.38);
-        }
-        .message-effects.active {
-            display:flex;
-        }
-        .effect-chip {
-            border:1px solid rgba(255,255,255,.14);
-            background:rgba(255,255,255,.07);
-            color:#fff;
-            border-radius:999px;
-            padding:7px 10px;
-            font:inherit;
-            font-size:.78rem;
-            white-space:nowrap;
-            cursor:pointer;
-            text-align:left;
-        }
-        .effect-chip.active {
-            border-color:rgba(255,75,114,.52);
-            background:rgba(255,75,114,.18);
-            box-shadow:0 0 18px rgba(255,75,114,.14);
-        }
-        .bubble.effect-glow { animation: messageGlow 1.8s ease-in-out infinite alternate; }
-        .bubble.effect-heart-rain { position:relative; overflow:hidden; }
-        .bubble.effect-heart-rain::after {
-            content:'💕 💖 💗';
-            position:absolute;
-            left:10px;
-            right:10px;
-            top:-22px;
-            opacity:.8;
-            animation: bubbleHearts 2.4s linear infinite;
-            pointer-events:none;
-        }
-        .secret-cover {
-            margin-top:6px;
-            border:1px dashed rgba(255,255,255,.2);
-            border-radius:12px;
-            padding:12px;
-            background:rgba(0,0,0,.22);
-            cursor:pointer;
-            font-weight:700;
-            text-align:center;
-        }
-        .tap-reveal-content { display:none; }
-        .tap-reveal-content.revealed { display:block; }
-        .gift-burst {
-            position:fixed;
-            inset:0;
-            z-index:5000;
-            pointer-events:none;
-            overflow:hidden;
-        }
-        .gift-burst span {
-            position:absolute;
-            bottom:-40px;
-            font-size:24px;
-            animation: giftFloat 2.8s ease-out forwards;
-        }
-        @keyframes messageGlow {
-            from { box-shadow:0 0 0 rgba(255,209,102,0); }
-            to { box-shadow:0 0 26px rgba(255,209,102,.42); }
-        }
-        @keyframes bubbleHearts {
-            from { transform:translateY(0); opacity:.2; }
-            45% { opacity:.9; }
-            to { transform:translateY(100px); opacity:0; }
-        }
-        @keyframes giftFloat {
-            0% { transform:translateY(0) scale(.8) rotate(0deg); opacity:0; }
-            12% { opacity:1; }
-            100% { transform:translateY(-110vh) scale(1.25) rotate(24deg); opacity:0; }
-        }
 
         /* --- Date Divider --- */
         .date-divider {
@@ -1241,7 +1154,7 @@
         }
         .message-wrapper { position: relative; }
 
-        /* Emoji bar mesaj balonunun üstünde ve ucunda */
+        /* Emoji bar mesaj balonunun Ã¼stÃ¼nde ve ucunda */
         .message-wrapper.msg-ayse .ig-reaction-bar {
             left: 10px;
             right: auto;
@@ -1259,7 +1172,7 @@
             transform: translateX(0) scale(1);
         }
 
-        /* Emoji Düzenleme Modal */
+        /* Emoji DÃ¼zenleme Modal */
         .emoji-edit-overlay {
             display: none;
             position: fixed;
@@ -1307,6 +1220,9 @@
             background: rgba(255,75,114,0.7);
             border-color: var(--primary);
             transform: scale(1.05);
+        }
+        .emoji-edit-close::before {
+            content: 'âœ•';
         }
         .emoji-edit-current {
             display: flex;
@@ -1486,9 +1402,9 @@
             background: var(--primary);
         }
 
-        /* === MOBİL OPTİMİZASYONLAR === */
+        /* === MOBÄ°L OPTÄ°MÄ°ZASYONLAR === */
         @media (max-width: 480px) {
-            /* Küçük ekranlar için emoji bar */
+            /* KÃ¼Ã§Ã¼k ekranlar iÃ§in emoji bar */
             .ig-reaction-bar {
                 max-width: 240px;
                 padding: 6px 12px;
@@ -1505,7 +1421,7 @@
                 font-size: 1.2rem;
             }
             
-            /* Mesaj balonları */
+            /* Mesaj balonlarÄ± */
             .bubble {
                 max-width: 85%;
                 padding: 10px 14px;
@@ -1710,7 +1626,7 @@
             border-radius: 16px;
         }
 
-        /* iPhone X ve üzeri için notch desteği */
+        /* iPhone X ve Ã¼zeri iÃ§in notch desteÄŸi */
         @supports (padding-top: env(safe-area-inset-top)) {
             .chat-header {
                 padding-top: max(12px, env(safe-area-inset-top));
@@ -1720,7 +1636,7 @@
             }
         }
 
-        /* Touch cihazlar için hover yerine active kullan */
+        /* Touch cihazlar iÃ§in hover yerine active kullan */
         @media (hover: none) and (pointer: coarse) {
             .bubble:hover {
                 transform: none;
@@ -1745,70 +1661,62 @@
 <body>
 
     <header class="chat-header">
-        <a href="index.html#hub" class="back-btn" aria-label="Ana sayfaya dön" title="Ana sayfaya dön">‹</a>
-        <div class="partner-avatar" id="p-avatar">❤️</div>
+        <a href="index.html#hub" class="back-btn">â€¹</a>
+        <div class="partner-avatar" id="p-avatar">â¤ï¸</div>
         <div class="partner-info" id="partner-info-clickable">
             <span class="partner-name" id="p-name">Zeytinim</span>
-            <span class="partner-status" id="p-status">Bağlanıyor...</span>
+            <span class="partner-status" id="p-status">BaÄŸlanÄ±yor...</span>
         </div>
         <div class="header-actions">
-            <button class="header-action" onclick="location.href='starred-messages.html'" title="Yıldızlı mesajlar" aria-label="Yıldızlı mesajlar">⭐</button>
-            <button class="header-action" onclick="openChatSearch()" title="Mesajlarda ara" aria-label="Mesajlarda ara">⌕</button>
-            <button class="header-action" onclick="location.href='chat-profile.html'" title="Sohbet profili" aria-label="Sohbet profili">⋯</button>
+            <button class="header-action" onclick="location.href='starred-messages.html'" title="YÄ±ldÄ±zlÄ± mesajlar">â­</button>
+            <button class="header-action" onclick="openChatSearch()" title="Mesajlarda ara">âŒ•</button>
+            <button class="header-action" onclick="location.href='chat-profile.html'" title="Sohbet profili">â‹¯</button>
         </div>
     </header>
 
     <div class="chat-search-panel" id="chat-search-panel">
         <div class="chat-search-row">
             <input id="chat-search-input" class="chat-search-input" type="search" placeholder="Mesajlarda ara..." oninput="performChatSearch(this.value)">
-            <button class="chat-search-close" onclick="closeChatSearch()" title="Aramayı kapat" aria-label="Aramayı kapat">✕</button>
+            <button class="chat-search-close" onclick="closeChatSearch()">âœ•</button>
         </div>
         <div class="chat-search-results" id="chat-search-results"></div>
     </div>
 
     <div class="chat-flow" id="chat-flow"></div>
     <div class="typing-indicator" id="typing-indicator">
-        <span id="typing-name">Yazıyor</span>
+        <span id="typing-name">YazÄ±yor</span>
         <span class="typing-dot"></span>
         <span class="typing-dot"></span>
         <span class="typing-dot"></span>
     </div>
 
-    <!-- Debug: Bildirim Test Paneli (Geliştirme için) -->
+    <!-- Debug: Bildirim Test Paneli (GeliÅŸtirme iÃ§in) -->
     <div id="notif-debug" style="position: fixed; bottom: 80px; right: 10px; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 10px; font-size: 11px; color: #fff; z-index: 999; display: none;">
-        <div onclick="window.testNotification?.()" style="cursor: pointer; background: var(--primary); padding: 5px 10px; border-radius: 5px; margin-bottom: 5px; text-align: center;">🧪 Test Bildirim</div>
+        <div onclick="window.testNotification?.()" style="cursor: pointer; background: var(--primary); padding: 5px 10px; border-radius: 5px; margin-bottom: 5px; text-align: center;">ğŸ§ª Test Bildirim</div>
         <div id="notif-status" style="color: #aaa;">Kontrol ediliyor...</div>
     </div>
 
     <div class="chat-input-bar">
         <div class="reply-preview" id="reply-preview">
             <div class="reply-preview-text">
-                <strong id="reply-preview-name">Yanıt</strong>
+                <strong id="reply-preview-name">YanÄ±t</strong>
                 <span id="reply-preview-snippet"></span>
             </div>
-            <button class="reply-cancel" onclick="clearReply()" title="Yanıtı iptal et" aria-label="Yanıtı iptal et">✕</button>
+            <button class="reply-cancel" onclick="clearReply()">âœ•</button>
         </div>
         <div id="previews">
             <div style="position: relative;">
                 <img id="temp-photo" class="preview-img" style="display: none;">
-                <div id="voice-label" style="display: none; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 10px; font-size: 0.8rem;">🎤 Ses kaydedildi</div>
-                <div class="cancel-preview" onclick="cancelMedia()" title="Eki kaldır" aria-label="Eki kaldır" role="button">✕</div>
+                <div id="voice-label" style="display: none; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 10px; font-size: 0.8rem;">ğŸ¤ Ses kaydedildi</div>
+                <div class="cancel-preview" onclick="cancelMedia()">âœ•</div>
             </div>
         </div>
 
         <div class="input-container">
-            <label for="chat-file" class="action-icon" title="Fotoğraf ekle" aria-label="Fotoğraf ekle">➕</label>
+            <label for="chat-file" class="action-icon">â•</label>
             <input type="file" id="chat-file" hidden accept="image/*" onchange="handlePhoto()">
-            <button class="action-icon" id="effect-menu-btn" type="button" onclick="toggleEffectMenu()" title="Mesaj türü" aria-label="Mesaj türü">⋯</button>
-            <div class="message-effects" id="message-effects" aria-label="Mesaj efekti seç">
-                <button class="effect-chip active" type="button" data-effect="none">Normal mesaj</button>
-                <button class="effect-chip" type="button" data-effect="heart_rain">Kalp yağmuru</button>
-                <button class="effect-chip" type="button" data-effect="glow">Parlayan mesaj</button>
-                <button class="effect-chip" type="button" data-effect="secret">Gizli mesaj</button>
-                <button class="effect-chip" type="button" data-effect="tap_reveal">Dokununca açılan mesaj</button>
-            </div>
             
-            <textarea id="chat-textarea" class="chat-textarea" placeholder="Mesajını yaz meleğim..." rows="1"></textarea>
+            <textarea id="chat-textarea" class="chat-textarea" placeholder="MesajÄ±nÄ± yaz meleÄŸim..." rows="1"></textarea>
             
             <div class="voice-waves" id="voice-waves">
                 <div class="wave-bar"></div>
@@ -1817,25 +1725,25 @@
                 <div class="wave-bar"></div>
             </div>
             
-            <button class="action-icon" id="voice-btn" onclick="toggleVoice()" title="Ses kaydı" aria-label="Ses kaydı">🎙️</button>
+            <button class="action-icon" id="voice-btn" onclick="toggleVoice()">ğŸ™ï¸</button>
         </div>
 
-        <button class="gift-btn" onclick="openGiftModal()" title="Hediye gönder" aria-label="Hediye gönder">🎁</button>
-        <button class="send-btn" id="send-btn" onclick="sendMessage()" title="Mesaj gönder" aria-label="Mesaj gönder">🚀</button>
+        <button class="gift-btn" onclick="openGiftModal()" title="Hediye gÃ¶nder">ğŸ</button>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">ğŸš€</button>
     </div>
 
     <div class="gift-modal" id="gift-modal" onclick="closeGiftModal()">
         <div class="gift-box" onclick="event.stopPropagation()">
-            <h3 style="margin:0 0 8px;color:var(--primary);">Hediye Gönder</h3>
+            <h3 style="margin:0 0 8px;color:var(--primary);">Hediye GÃ¶nder</h3>
             <select id="gift-type" onchange="renderGiftFields()">
-                <option value="heart">Kalp gönder</option>
-                <option value="coupon">Kupon gönder</option>
-                <option value="note">Mini not gönder</option>
+                <option value="heart">Kalp gÃ¶nder</option>
+                <option value="coupon">Kupon gÃ¶nder</option>
+                <option value="note">Mini not gÃ¶nder</option>
             </select>
             <div id="gift-fields"></div>
             <textarea id="gift-note" rows="2" maxlength="160" placeholder="Minik not (opsiyonel)"></textarea>
             <div class="gift-actions">
-                <button onclick="sendGift()">Gönder</button>
+                <button onclick="sendGift()">GÃ¶nder</button>
                 <button class="alt" onclick="closeGiftModal()">Kapat</button>
             </div>
         </div>
@@ -1846,7 +1754,6 @@
     </div>
 
     <div class="toast" id="toast"></div>
-    <div class="gift-burst" id="gift-burst"></div>
 
     <!-- Sticky Date Header -->
     <div class="sticky-date-header" id="sticky-date-header"></div>
@@ -1855,27 +1762,27 @@
     <div class="message-menu-overlay" id="message-menu-overlay" onclick="closeMessageMenu()">
         <div class="message-menu" onclick="event.stopPropagation()">
             <div class="message-menu-header">
-                <div class="message-menu-title">Mesaj Seçenekleri</div>
+                <div class="message-menu-title">Mesaj SeÃ§enekleri</div>
             </div>
             <div class="message-menu-actions">
                 <div class="message-menu-item" onclick="replyToSelectedMessage()">
-                    <div class="message-menu-icon" style="background: rgba(79,172,254,0.2);">↩</div>
-                    <div class="message-menu-text">Yanıtla</div>
+                    <div class="message-menu-icon" style="background: rgba(79,172,254,0.2);">â†©</div>
+                    <div class="message-menu-text">YanÄ±tla</div>
                 </div>
                 <div class="message-menu-item" onclick="copyMessage()">
-                    <div class="message-menu-icon" style="background: rgba(255,255,255,0.12);">📋</div>
+                    <div class="message-menu-icon" style="background: rgba(255,255,255,0.12);">ğŸ“‹</div>
                     <div class="message-menu-text">Kopyala</div>
                 </div>
                 <div class="message-menu-item" onclick="toggleStarSelectedMessage()">
-                    <div class="message-menu-icon" style="background: rgba(255,209,102,0.2);">⭐</div>
-                    <div class="message-menu-text" id="star-message-label">Yıldızla</div>
+                    <div class="message-menu-icon" style="background: rgba(255,209,102,0.2);">â­</div>
+                    <div class="message-menu-text" id="star-message-label">YÄ±ldÄ±zla</div>
                 </div>
                 <div class="message-menu-item" onclick="deleteForMe()">
-                    <div class="message-menu-icon" style="background: rgba(255,75,114,0.2);">🗑️</div>
+                    <div class="message-menu-icon" style="background: rgba(255,75,114,0.2);">ğŸ—‘ï¸</div>
                     <div class="message-menu-text danger">Benden Sil</div>
                 </div>
                 <div class="message-menu-item" onclick="deleteForAll()">
-                    <div class="message-menu-icon" style="background: rgba(255,59,48,0.2);">🗑️</div>
+                    <div class="message-menu-icon" style="background: rgba(255,59,48,0.2);">ğŸ—‘ï¸</div>
                     <div class="message-menu-text danger">Herkesten Sil</div>
                 </div>
             </div>
@@ -1886,11 +1793,11 @@
     <div class="emoji-edit-overlay" id="emoji-edit-overlay" onclick="closeEmojiEditModal()">
         <div class="emoji-edit-modal" onclick="event.stopPropagation()">
             <div class="emoji-edit-header">
-                <div class="emoji-edit-title">⚡ Hızlı İfadeleri Düzenle</div>
-                <button class="emoji-edit-close" onclick="closeEmojiEditModal()" title="Kapat" aria-label="Kapat">✕</button>
+                <div class="emoji-edit-title">âš¡ HÄ±zlÄ± Ä°fadeleri DÃ¼zenle</div>
+                <button class="emoji-edit-close" onclick="closeEmojiEditModal()"><i class="fas fa-times"></i></button>
             </div>
             <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 12px;">
-                Mesaja dokununca gözükecek emojiler (Maks. 8)
+                Mesaja dokununca gÃ¶zÃ¼kecek emojiler (Maks. 8)
             </div>
             <div class="emoji-edit-current" id="emoji-edit-current"></div>
             <div class="emoji-edit-grid" id="emoji-edit-grid"></div>
@@ -1917,13 +1824,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        console.log('[Chat] Firebase başlatıldı');
+        console.log('[Chat] Firebase baÅŸlatÄ±ldÄ±');
 
         const currentUser = localStorage.getItem('active_player') || 'Bilinmeyen';
-        console.log('[Chat] Aktif kullanıcı:', currentUser);
+        console.log('[Chat] Aktif kullanÄ±cÄ±:', currentUser);
         const inventoryRef = doc(db, 'user_inventory', currentUser);
         const currentStatsRef = doc(db, 'user_stats', currentUser);
-        const partnerName = currentUser === 'Ayşe' || currentUser === 'Ayşe' ? 'Mert' : 'Ayşe';
+        const partnerName = currentUser === 'Ayşe' || currentUser === 'AyÅŸe' ? 'Mert' : 'Ayşe';
         const partnerInventoryRef = doc(db, 'user_inventory', partnerName);
         const economyRef = doc(db, 'economy', 'balances');
         let currentInventory = {};
@@ -1952,37 +1859,8 @@
         let messageCache = [];
         let replyTarget = null;
         let typingTimer = null;
-        let selectedMessageEffect = 'none';
         const CHAT_WP_KEY = 'chat_wallpaper_pref';
         const CUSTOM_WP_KEY = 'chat_custom_wallpaper_url';
-
-        document.querySelectorAll('.effect-chip').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.effect-chip').forEach(x => x.classList.remove('active'));
-                btn.classList.add('active');
-                selectedMessageEffect = btn.dataset.effect || 'none';
-                document.getElementById('message-effects')?.classList.remove('active');
-            });
-        });
-
-        window.toggleEffectMenu = function() {
-            document.getElementById('message-effects')?.classList.toggle('active');
-        };
-
-        document.addEventListener('click', (event) => {
-            const menu = document.getElementById('message-effects');
-            if (!menu || !menu.classList.contains('active')) return;
-            if (event.target.closest('#message-effects, #effect-menu-btn')) return;
-            menu.classList.remove('active');
-        });
-
-        function resetMessageEffect() {
-            selectedMessageEffect = 'none';
-            document.querySelectorAll('.effect-chip').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.effect === 'none');
-            });
-            document.getElementById('message-effects')?.classList.remove('active');
-        }
 
         function escapeHTML(value) {
             return String(value || '').replace(/[&<>"']/g, (char) => ({
@@ -1998,34 +1876,27 @@
             if (!msg) return 'Mesaj';
             if (msg.gift) return 'Hediye';
             if (msg.text) return msg.text;
-            if (msg.photo) return 'Fotoğraf';
+            if (msg.photo) return 'FotoÄŸraf';
             if (msg.audio) return 'Sesli mesaj';
             return 'Mesaj';
         }
-
-        window.revealSecretMessage = function(trigger, hideText) {
-            const content = trigger.nextElementSibling;
-            if (!content) return;
-            const revealed = content.classList.toggle('revealed');
-            trigger.textContent = revealed ? hideText : (trigger.textContent.includes('Gizli') ? '🔒 Gizli mesajı aç' : '👆 Dokununca açılır');
-        };
 
         function updateSendButton() {
             const btn = document.getElementById('send-btn');
             const hasPayload = ta.value.trim() || media.photo || media.voice;
             btn.classList.toggle('ready', Boolean(hasPayload));
-            btn.innerText = hasPayload ? '➤' : '➤';
+            btn.innerText = hasPayload ? 'â¤' : 'â¤';
         }
 
         async function setTypingState(isTyping) {
-            if (currentUser !== 'Ayşe' && currentUser !== 'Mert') return;
+            if (currentUser !== 'AyÅŸe' && currentUser !== 'Mert') return;
             try {
                 await setDoc(doc(db, 'chat_typing', currentUser), {
                     isTyping,
                     updatedAt: serverTimestamp()
                 }, { merge: true });
             } catch (e) {
-                console.warn('[Typing] Durum yazılamadı:', e);
+                console.warn('[Typing] Durum yazÄ±lamadÄ±:', e);
             }
         }
 
@@ -2035,7 +1906,7 @@
             typingTimer = setTimeout(() => setTypingState(false), 1700);
         }
 
-        // Header'a tıklayınca chat profil sayfasına git (Instagram tarzı UI)
+        // Header'a tÄ±klayÄ±nca chat profil sayfasÄ±na git (Instagram tarzÄ± UI)
         [document.getElementById('p-avatar'), document.getElementById('p-name'), document.getElementById('partner-info-clickable')].forEach((el) => {
             if (!el) return;
             el.style.cursor = 'pointer';
@@ -2044,7 +1915,7 @@
                 location.href = 'chat-profile.html';
             });
         });
-        // Search ve filter özellikleri şimdilik devre dışı
+        // Search ve filter Ã¶zellikleri ÅŸimdilik devre dÄ±ÅŸÄ±
 
         onSnapshot(inventoryRef, (snap) => {
             if (!snap.exists()) return;
@@ -2064,7 +1935,7 @@
             }
         });
 
-        // --- Tema Senkronizasyonu (Partnerin temasını gör) ---
+        // --- Tema Senkronizasyonu (Partnerin temasÄ±nÄ± gÃ¶r) ---
         const THEMES = {
             'default': 'linear-gradient(135deg, #1a1a2e, #16213e)',
             'love': 'linear-gradient(135deg, #ff4b72, #ff8c00)',
@@ -2087,26 +1958,26 @@
             if (snap.exists()) {
                 const data = snap.data();
 
-                // Özel tema (resimli)
+                // Ã–zel tema (resimli)
                 if (data.themeId?.startsWith('custom_') && data.customUrl) {
                     document.body.style.background = `url(${data.customUrl}) center/cover no-repeat fixed`;
                 }
-                // Özel tema (renkli)
+                // Ã–zel tema (renkli)
                 else if (data.themeId?.startsWith('custom_') && data.bgColor) {
                     document.body.style.background = data.bgColor;
                 }
-                // Hazır tema
+                // HazÄ±r tema
                 else if (THEMES[data.themeId]) {
                     document.body.style.background = THEMES[data.themeId];
                 }
 
-                // Özel mesaj renklerini uygula
+                // Ã–zel mesaj renklerini uygula
                 if (data.myMessageColor || data.partnerMessageColor) {
-                    const isAyse = currentUser === 'Ayşe';
+                    const isAyse = currentUser === 'AyÅŸe';
                     const myColor = data.myMessageColor || (isAyse ? '#ff4b72' : '#4facfe');
                     const partnerColor = data.partnerMessageColor || (isAyse ? '#4facfe' : '#ff4b72');
 
-                    // CSS değişkenlerini güncelle
+                    // CSS deÄŸiÅŸkenlerini gÃ¼ncelle
                     document.documentElement.style.setProperty('--mert-bubble', myColor);
                     document.documentElement.style.setProperty('--ayse-bubble', partnerColor);
                 }
@@ -2114,21 +1985,21 @@
         });
 
         // --- Emoji Senkronizasyonu ---
-        // Önce localStorage'dan oku, yoksa varsayılanları kullan
-        let quickEmojis = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['❤️','😍','😂','😮','😢','👏','🔥','🎉'];
+        // Ã–nce localStorage'dan oku, yoksa varsayÄ±lanlarÄ± kullan
+        let quickEmojis = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['â¤ï¸','ğŸ˜','ğŸ˜‚','ğŸ˜®','ğŸ˜¢','ğŸ‘','ğŸ”¥','ğŸ‰'];
 
-        // Firestore'dan da senkronize et (farklı cihazlar için) - ANINDA GÜNCELLEME
+        // Firestore'dan da senkronize et (farklÄ± cihazlar iÃ§in) - ANINDA GÃœNCELLEME
         onSnapshot(doc(db, 'chat_settings', currentUser), (snap) => {
             if (snap.exists()) {
                 const data = snap.data();
 
-                // Emoji güncellemesi
+                // Emoji gÃ¼ncellemesi
                 if (data.quickEmojis) {
                     const oldEmojis = JSON.stringify(quickEmojis);
                     quickEmojis = data.quickEmojis;
                     localStorage.setItem('chat_quick_emojis', JSON.stringify(quickEmojis));
 
-                    // Emoji değiştiyse mesajları yeniden render et
+                    // Emoji deÄŸiÅŸtiyse mesajlarÄ± yeniden render et
                     if (oldEmojis !== JSON.stringify(quickEmojis)) {
                         renderMessages();
                     }
@@ -2147,7 +2018,7 @@
             }
         }
 
-        // Firestore'dan takma adları senkronize et - ANINDA GÜNCELLEME
+        // Firestore'dan takma adlarÄ± senkronize et - ANINDA GÃœNCELLEME
         onSnapshot(doc(db, 'chat_settings', currentUser), (snap) => {
             if (snap.exists() && snap.data().nicknames) {
                 localStorage.setItem(NICKNAMES_KEY, JSON.stringify(snap.data().nicknames));
@@ -2155,10 +2026,10 @@
             }
         });
 
-        // Başlangıçta takma adı yükle
+        // BaÅŸlangÄ±Ã§ta takma adÄ± yÃ¼kle
         loadPartnerNickname();
 
-        // --- Aktivite Kaydetme (Geçirilen Süreye Dahil) ---
+        // --- Aktivite Kaydetme (GeÃ§irilen SÃ¼reye Dahil) ---
         async function recordActivity(type) {
             const today = new Date().toISOString().split('T')[0];
             const statsRef = doc(db, 'user_stats', currentUser);
@@ -2174,7 +2045,7 @@
             }
         }
 
-        // --- Tema Bildirimleri (Sadece 1 kere göster, sadece yeni olanlar) ---
+        // --- Tema Bildirimleri (Sadece 1 kere gÃ¶ster, sadece yeni olanlar) ---
         const shownNotifications = new Set();
         const pageLoadTime = Date.now();
         const themeQuery = query(collection(db, 'theme_updates'), orderBy('timestamp', 'desc'));
@@ -2182,12 +2053,12 @@
             snap.docChanges().forEach(change => {
                 if (change.type === 'added') {
                     const data = change.doc.data();
-                    // Bildirim bana geldi mi ve başkasından mı geldi?
+                    // Bildirim bana geldi mi ve baÅŸkasÄ±ndan mÄ± geldi?
                     if (data.to === currentUser && data.from !== currentUser) {
-                        // Sadece sayfa açıldıktan sonraki bildirimleri göster (eskileri değil)
+                        // Sadece sayfa aÃ§Ä±ldÄ±ktan sonraki bildirimleri gÃ¶ster (eskileri deÄŸil)
                         const notifTime = data.timestamp?.toDate?.() || new Date();
                         if (notifTime.getTime() > pageLoadTime - 5000) { // 5 saniye tolerans
-                            // Aynı bildirimi sadece 1 kere göster
+                            // AynÄ± bildirimi sadece 1 kere gÃ¶ster
                             const notifId = `${data.type}_${data.from}_${data.message}`;
                             if (!shownNotifications.has(notifId)) {
                                 shownNotifications.add(notifId);
@@ -2199,13 +2070,13 @@
             });
         });
 
-        // --- Bildirim Durum Kontrolü (Debug) ---
+        // --- Bildirim Durum KontrolÃ¼ (Debug) ---
         setTimeout(async () => {
             const debugPanel = document.getElementById('notif-debug');
             const statusDiv = document.getElementById('notif-status');
             if (!debugPanel || !statusDiv) return;
             
-            // URL'de ?debug varsa paneli göster
+            // URL'de ?debug varsa paneli gÃ¶ster
             if (location.search.includes('debug')) {
                 debugPanel.style.display = 'block';
             }
@@ -2215,9 +2086,9 @@
                 if (window.OneSignal) {
                     const permission = await window.OneSignal.Notifications.permission;
                     const userId = await window.OneSignal.User.onesignalId;
-                    statusDiv.innerHTML = `İzin: ${permission}<br>ID: ${userId ? '✅' : '❌'}`;
+                    statusDiv.innerHTML = `Ä°zin: ${permission}<br>ID: ${userId ? 'âœ…' : 'âŒ'}`;
                 } else {
-                    statusDiv.textContent = 'OneSignal yüklenmedi';
+                    statusDiv.textContent = 'OneSignal yÃ¼klenmedi';
                 }
             } catch(e) {
                 statusDiv.textContent = 'Hata: ' + e.message;
@@ -2251,7 +2122,7 @@
         window.handlePhoto = async () => {
             const file = document.getElementById('chat-file').files[0];
             if (!file) return;
-            showToast('Fotoğraf hazırlanıyor... 📸');
+            showToast('FotoÄŸraf hazÄ±rlanÄ±yor... ğŸ“¸');
             try {
                 const base64 = await new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -2270,7 +2141,7 @@
                     document.getElementById('previews').style.display = 'flex';
                     updateSendButton();
                 }
-            } catch (e) { showToast('Yükleme hatası 😔'); }
+            } catch (e) { showToast('YÃ¼kleme hatasÄ± ğŸ˜”'); }
         };
 
         let mediaRecorder;
@@ -2303,15 +2174,15 @@
                     document.getElementById('voice-label').style.display = 'block';
                     document.getElementById('previews').style.display = 'flex';
                     updateSendButton();
-                    showToast('Ses hazır! 🎤');
-                    // Artık track'leri durdurmuyoruz, oturum boyunca izni saklıyoruz
+                    showToast('Ses hazÄ±r! ğŸ¤');
+                    // ArtÄ±k track'leri durdurmuyoruz, oturum boyunca izni saklÄ±yoruz
                 };
                 mediaRecorder.start();
                 btn.style.color = '#ff4b72';
                 waves.style.display = 'flex';
                 ta.style.display = 'none';
-                showToast('Kaydediliyor... 🔴');
-            } catch (e) { showToast('Mikrofon hatası ⚠️'); }
+                showToast('Kaydediliyor... ğŸ”´');
+            } catch (e) { showToast('Mikrofon hatasÄ± âš ï¸'); }
         };
 
         window.cancelMedia = () => {
@@ -2339,7 +2210,7 @@
 
             const btn = document.getElementById('send-btn');
             btn.disabled = true;
-            btn.innerText = '⏳';
+            btn.innerText = 'â³';
 
             try {
                 let audioUrl = null;
@@ -2356,46 +2227,42 @@
                         text: getMessagePreview(replyTarget).slice(0, 160)
                     } : null,
                     reactions: {},
-                    readBy: { [currentUser]: true }, // Gönderen otomatik okudu
-                    messageEffect: selectedMessageEffect !== 'none' ? selectedMessageEffect : null,
+                    readBy: { [currentUser]: true }, // GÃ¶nderen otomatik okudu
                     timestamp: serverTimestamp()
                 });
                 await addDoc(collection(db, 'activity_logs'), {
                     type: 'message',
-                    title: 'Yeni mesaj gönderildi',
+                    title: 'Yeni mesaj gÃ¶nderildi',
                     user: currentUser,
                     meta: { hasText: !!text, hasPhoto: !!media.photo, hasAudio: !!audioUrl },
                     createdAt: serverTimestamp()
                 });
 
-                // Aktivite sayacını artır (geçirilen süreye dahil)
+                // Aktivite sayacÄ±nÄ± artÄ±r (geÃ§irilen sÃ¼reye dahil)
                 await recordActivity('message');
 
-                // --- Kapalıyken Giden Push Bildirimi ---
+                // --- KapalÄ±yken Giden Push Bildirimi ---
                 if (window.sendLoveNotification && currentUser !== 'Bilinmeyen') {
                     let notifMsg = text;
-                    if (selectedMessageEffect === 'secret' || selectedMessageEffect === 'tap_reveal') {
-                        notifMsg = selectedMessageEffect === 'secret' ? '🔒 Sana gizli bir mesaj gönderdi.' : '👆 Sana dokununca açılan bir mesaj gönderdi.';
-                    } else if (!text) {
-                        if (media.voice) notifMsg = "🎤 Sana bir sesli mesaj gönderdi.";
-                        else if (media.photo) notifMsg = "📷 Sana bir fotoğraf gönderdi.";
+                    if (!text) {
+                        if (media.voice) notifMsg = "ğŸ¤ Sana bir sesli mesaj gÃ¶nderdi.";
+                        else if (media.photo) notifMsg = "ğŸ“· Sana bir fotoÄŸraf gÃ¶nderdi.";
                     } else if (media.voice || media.photo) {
-                        notifMsg += " (Medyalı Mesaj)";
+                        notifMsg += " (MedyalÄ± Mesaj)";
                     }
-                    window.sendLoveNotification("Yeni Bir Mesajın Var 💌", `${currentUser}: ${notifMsg}`);
+                    window.sendLoveNotification("Yeni Bir MesajÄ±n Var ğŸ’Œ", `${currentUser}: ${notifMsg}`);
                 }
 
                 ta.value = '';
                 ta.style.height = 'auto';
                 cancelMedia();
                 clearReply();
-                resetMessageEffect();
                 setTypingState(false);
                 updateSendButton();
-                showToast('Mesaj gönderildi! 💌');
+                showToast('Mesaj gÃ¶nderildi! ğŸ’Œ');
             } catch (e) {
                 console.error('[SendMessage] Hata:', e);
-                showToast('Mesaj gönderilemedi: ' + (e.message || 'Bilinmeyen hata') + ' 😔');
+                showToast('Mesaj gÃ¶nderilemedi: ' + (e.message || 'Bilinmeyen hata') + ' ğŸ˜”');
             }
             finally { btn.disabled = false; updateSendButton(); }
         };
@@ -2409,9 +2276,9 @@
             const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
             
             if (dateOnly.getTime() === today.getTime()) {
-                return 'Bugün';
+                return 'BugÃ¼n';
             } else if (dateOnly.getTime() === yesterday.getTime()) {
-                return 'Dün';
+                return 'DÃ¼n';
             } else {
                 return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
             }
@@ -2419,14 +2286,14 @@
 
         // --- Messaging Logic ---
         function renderMessages() {
-            console.log('[Chat] renderMessages çağrıldı, mesaj sayısı:', messageCache.length);
+            console.log('[Chat] renderMessages Ã§aÄŸrÄ±ldÄ±, mesaj sayÄ±sÄ±:', messageCache.length);
             chatFlow.innerHTML = '';
             let lastDate = null;
             sharedPhotos = [];
             sharedAudios = [];
             
             if (messageCache.length === 0) {
-                chatFlow.innerHTML = '<div style="text-align:center;padding:40px;opacity:0.5;">Henüz mesaj yok<br>İlk mesajı sen gönder! 💌</div>';
+                chatFlow.innerHTML = '<div style="text-align:center;padding:40px;opacity:0.5;">HenÃ¼z mesaj yok<br>Ä°lk mesajÄ± sen gÃ¶nder! ğŸ’Œ</div>';
                 return;
             }
             
@@ -2439,7 +2306,7 @@
 
                 const currDate = msgDateD.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
                 
-                // Benden Silinmişse atla
+                // Benden SilinmiÅŸse atla
                 if (msg.deletedFor && msg.deletedFor[currentUser]) return;
 
                 if (currDate !== lastDate) {
@@ -2452,8 +2319,8 @@
                     yesterday.setDate(yesterday.getDate() - 1);
                     const yesterdayStr = yesterday.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
                     
-                    if (currDate === today) divider.innerText = 'Bugün';
-                    else if (currDate === yesterdayStr) divider.innerText = 'Dün';
+                    if (currDate === today) divider.innerText = 'BugÃ¼n';
+                    else if (currDate === yesterdayStr) divider.innerText = 'DÃ¼n';
                     else divider.innerText = currDate;
                     
                     chatFlow.appendChild(divider);
@@ -2468,22 +2335,12 @@
                 wrap.id = `msg-${id}`;
                 wrap.dataset.messageId = id;
 
-                const effectClass = msg.messageEffect === 'glow' ? 'effect-glow' : (msg.messageEffect === 'heart_rain' ? 'effect-heart-rain' : '');
-                let content = `<div class="bubble ${effectClass}">`;
+                let content = `<div class="bubble">`;
                 if (msg.replyTo) {
-                    content += `<div class="bubble-reply"><strong>${escapeHTML(msg.replyTo.sender || 'Yanıt')}</strong>${escapeHTML(msg.replyTo.text || 'Mesaj')}</div>`;
+                    content += `<div class="bubble-reply"><strong>${escapeHTML(msg.replyTo.sender || 'YanÄ±t')}</strong>${escapeHTML(msg.replyTo.text || 'Mesaj')}</div>`;
                 }
                 if (msg.photo) content += `<img src="${msg.photo}" class="msg-photo" onclick="event.stopPropagation(); zoomImg('${msg.photo}')">`;
-                if (msg.text) {
-                    const safeText = escapeHTML(msg.text).replace(/\n/g, '<br>');
-                    if (msg.messageEffect === 'secret') {
-                        content += `<div class="secret-cover" onclick="event.stopPropagation(); revealSecretMessage(this, 'Gizli mesajı kapat')">🔒 Gizli mesajı aç</div><div class="tap-reveal-content" style="padding-top:4px;">${safeText}</div>`;
-                    } else if (msg.messageEffect === 'tap_reveal') {
-                        content += `<div class="secret-cover" onclick="event.stopPropagation(); revealSecretMessage(this, 'Tekrar gizle')">👆 Dokununca açılır</div><div class="tap-reveal-content" style="padding-top:4px;">${safeText}</div>`;
-                    } else {
-                        content += `<div style="padding-top:4px;">${safeText}</div>`;
-                    }
-                }
+                if (msg.text) content += `<div style="padding-top:4px;">${escapeHTML(msg.text).replace(/\n/g, '<br>')}</div>`;
                 if (msg.gift) {
                     const gift = msg.gift;
                     const label = gift.type === 'heart' ? `${gift.amount || 0} ❤️ Kalp` : gift.type === 'coupon' ? `🎟️ ${escapeHTML(gift.title || gift.key || 'Kupon')}` : '💌 Mini not';
@@ -2493,24 +2350,24 @@
 
                 const time = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '...';
 
-                // Okundu bilgisi (sadece kendi mesajlarımda göster)
+                // Okundu bilgisi (sadece kendi mesajlarÄ±mda gÃ¶ster)
                 let readReceipt = '';
                 if (isMe) {
-                    const partnerName = currentUser === 'Ayşe' ? 'Mert' : 'Ayşe';
+                    const partnerName = currentUser === 'AyÅŸe' ? 'Mert' : 'AyÅŸe';
                     const isRead = msg.readBy && msg.readBy[partnerName];
                     const readStatusClass = isRead ? 'read' : 'delivered';
                     readReceipt = `<span class="read-status ${readStatusClass}"><span class="tick"></span></span>`;
                 }
 
-                const starMark = msg.starredBy && msg.starredBy[currentUser] ? '<span class="starred-mark">⭐</span>' : '';
+                const starMark = msg.starredBy && msg.starredBy[currentUser] ? '<span class="starred-mark">â­</span>' : '';
                 content += `<div class="msg-info">${time}${starMark}${readReceipt}</div></div>`;
 
-                // Instagram Style Reaction Bar (Mesaj üstüne tıklayınca çıkar)
+                // Instagram Style Reaction Bar (Mesaj Ã¼stÃ¼ne tÄ±klayÄ±nca Ã§Ä±kar)
                 const reactionBar = document.createElement('div');
                 reactionBar.className = 'ig-reaction-bar';
                 reactionBar.id = `reaction-bar-${id}`;
 
-                // Kullanıcının hızlı ifadeleri
+                // KullanÄ±cÄ±nÄ±n hÄ±zlÄ± ifadeleri
                 const quickEmojis = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['❤️','⭐','🫂','😏','😍','😂','👏','🔥'];
 
                 quickEmojis.forEach(emoji => {
@@ -2525,7 +2382,7 @@
                     reactionBar.appendChild(span);
                 });
 
-                // "+" butonu - emoji düzenleme modalını açar
+                // "+" butonu - emoji dÃ¼zenleme modalÄ±nÄ± aÃ§ar
                 const moreBtn = document.createElement('span');
                 moreBtn.className = 're-more';
                 moreBtn.innerHTML = '+';
@@ -2538,7 +2395,7 @@
 
                 wrap.innerHTML = content;
 
-                // Reaksiyonları mesaj balonunun Dışına ekle (Instagram tarzı - balonu genişletmez)
+                // ReaksiyonlarÄ± mesaj balonunun DÄ±ÅŸÄ±na ekle (Instagram tarzÄ± - balonu geniÅŸletmez)
                 if (msg.reactions && Object.keys(msg.reactions).length > 0) {
                     const reactionPills = Object.entries(msg.reactions)
                         .filter(([user, emoji]) => emoji !== null)
@@ -2554,27 +2411,27 @@
 
                 wrap.appendChild(reactionBar);
 
-                // Mesaj üstüne tıklayınca reaksiyon barı göster
+                // Mesaj Ã¼stÃ¼ne tÄ±klayÄ±nca reaksiyon barÄ± gÃ¶ster
                 wrap.onclick = function(e) {
                     e.stopPropagation();
-                    // Diğer tüm reaksiyon barlarını kapat
+                    // DiÄŸer tÃ¼m reaksiyon barlarÄ±nÄ± kapat
                     document.querySelectorAll('.ig-reaction-bar').forEach(bar => bar.classList.remove('active'));
-                    // Bu mesajın reaksiyon barını aç
+                    // Bu mesajÄ±n reaksiyon barÄ±nÄ± aÃ§
                     reactionBar.classList.add('active');
                 };
 
-                // Çift tıklama (bilgisayar): Mesaj menüsü aç
+                // Ã‡ift tÄ±klama (bilgisayar): Mesaj menÃ¼sÃ¼ aÃ§
                 wrap.ondblclick = function(e) {
                     e.stopPropagation();
                     reactionBar.classList.remove('active');
                     openMessageMenu(id, msg);
                 };
 
-                // Basılı tutma (mobil/tablet): Mesaj menüsü aç
+                // BasÄ±lÄ± tutma (mobil/tablet): Mesaj menÃ¼sÃ¼ aÃ§
                 let pressTimer;
                 let isPressing = false;
                 
-                // Mouse olayları (bilgisayar)
+                // Mouse olaylarÄ± (bilgisayar)
                 wrap.onmousedown = function(e) {
                     if (e.button !== 0) return;
                     isPressing = true;
@@ -2587,7 +2444,7 @@
                             // Mobil cihazlarda haptic feedback
                             if (navigator.vibrate) navigator.vibrate(50);
                         }
-                    }, 600); // 600ms basılı tutunca menü açılır
+                    }, 600); // 600ms basÄ±lÄ± tutunca menÃ¼ aÃ§Ä±lÄ±r
                 };
                 wrap.onmouseup = function() {
                     isPressing = false;
@@ -2598,7 +2455,7 @@
                     clearTimeout(pressTimer);
                 };
                 
-                // Touch olayları (mobil) - daha hassas
+                // Touch olaylarÄ± (mobil) - daha hassas
                 wrap.ontouchstart = function(e) {
                     isPressing = true;
                     pressTimer = setTimeout(() => {
@@ -2618,14 +2475,14 @@
                     clearTimeout(pressTimer);
                 };
                 wrap.ontouchmove = function() {
-                    // Kaydırma başlayınca iptal et
+                    // KaydÄ±rma baÅŸlayÄ±nca iptal et
                     isPressing = false;
                     clearTimeout(pressTimer);
                 };
 
                 chatFlow.appendChild(wrap);
                 
-                // Okunmamış mesajları okundu olarak işaretle (görünürse)
+                // OkunmamÄ±ÅŸ mesajlarÄ± okundu olarak iÅŸaretle (gÃ¶rÃ¼nÃ¼rse)
                 if (!isMe && (!msg.readBy || !msg.readBy[currentUser])) {
                     markAsRead(id);
                 }
@@ -2648,23 +2505,23 @@
                     [`readBy.${currentUser}`]: true
                 });
             } catch (e) {
-                console.error('[ReadReceipt] Okundu işaretlenemedi:', e);
+                console.error('[ReadReceipt] Okundu iÅŸaretlenemedi:', e);
             }
         }
         
-        // Mesajları dinle
+        // MesajlarÄ± dinle
         const messagesQuery = query(collection(db, 'chat_messages'), orderBy('timestamp', 'asc'));
-        console.log('[Chat] Mesaj dinleyici başlatılıyor...');
+        console.log('[Chat] Mesaj dinleyici baÅŸlatÄ±lÄ±yor...');
         
         onSnapshot(messagesQuery, (snap) => {
-            console.log('[Chat] Mesajlar yüklendi:', snap.docs.length, 'adet');
+            console.log('[Chat] Mesajlar yÃ¼klendi:', snap.docs.length, 'adet');
             messageCache = snap.docs.map((d) => ({ id: d.id, msg: d.data() }));
             renderMessages();
             dateDividers = [];
             setTimeout(updateStickyHeader, 100);
         }, (error) => {
-            console.error('[Chat] Mesaj dinleme hatası:', error);
-            showToast('Mesajlar yüklenemedi 😔');
+            console.error('[Chat] Mesaj dinleme hatasÄ±:', error);
+            showToast('Mesajlar yÃ¼klenemedi ğŸ˜”');
         });
 
         onSnapshot(doc(db, 'chat_typing', partnerName), (snap) => {
@@ -2674,7 +2531,7 @@
             const data = snap.data();
             const updated = data.updatedAt?.toDate?.();
             const isFresh = updated ? (Date.now() - updated.getTime()) < 5000 : false;
-            typingName.textContent = `${partnerName} yazıyor`;
+            typingName.textContent = `${partnerName} yazÄ±yor`;
             indicator.classList.toggle('active', Boolean(data.isTyping && isFresh));
         });
 
@@ -2685,7 +2542,7 @@
             // WhatsApp style: one reaction per user. Toggle off if same emoji.
             const newEmoji = currentReactions?.[currentUser] === emoji ? null : emoji;
             await updateDoc(ref, { [`reactions.${currentUser}`]: newEmoji });
-            // Scroll pozisyonunu geri yükle (anında, fark edilmez)
+            // Scroll pozisyonunu geri yÃ¼kle (anÄ±nda, fark edilmez)
             requestAnimationFrame(() => {
                 chatFlow.scrollTop = scrollPos;
             });
@@ -2780,27 +2637,10 @@
                 closeGiftModal();
                 document.getElementById('gift-note').value = '';
                 showToast('Hediye gönderildi 🎁');
-                playGiftBurst(gift.type === 'heart' ? '💖' : (gift.type === 'coupon' ? '🎟️' : '🎈'));
             } catch (e) {
                 showToast(e.message || 'Hediye gönderilemedi.');
             }
         };
-
-        function playGiftBurst(symbol) {
-            const host = document.getElementById('gift-burst');
-            if (!host) return;
-            host.innerHTML = '';
-            const icons = [symbol || '🎁', '🎈', '💖', '✨', '💕'];
-            for (let i = 0; i < 28; i++) {
-                const span = document.createElement('span');
-                span.textContent = icons[i % icons.length];
-                span.style.left = `${Math.random() * 96}%`;
-                span.style.animationDelay = `${Math.random() * .55}s`;
-                span.style.fontSize = `${18 + Math.random() * 18}px`;
-                host.appendChild(span);
-            }
-            setTimeout(() => { host.innerHTML = ''; }, 3600);
-        }
 
         window.zoomImg = function(url) {
             var m = document.getElementById('img-modal');
@@ -2827,7 +2667,7 @@
             const box = document.getElementById('chat-search-results');
             const term = value.trim().toLowerCase();
             if (!term) {
-                box.innerHTML = '<div class="chat-search-result" style="opacity:.65;">Aramak için yaz...</div>';
+                box.innerHTML = '<div class="chat-search-result" style="opacity:.65;">Aramak iÃ§in yaz...</div>';
                 return;
             }
             const results = messageCache
@@ -2837,7 +2677,7 @@
                 .reverse();
 
             if (!results.length) {
-                box.innerHTML = '<div class="chat-search-result" style="opacity:.65;">Sonuç bulunamadı.</div>';
+                box.innerHTML = '<div class="chat-search-result" style="opacity:.65;">SonuÃ§ bulunamadÄ±.</div>';
                 return;
             }
 
@@ -2846,7 +2686,7 @@
                     ? msg.timestamp.toDate().toLocaleString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
                     : '';
                 return `<div class="chat-search-result" onclick="goToMessage('${id}')">
-                    <div class="chat-search-meta">${escapeHTML(msg.sender)} · ${escapeHTML(when)}</div>
+                    <div class="chat-search-meta">${escapeHTML(msg.sender)} Â· ${escapeHTML(when)}</div>
                     <div>${escapeHTML(getMessagePreview(msg)).slice(0, 120)}</div>
                 </div>`;
             }).join('');
@@ -2874,11 +2714,11 @@
             var overlay = document.createElement('div');
             overlay.className = 'delete-overlay';
             var html = '<div class="delete-menu">';
-            html += '<button class="danger" onclick="deleteMsg(\'' + msgId + '\', \'benden\')">Benden Sil 🗑️</button>';
+            html += '<button class="danger" onclick="deleteMsg(\'' + msgId + '\', \'benden\')">Benden Sil ğŸ—‘ï¸</button>';
             if (isMyMessage) {
-                html += '<button class="danger" onclick="deleteMsg(\'' + msgId + '\', \'herkesten\')">Herkesten Sil 🚫</button>';
+                html += '<button class="danger" onclick="deleteMsg(\'' + msgId + '\', \'herkesten\')">Herkesten Sil ğŸš«</button>';
             }
-            html += '<button onclick="this.parentElement.parentElement.remove()">İptal</button>';
+            html += '<button onclick="this.parentElement.parentElement.remove()">Ä°ptal</button>';
             html += '</div>';
             overlay.innerHTML = html;
             document.body.appendChild(overlay);
@@ -2889,7 +2729,7 @@
             try {
                 if (type === 'herkesten') {
                     await updateDoc(ref, { 
-                        text: "🚫 Bu mesaj silindi", 
+                        text: "ğŸš« Bu mesaj silindi", 
                         photo: null, 
                         audio: null, 
                         reactions: {} 
@@ -2904,18 +2744,18 @@
 
         // --- Instagram Style Emoji Picker ---
         window.showEmojiPicker = function(msgId, currentReactions, reactBar) {
-            // Geniş emoji listesi
+            // GeniÅŸ emoji listesi
             const ALL_EMOJIS = [
-                '❤️','💙','💜','🖤','💚','💛','🧡','🤍','🤎','💗','💖','💝',
-                '😍','🥰','😘','😻','💋','🫶','💕','💞','💓','💘','❣️',
-                '😂','🤣','😅','😆','😄','😃','😁','🙂','😊','☺️','😉',
-                '😢','😭','😥','😰','😓','🥺','😦','😧','😨','😩',
-                '😮','😲','😱','🤯','😳','🥵','🥶','😶‍🌫️',
-                '👏','🙌','👍','👎','👌','✌️','🤞','🫰','🤟','🤘',
-                '🔥','💯','⭐','✨','🌟','💫','🎉','🎊','🎁','🎈',
-                '🥳','🤩','😎','🤓','🧐','🤔','🤨','😏','😒','🙄',
-                '🌹','🌸','🌺','🌷','🌻','💐','🍫','🍬','🍭','🧁',
-                '🌙','☀️','⭐','🌈','☁️','⛅','🌤️','🌦️','🌧️'
+                'â¤ï¸','ğŸ’™','ğŸ’œ','ğŸ–¤','ğŸ’š','ğŸ’›','ğŸ§¡','ğŸ¤','ğŸ¤','ğŸ’—','ğŸ’–','ğŸ’',
+                'ğŸ˜','ğŸ¥°','ğŸ˜˜','ğŸ˜»','ğŸ’‹','ğŸ«¶','ğŸ’•','ğŸ’','ğŸ’“','ğŸ’˜','â£ï¸',
+                'ğŸ˜‚','ğŸ¤£','ğŸ˜…','ğŸ˜†','ğŸ˜„','ğŸ˜ƒ','ğŸ˜','ğŸ™‚','ğŸ˜Š','â˜ºï¸','ğŸ˜‰',
+                'ğŸ˜¢','ğŸ˜­','ğŸ˜¥','ğŸ˜°','ğŸ˜“','ğŸ¥º','ğŸ˜¦','ğŸ˜§','ğŸ˜¨','ğŸ˜©',
+                'ğŸ˜®','ğŸ˜²','ğŸ˜±','ğŸ¤¯','ğŸ˜³','ğŸ¥µ','ğŸ¥¶','ğŸ˜¶â€ğŸŒ«ï¸',
+                'ğŸ‘','ğŸ™Œ','ğŸ‘','ğŸ‘','ğŸ‘Œ','âœŒï¸','ğŸ¤','ğŸ«°','ğŸ¤Ÿ','ğŸ¤˜',
+                'ğŸ”¥','ğŸ’¯','â­','âœ¨','ğŸŒŸ','ğŸ’«','ğŸ‰','ğŸŠ','ğŸ','ğŸˆ',
+                'ğŸ¥³','ğŸ¤©','ğŸ˜','ğŸ¤“','ğŸ§','ğŸ¤”','ğŸ¤¨','ğŸ˜','ğŸ˜’','ğŸ™„',
+                'ğŸŒ¹','ğŸŒ¸','ğŸŒº','ğŸŒ·','ğŸŒ»','ğŸ’','ğŸ«','ğŸ¬','ğŸ­','ğŸ§',
+                'ğŸŒ™','â˜€ï¸','â­','ğŸŒˆ','â˜ï¸','â›…','ğŸŒ¤ï¸','ğŸŒ¦ï¸','ğŸŒ§ï¸'
             ];
             
             const picker = document.createElement('div');
@@ -2930,8 +2770,8 @@
             picker.innerHTML = `
                 <div style="background:#1a1a2e;width:100%;max-width:500px;border-radius:25px 25px 0 0;padding:20px;animation:slideUp 0.3s ease;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
-                        <span style="font-weight:600;">Tepki Bırak</span>
-                        <button onclick="this.closest('.emoji-picker-overlay').remove()" style="background:rgba(255,255,255,0.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.2rem;">✕</button>
+                        <span style="font-weight:600;">Tepki BÄ±rak</span>
+                        <button onclick="this.closest('.emoji-picker-overlay').remove()" style="background:rgba(255,255,255,0.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.2rem;">âœ•</button>
                     </div>
                     <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px;max-height:300px;overflow-y:auto;padding-right:10px;">${emojiGrid}</div>
                 </div>
@@ -2972,16 +2812,16 @@
                     const now = new Date().getTime();
                     const diffSecs = (now - lastSeenTime) / 1000;
                     
-                    // Sadece online === true ise çevrimiçi göster
-                    // veya son 2 dakika içinde aktifse (60 saniye tolerans)
+                    // Sadece online === true ise Ã§evrimiÃ§i gÃ¶ster
+                    // veya son 2 dakika iÃ§inde aktifse (60 saniye tolerans)
                     const isRecentlyActive = diffSecs < 60;
                     
                     if (data.online === true && isRecentlyActive) {
-                        statusEl.innerText = "çevrimiçi";
+                        statusEl.innerText = "Ã§evrimiÃ§i";
                         setPartnerPresence(true);
                         statusEl.style.color = "#48c78e";
                     } else {
-                        statusEl.innerText = "son görülme " + formatLastSeen(lastSeenDate);
+                        statusEl.innerText = "son gÃ¶rÃ¼lme " + formatLastSeen(lastSeenDate);
                         setPartnerPresence(false);
                         statusEl.style.color = "var(--text-muted)";
                     }
@@ -2989,7 +2829,7 @@
                     setPartnerPresence(false);
                 }
             } else {
-                statusEl.innerText = "son görülme bulunamadı";
+                statusEl.innerText = "son gÃ¶rÃ¼lme bulunamadÄ±";
             }
         });
 
@@ -3003,9 +2843,9 @@
             const timeStr = date.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
             
             if (dateOnly.getTime() === today.getTime()) {
-                return 'bugün ' + timeStr;
+                return 'bugÃ¼n ' + timeStr;
             } else if (dateOnly.getTime() === yesterday.getTime()) {
-                return 'dün ' + timeStr;
+                return 'dÃ¼n ' + timeStr;
             } else {
                 const dateStr = date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
                 return dateStr + ' ' + timeStr;
@@ -3020,22 +2860,22 @@
             selectedMessageId = msgId;
             selectedMessageData = msg;
             
-            // Mesaj sahibini kontrol et (sender alanını kullan)
+            // Mesaj sahibini kontrol et (sender alanÄ±nÄ± kullan)
             const isMyMessage = msg.sender === currentUser;
             
-            // Menü öğelerini kontrol et
+            // MenÃ¼ Ã¶ÄŸelerini kontrol et
             const deleteForAllItem = document.querySelector('.message-menu-item[onclick="deleteForAll()"]');
             if (deleteForAllItem) {
-                // Sadece kendi mesajlarımız için "Herkesten Sil" göster
+                // Sadece kendi mesajlarÄ±mÄ±z iÃ§in "Herkesten Sil" gÃ¶ster
                 deleteForAllItem.style.display = isMyMessage ? 'flex' : 'none';
             }
             const starLabel = document.getElementById('star-message-label');
             if (starLabel) {
-                starLabel.textContent = msg.starredBy && msg.starredBy[currentUser] ? 'Yıldızı Kaldır' : 'Yıldızla';
+                starLabel.textContent = msg.starredBy && msg.starredBy[currentUser] ? 'YÄ±ldÄ±zÄ± KaldÄ±r' : 'YÄ±ldÄ±zla';
             }
             
             document.getElementById('message-menu-overlay').classList.add('active');
-            // Emoji editor'ı gizle başlangıçta
+            // Emoji editor'Ä± gizle baÅŸlangÄ±Ã§ta
             const editor = document.getElementById('emoji-editor-section');
             if (editor) editor.style.display = 'none';
         };
@@ -3049,7 +2889,7 @@
         };
 
         window.editQuickEmojis = function() {
-            // Emoji editor'ı göster
+            // Emoji editor'Ä± gÃ¶ster
             const editor = document.getElementById('emoji-editor-section');
             if (!editor) return;
             editor.style.display = 'block';
@@ -3063,7 +2903,7 @@
                 sender: selectedMessageData.sender,
                 text: getMessagePreview(selectedMessageData)
             };
-            document.getElementById('reply-preview-name').textContent = selectedMessageData.sender || 'Yanıt';
+            document.getElementById('reply-preview-name').textContent = selectedMessageData.sender || 'YanÄ±t';
             document.getElementById('reply-preview-snippet').textContent = getMessagePreview(selectedMessageData);
             document.getElementById('reply-preview').classList.add('active');
             closeMessageMenu();
@@ -3078,9 +2918,9 @@
         window.copyMessage = function() {
             if (selectedMessageData && selectedMessageData.text) {
                 navigator.clipboard.writeText(selectedMessageData.text);
-                showToast('Mesaj kopyalandı! 📋');
+                showToast('Mesaj kopyalandÄ±! ğŸ“‹');
             } else {
-                showToast('Kopyalanacak yazı yok.');
+                showToast('Kopyalanacak yazÄ± yok.');
             }
             closeMessageMenu();
         };
@@ -3096,10 +2936,10 @@
                 await setDoc(currentStatsRef, {
                     starredMessages: increment(!isStarred ? 1 : -1)
                 }, { merge: true });
-                showToast(!isStarred ? 'Mesaj yıldızlandı ⭐' : 'Yıldız kaldırıldı');
+                showToast(!isStarred ? 'Mesaj yÄ±ldÄ±zlandÄ± â­' : 'YÄ±ldÄ±z kaldÄ±rÄ±ldÄ±');
             } catch (e) {
                 console.error(e);
-                showToast('Yıldız güncellenemedi 😔');
+                showToast('YÄ±ldÄ±z gÃ¼ncellenemedi ğŸ˜”');
             }
             closeMessageMenu();
         };
@@ -3110,7 +2950,7 @@
                 await updateDoc(doc(db, 'chat_messages', selectedMessageId), {
                     [`deletedFor.${currentUser}`]: true
                 });
-                showToast('Mesaj senden silindi 🗑️');
+                showToast('Mesaj senden silindi ğŸ—‘ï¸');
             } catch (e) {
                 console.error(e);
             }
@@ -3120,25 +2960,25 @@
         window.deleteForAll = async function() {
             if (!selectedMessageId || !selectedMessageData) return;
             
-            // Sadece kendi mesajlarımızı herkesten silebiliriz (sender alanını kontrol et)
+            // Sadece kendi mesajlarÄ±mÄ±zÄ± herkesten silebiliriz (sender alanÄ±nÄ± kontrol et)
             if (selectedMessageData.sender !== currentUser) {
-                showToast('Sadece kendi mesajlarınızı herkesten silebilirsiniz! 🚫');
+                showToast('Sadece kendi mesajlarÄ±nÄ±zÄ± herkesten silebilirsiniz! ğŸš«');
                 closeMessageMenu();
                 return;
             }
             
-            if (!confirm('Bu mesaj herkesten silinecek. Emin misin? 🥺')) {
+            if (!confirm('Bu mesaj herkesten silinecek. Emin misin? ğŸ¥º')) {
                 closeMessageMenu();
                 return;
             }
             try {
                 await updateDoc(doc(db, 'chat_messages', selectedMessageId), {
                     deletedForAll: true,
-                    text: '🗑️ Bu mesaj silindi',
+                    text: 'ğŸ—‘ï¸ Bu mesaj silindi',
                     photo: null,
                     audio: null
                 });
-                showToast('Mesaj herkesten silindi 🗑️');
+                showToast('Mesaj herkesten silindi ğŸ—‘ï¸');
             } catch (e) {
                 console.error(e);
             }
@@ -3146,32 +2986,32 @@
         };
 
         // --- Quick Emoji Editor ---
-        let quickEmojisList = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['❤️','😍','😂','😮','😢','👏','🔥','🎉'];
+        let quickEmojisList = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['â¤ï¸','ğŸ˜','ğŸ˜‚','ğŸ˜®','ğŸ˜¢','ğŸ‘','ğŸ”¥','ğŸ‰'];
 
         function renderEmojiEditor() {
             const display = document.getElementById('current-emojis-display');
             const grid = document.getElementById('emoji-selection-grid');
             
-            // Mevcut emojileri göster
+            // Mevcut emojileri gÃ¶ster
             display.innerHTML = quickEmojisList.map(emo => 
                 `<div class="current-emoji" onclick="removeQuickEmoji('${emo}')">${emo}</div>`
             ).join('');
             
-            // Tüm emojileri göster
+            // TÃ¼m emojileri gÃ¶ster
             const ALL_EMOJIS = [
-                '❤️','💙','💜','🖤','💚','💛','🧡','🤍','🤎','💗','💖','💝',
-                '😍','🥰','😘','😻','💋','🫶','💕','💞','💓','💘','❣️',
-                '😂','🤣','😅','😆','😄','😃','😁','🙂','😊','☺️','😉',
-                '😢','😭','😥','😰','😓','🥺','😦','😧','😨','😩',
-                '😮','😲','😱','🤯','😳','🥵','🥶','😶‍🌫️',
-                '👏','🙌','👍','👎','👌','✌️','🤞','🫰','🤟','🤘',
-                '🔥','💯','⭐','✨','🌟','💫','🎉','🎊','🎁','🎈',
-                '🥳','🤩','😎','🤓','🧐','🤔','🤨','😏','😒','🙄',
-                '🌹','🌸','🌺','🌷','🌻','💐','🍫','🍬','🍭','🧁',
-                '🌙','☀️','⭐','🌈','☁️','⛅','🌤️','🌦️','🌧️',
-                '🍎','🍓','🍒','🍑','🍊','🍋','🍌','🍉','🍇',
-                '🐱','🐶','🐰','🦊','🐻','🐼','🐨','🐯','🦁',
-                '🎵','🎶','🎤','🎧','🎸','🎹','🎺','🎻','🥁'
+                'â¤ï¸','ğŸ’™','ğŸ’œ','ğŸ–¤','ğŸ’š','ğŸ’›','ğŸ§¡','ğŸ¤','ğŸ¤','ğŸ’—','ğŸ’–','ğŸ’',
+                'ğŸ˜','ğŸ¥°','ğŸ˜˜','ğŸ˜»','ğŸ’‹','ğŸ«¶','ğŸ’•','ğŸ’','ğŸ’“','ğŸ’˜','â£ï¸',
+                'ğŸ˜‚','ğŸ¤£','ğŸ˜…','ğŸ˜†','ğŸ˜„','ğŸ˜ƒ','ğŸ˜','ğŸ™‚','ğŸ˜Š','â˜ºï¸','ğŸ˜‰',
+                'ğŸ˜¢','ğŸ˜­','ğŸ˜¥','ğŸ˜°','ğŸ˜“','ğŸ¥º','ğŸ˜¦','ğŸ˜§','ğŸ˜¨','ğŸ˜©',
+                'ğŸ˜®','ğŸ˜²','ğŸ˜±','ğŸ¤¯','ğŸ˜³','ğŸ¥µ','ğŸ¥¶','ğŸ˜¶â€ğŸŒ«ï¸',
+                'ğŸ‘','ğŸ™Œ','ğŸ‘','ğŸ‘','ğŸ‘Œ','âœŒï¸','ğŸ¤','ğŸ«°','ğŸ¤Ÿ','ğŸ¤˜',
+                'ğŸ”¥','ğŸ’¯','â­','âœ¨','ğŸŒŸ','ğŸ’«','ğŸ‰','ğŸŠ','ğŸ','ğŸˆ',
+                'ğŸ¥³','ğŸ¤©','ğŸ˜','ğŸ¤“','ğŸ§','ğŸ¤”','ğŸ¤¨','ğŸ˜','ğŸ˜’','ğŸ™„',
+                'ğŸŒ¹','ğŸŒ¸','ğŸŒº','ğŸŒ·','ğŸŒ»','ğŸ’','ğŸ«','ğŸ¬','ğŸ­','ğŸ§',
+                'ğŸŒ™','â˜€ï¸','â­','ğŸŒˆ','â˜ï¸','â›…','ğŸŒ¤ï¸','ğŸŒ¦ï¸','ğŸŒ§ï¸',
+                'ğŸ','ğŸ“','ğŸ’','ğŸ‘','ğŸŠ','ğŸ‹','ğŸŒ','ğŸ‰','ğŸ‡',
+                'ğŸ±','ğŸ¶','ğŸ°','ğŸ¦Š','ğŸ»','ğŸ¼','ğŸ¨','ğŸ¯','ğŸ¦',
+                'ğŸµ','ğŸ¶','ğŸ¤','ğŸ§','ğŸ¸','ğŸ¹','ğŸº','ğŸ»','ğŸ¥'
             ];
             
             grid.innerHTML = ALL_EMOJIS.map(emo => {
@@ -3183,14 +3023,14 @@
         window.toggleQuickEmoji = function(emoji) {
             const index = quickEmojisList.indexOf(emoji);
             if (index > -1) {
-                // Kaldır
+                // KaldÄ±r
                 quickEmojisList.splice(index, 1);
             } else {
                 // Ekle (max 16)
                 if (quickEmojisList.length < 16) {
                     quickEmojisList.push(emoji);
                 } else {
-                    showToast('Maksimum 16 emoji ekleyebilirsin! 😅');
+                    showToast('Maksimum 16 emoji ekleyebilirsin! ğŸ˜…');
                     return;
                 }
             }
@@ -3209,19 +3049,19 @@
 
         // --- Instagram Style Emoji Edit Modal Functions ---
         const ALL_EMOJIS = [
-            '❤️','😍','😂','😮','😢','👏','🔥','🎉','🥺','✨','💕','🌹','🎁','🤗','😘','🥰',
-            '💙','💜','🖤','💚','💛','🧡','🤍','🤎','💗','💖','💝','💋','🫶','💞','💓','💘','❣️',
-            '🤣','😅','😆','😄','😃','😁','🙂','😊','☺️','😉','😌','😋','😛','😝','😜','🤪',
-            '😭','😥','😰','😓','😦','😧','😨','😩','🥵','🥶','😶‍🌫️','😱','🤯','😳',
-            '🙌','👍','👎','👌','✌️','🤞','🫰','🤟','🤘','👊','🤝','🙏','💪','🤲',
-            '💯','⭐','🌟','💫','🌈','☀️','🌙','☁️','⛅','🌤️','🌧️','⛈️','❄️','🌊',
-            '🥳','🤩','😎','🤓','🧐','🤔','🤨','😏','😒','🙄','😬','😮‍💨','🤥',
-            '🌸','🌺','🌷','🌻','💐','🍫','🍬','🍭','🧁','🍰','🎂','🍷','🍾','🥂',
-            '🐱','🐶','🐻','🦊','🐼','🐨','🐯','🦁','🐷','🐸','🦄','🐙','🦋','🐝',
-            '🎵','🎶','🎼','🎸','🎹','🎺','🎻','🥁','📻','🎧','🎤','🎬','🎮','🎯',
-            '🚀','🛸','🌍','🌎','🌏','🌕','🌑','⭐','🌠','🌌','☄️','🎆','🎇','✨',
-            '👑','💍','💎','🔮','🧿','🪬','🧸','🎀','🎊','🎋','🎍','🎎','🎏','🎐',
-            '💌','📨','📬','📭','📪','📫','📮','📯','📜','📃','📄','📑','🧾','📊','📈','📉'
+            'â¤ï¸','ğŸ˜','ğŸ˜‚','ğŸ˜®','ğŸ˜¢','ğŸ‘','ğŸ”¥','ğŸ‰','ğŸ¥º','âœ¨','ğŸ’•','ğŸŒ¹','ğŸ','ğŸ¤—','ğŸ˜˜','ğŸ¥°',
+            'ğŸ’™','ğŸ’œ','ğŸ–¤','ğŸ’š','ğŸ’›','ğŸ§¡','ğŸ¤','ğŸ¤','ğŸ’—','ğŸ’–','ğŸ’','ğŸ’‹','ğŸ«¶','ğŸ’','ğŸ’“','ğŸ’˜','â£ï¸',
+            'ğŸ¤£','ğŸ˜…','ğŸ˜†','ğŸ˜„','ğŸ˜ƒ','ğŸ˜','ğŸ™‚','ğŸ˜Š','â˜ºï¸','ğŸ˜‰','ğŸ˜Œ','ğŸ˜‹','ğŸ˜›','ğŸ˜','ğŸ˜œ','ğŸ¤ª',
+            'ğŸ˜­','ğŸ˜¥','ğŸ˜°','ğŸ˜“','ğŸ˜¦','ğŸ˜§','ğŸ˜¨','ğŸ˜©','ğŸ¥µ','ğŸ¥¶','ğŸ˜¶â€ğŸŒ«ï¸','ğŸ˜±','ğŸ¤¯','ğŸ˜³',
+            'ğŸ™Œ','ğŸ‘','ğŸ‘','ğŸ‘Œ','âœŒï¸','ğŸ¤','ğŸ«°','ğŸ¤Ÿ','ğŸ¤˜','ğŸ‘Š','ğŸ¤','ğŸ™','ğŸ’ª','ğŸ¤²',
+            'ğŸ’¯','â­','ğŸŒŸ','ğŸ’«','ğŸŒˆ','â˜€ï¸','ğŸŒ™','â˜ï¸','â›…','ğŸŒ¤ï¸','ğŸŒ§ï¸','â›ˆï¸','â„ï¸','ğŸŒŠ',
+            'ğŸ¥³','ğŸ¤©','ğŸ˜','ğŸ¤“','ğŸ§','ğŸ¤”','ğŸ¤¨','ğŸ˜','ğŸ˜’','ğŸ™„','ğŸ˜¬','ğŸ˜®â€ğŸ’¨','ğŸ¤¥',
+            'ğŸŒ¸','ğŸŒº','ğŸŒ·','ğŸŒ»','ğŸ’','ğŸ«','ğŸ¬','ğŸ­','ğŸ§','ğŸ°','ğŸ‚','ğŸ·','ğŸ¾','ğŸ¥‚',
+            'ğŸ±','ğŸ¶','ğŸ»','ğŸ¦Š','ğŸ¼','ğŸ¨','ğŸ¯','ğŸ¦','ğŸ·','ğŸ¸','ğŸ¦„','ğŸ™','ğŸ¦‹','ğŸ',
+            'ğŸµ','ğŸ¶','ğŸ¼','ğŸ¸','ğŸ¹','ğŸº','ğŸ»','ğŸ¥','ğŸ“»','ğŸ§','ğŸ¤','ğŸ¬','ğŸ®','ğŸ¯',
+            'ğŸš€','ğŸ›¸','ğŸŒ','ğŸŒ','ğŸŒ','ğŸŒ•','ğŸŒ‘','â­','ğŸŒ ','ğŸŒŒ','â˜„ï¸','ğŸ†','ğŸ‡','âœ¨',
+            'ğŸ‘‘','ğŸ’','ğŸ’','ğŸ”®','ğŸ§¿','ğŸª¬','ğŸ§¸','ğŸ€','ğŸŠ','ğŸ‹','ğŸ','ğŸ','ğŸ','ğŸ',
+            'ğŸ’Œ','ğŸ“¨','ğŸ“¬','ğŸ“­','ğŸ“ª','ğŸ“«','ğŸ“®','ğŸ“¯','ğŸ“œ','ğŸ“ƒ','ğŸ“„','ğŸ“‘','ğŸ§¾','ğŸ“Š','ğŸ“ˆ','ğŸ“‰'
         ];
 
         window.openEmojiEditModal = function() {
@@ -3236,14 +3076,14 @@
         function renderEmojiEditGrid() {
             const current = document.getElementById('emoji-edit-current');
             const grid = document.getElementById('emoji-edit-grid');
-            const quickEmojis = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['❤️','😍','😂','😮','😢','👏','🔥','🎉'];
+            const quickEmojis = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['â¤ï¸','ğŸ˜','ğŸ˜‚','ğŸ˜®','ğŸ˜¢','ğŸ‘','ğŸ”¥','ğŸ‰'];
 
-            // Mevcut emojileri göster
+            // Mevcut emojileri gÃ¶ster
             current.innerHTML = quickEmojis.map(emoji =>
                 `<div class="emoji-edit-item" onclick="removeEmojiFromQuick('${emoji}')">${emoji}</div>`
             ).join('');
 
-            // Tüm emojileri göster
+            // TÃ¼m emojileri gÃ¶ster
             grid.innerHTML = ALL_EMOJIS.map(emoji => {
                 const isSelected = quickEmojis.includes(emoji);
                 return `<div class="emoji-edit-option ${isSelected ? 'selected' : ''}" onclick="toggleEmojiQuick('${emoji}')">${emoji}</div>`;
@@ -3251,39 +3091,39 @@
         }
 
         window.toggleEmojiQuick = async function(emoji) {
-            let quickEmojis = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['❤️','😍','😂','😮','😢','👏','🔥','🎉'];
+            let quickEmojis = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['â¤ï¸','ğŸ˜','ğŸ˜‚','ğŸ˜®','ğŸ˜¢','ğŸ‘','ğŸ”¥','ğŸ‰'];
             const index = quickEmojis.indexOf(emoji);
 
             if (index > -1) {
-                // Kaldır
+                // KaldÄ±r
                 quickEmojis.splice(index, 1);
             } else {
                 // Ekle (max 8)
                 if (quickEmojis.length < 8) {
                     quickEmojis.push(emoji);
                 } else {
-                    showToast('Maksimum 8 emoji ekleyebilirsin! 😅');
+                    showToast('Maksimum 8 emoji ekleyebilirsin! ğŸ˜…');
                     return;
                 }
             }
 
             localStorage.setItem('chat_quick_emojis', JSON.stringify(quickEmojis));
 
-            // Firestore'a da kaydet (senkronizasyon için)
+            // Firestore'a da kaydet (senkronizasyon iÃ§in)
             await setDoc(doc(db, 'chat_settings', currentUser), {
                 quickEmojis: quickEmojis,
                 updatedAt: serverTimestamp()
             }, { merge: true });
 
-            // ANINDA MESAJLARI YENİDEN RENDER ET
+            // ANINDA MESAJLARI YENÄ°DEN RENDER ET
             renderMessages();
 
             renderEmojiEditGrid();
-            showToast('Hızlı ifadeler güncellendi! ⚡');
+            showToast('HÄ±zlÄ± ifadeler gÃ¼ncellendi! âš¡');
         };
 
         window.removeEmojiFromQuick = function(emoji) {
-            let quickEmojis = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['❤️','😍','😂','😮','😢','👏','🔥','🎉'];
+            let quickEmojis = JSON.parse(localStorage.getItem('chat_quick_emojis')) || ['â¤ï¸','ğŸ˜','ğŸ˜‚','ğŸ˜®','ğŸ˜¢','ğŸ‘','ğŸ”¥','ğŸ‰'];
             const index = quickEmojis.indexOf(emoji);
             if (index > -1) {
                 quickEmojis.splice(index, 1);
@@ -3292,16 +3132,16 @@
             }
         };
 
-        // --- Takma Ad Fonksiyonları ---
-        // NICKNAMES_KEY yukarıda tanımlandı (chat_nicknames_v2)
+        // --- Takma Ad FonksiyonlarÄ± ---
+        // NICKNAMES_KEY yukarÄ±da tanÄ±mlandÄ± (chat_nicknames_v2)
 
-        // Partner'in takma adını al
+        // Partner'in takma adÄ±nÄ± al
         function getPartnerNickname() {
             const nicknames = JSON.parse(localStorage.getItem(NICKNAMES_KEY)) || {};
             return nicknames[partner] || partner;
         }
 
-        // Takma adı ayarla
+        // Takma adÄ± ayarla
         window.setPartnerNickname = async function(nickname) {
             const nicknames = JSON.parse(localStorage.getItem(NICKNAMES_KEY)) || {};
             nicknames[partner] = nickname;
@@ -3313,12 +3153,12 @@
                 updatedAt: serverTimestamp()
             }, { merge: true });
 
-            // Header'ı güncelle
+            // Header'Ä± gÃ¼ncelle
             document.getElementById('p-name').textContent = nickname;
-            showToast(`${partner} artık "${nickname}" olarak gözükecek! 💕`);
+            showToast(`${partner} artÄ±k "${nickname}" olarak gÃ¶zÃ¼kecek! ğŸ’•`);
         };
 
-        // Takma adı yükle
+        // Takma adÄ± yÃ¼kle
         function loadNickname() {
             const nicknames = JSON.parse(localStorage.getItem(NICKNAMES_KEY)) || {};
             if (nicknames[partner]) {
@@ -3326,7 +3166,7 @@
             }
         }
 
-        // Firestore'dan takma adları senkronize et
+        // Firestore'dan takma adlarÄ± senkronize et
         onSnapshot(doc(db, 'chat_settings', currentUser), (snap) => {
             if (snap.exists() && snap.data().nicknames) {
                 localStorage.setItem(NICKNAMES_KEY, JSON.stringify(snap.data().nicknames));
@@ -3334,7 +3174,7 @@
             }
         });
 
-        // Başlangıçta takma adı yükle
+        // BaÅŸlangÄ±Ã§ta takma adÄ± yÃ¼kle
         loadNickname();
 
         // Mobile Scroll Optimization

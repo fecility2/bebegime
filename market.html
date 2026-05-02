@@ -2,7 +2,13 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <title>Aşk Marketi 🛍️</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=3">
@@ -19,6 +25,12 @@
         .tab-btn.active { border-color: var(--primary); background: rgba(255,75,114,.18); }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; max-width: 980px; margin: 0 auto; }
         .item-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 18px; padding: 16px; }
+        .item-card.active-showcase { border-color: rgba(255,75,114,.55); box-shadow: 0 0 0 1px rgba(255,75,114,.18), 0 16px 35px rgba(255,75,114,.1); }
+        .item-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; min-height:24px; }
+        .item-tag { border:1px solid rgba(255,255,255,.16); border-radius:999px; padding:4px 8px; font-size:.72rem; font-weight:800; background:rgba(255,255,255,.08); color:#fff; }
+        .item-tag.owned { border-color:rgba(30,215,96,.42); background:rgba(30,215,96,.14); color:#8ff0b3; }
+        .item-tag.new { border-color:rgba(255,209,102,.42); background:rgba(255,209,102,.14); color:#ffe39a; }
+        .item-tag.showcase { border-color:rgba(255,75,114,.5); background:rgba(255,75,114,.18); color:#ffc2d0; }
         .item-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .item-icon { font-size: 1.6rem; }
         .item-title { font-size: 1.05rem; font-weight: 700; }
@@ -27,19 +39,31 @@
         .buy-btn { margin-top: 12px; width: 100%; border: none; border-radius: 12px; padding: 10px 12px; font-weight: 700; cursor: pointer; background: linear-gradient(45deg, #ff4b72, #ff8c00); color: #fff; }
         .buy-btn:disabled { opacity: .5; cursor: not-allowed; }
         .status { max-width: 980px; margin: 12px auto 0; text-align: center; font-weight: 600; min-height: 24px; }
+        .market-tools { max-width: 980px; margin: 0 auto 18px; display: grid; grid-template-columns: 1fr auto auto; gap: 10px; }
+        .market-tools input, .market-tools select { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.18); border-radius: 12px; color: #fff; padding: 11px 12px; font: inherit; }
+        .history-panel { max-width: 980px; margin: 26px auto 0; background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.12); border-radius: 16px; padding: 14px; }
+        .history-title { font-weight: 800; margin-bottom: 10px; color: var(--primary); }
+        .history-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 9px 0; border-top: 1px solid rgba(255,255,255,.08); font-size: .92rem; }
+        .history-row:first-of-type { border-top: 0; }
+        .history-meta { opacity: .68; font-size: .8rem; margin-top: 3px; }
+        .showcase-btn { margin-top: 8px; width: 100%; border: 1px solid rgba(255,255,255,.16); border-radius: 10px; padding: 8px; background: rgba(255,255,255,.1); color: #fff; cursor: pointer; font-weight: 700; }
+        .showcase-btn.active { border-color: rgba(255,75,114,.5); background: rgba(255,75,114,.18); }
+        .showcase-btn:disabled { opacity:.65; cursor:default; }
         .photo-market { max-width: 980px; margin: 30px auto 0; width: 100%; }
         .photo-form { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 16px; padding: 14px; display: grid; grid-template-columns: 1.1fr 1fr 1fr auto; gap: 10px; align-items: center; }
         .photo-form input { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.22); border-radius: 10px; color: #fff; padding: 10px; }
         .photo-grid { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
         .photo-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; overflow: hidden; }
+        .photo-card.active-showcase { border-color: rgba(255,75,114,.58); box-shadow: 0 0 0 1px rgba(255,75,114,.25), 0 16px 35px rgba(255,75,114,.12); }
         .photo-card img { width: 100%; height: 160px; object-fit: cover; display: block; }
         .photo-meta { padding: 10px; font-size: .88rem; }
         .photo-actions { display: flex; gap: 8px; margin-top: 8px; }
         .action-btn { flex: 1; border: none; border-radius: 10px; padding: 8px; cursor: pointer; font-weight: 700; }
         .buy-photo-btn { background: linear-gradient(45deg, #ff4b72, #ff8c00); color: #fff; }
         .dl-btn { background: rgba(255,255,255,.12); color: #fff; text-decoration: none; text-align: center; display: inline-block; }
-        @media (max-width: 900px) { .photo-form { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) { .photo-form, .market-tools { grid-template-columns: 1fr; } }
     </style>
+    <script src="app-bootstrap.js?v=1" defer></script>
 </head>
 <body>
     <div id="background-canvas"></div>
@@ -58,8 +82,31 @@
         <button class="tab-btn" data-tab="consumable">Tüketilebilir</button>
         <button class="tab-btn" data-tab="coupon" style="color: #ff8c00; border-color: rgba(255,140,0,0.5);">Kuponlar 🎟️</button>
     </div>
+    <div class="market-tools">
+        <input id="market-search" type="search" placeholder="Markette ara...">
+        <select id="market-sort">
+            <option value="default">Varsayılan sıra</option>
+            <option value="price_asc">Fiyat artan</option>
+            <option value="price_desc">Fiyat azalan</option>
+            <option value="owned_first">Sahip olduklarım önce</option>
+            <option value="not_owned_first">Alınmayanlar önce</option>
+        </select>
+        <select id="market-owned">
+            <option value="all">Tüm sahiplik</option>
+            <option value="owned">Sahip olduklarım</option>
+            <option value="missing">Almadıklarım</option>
+        </select>
+    </div>
     <div id="items-grid" class="grid"></div>
     <div id="status-msg" class="status"></div>
+    <div class="history-panel">
+        <div class="history-title">Harcama Geçmişi</div>
+        <div id="spending-history"><div class="history-meta">Yükleniyor...</div></div>
+    </div>
+    <div class="history-panel">
+        <div class="history-title">Ortak Tema Kilitleri</div>
+        <div id="shared-theme-locks"><div class="history-meta">İkiniz de aynı temayı alınca burada açılır.</div></div>
+    </div>
     <div class="photo-market">
         <h2 style="font-family:'Playfair Display',serif; margin: 10px 0 12px; color: var(--primary);">Fotoğraf Pazarı</h2>
         <div class="tabs" style="margin-bottom:12px;">
@@ -104,12 +151,25 @@
 
         const DEFAULT_ITEMS = [
             { id: "cos_badge_star", title: "Yıldız Rozet", icon: "⭐", type: "cosmetic", price: 1250, effectKey: "badge_star", description: "Profilde yıldız rozeti." },
+            { id: "cos_badge_crown", title: "Kalp Tacı", icon: "👑", type: "cosmetic", price: 2400, effectKey: "badge_crown", slot: "profileBadge", description: "Profilinde kraliyet havası veren özel taç rozeti." },
+            { id: "cos_badge_flame", title: "Alevli Kalp Rozeti", icon: "🔥", type: "cosmetic", price: 2100, effectKey: "badge_flame", slot: "profileBadge", description: "Profilinde daha iddialı, parlak bir rozet gösterir." },
             { id: "cos_theme_rose", title: "Gül Teması", icon: "🌹", type: "cosmetic", price: 1850, effectKey: "theme_rose", description: "Oyun arka planına gül tonları." },
+            { id: "cos_theme_gold", title: "Altın Gece Teması", icon: "🌙", type: "cosmetic", price: 2600, effectKey: "theme_gold", slot: "gameTheme", description: "Oyun menüsünü daha sıcak altın gece tonlarına taşır." },
+            { id: "cos_theme_blue", title: "Ay Işığı Teması", icon: "💎", type: "cosmetic", price: 2600, effectKey: "theme_blue", slot: "gameTheme", description: "Oyun menüsüne serin, parlak ay ışığı havası verir." },
             { id: "con_memory_retry", title: "Hafıza İkinci Şans", icon: "🃏", type: "consumable", price: 175, effectKey: "memory_retry", description: "Aşk Hafızası'nda 1 kez +10sn." },
             { id: "con_mine_shield", title: "Kalp Kalkanı", icon: "🛡️", type: "consumable", price: 750, effectKey: "mine_shield", description: "Kalp Avcısı'nda ilk bombayı bloklar." },
             { id: "con_dice_insurance", title: "Zar Sigortası", icon: "🎲", type: "consumable", price: 150, effectKey: "dice_insurance", description: "Şans Zarı'nda kötü sonuçta min 100❤️." },
             { id: "con_jackpot_boost", title: "Jackpot Boost", icon: "🎰", type: "consumable", price: 425, effectKey: "jackpot_boost", description: "Tek turda jackpot şansını artırır." },
             { id: "con_scratch_extra", title: "Ekstra Kazıma", icon: "🎟️", type: "consumable", price: 50, effectKey: "scratch_extra", description: "Kazı-Kazan'da kaybedersen 1 ek şans." },
+            { id: "con_quiz_hint", title: "Quiz İpucu", icon: "💡", type: "consumable", price: 120, effectKey: "quiz_hint", description: "Bizi Bil Bakalım'da bir yanlış şıkkı kaldırır." },
+            { id: "con_quiz_skip", title: "Soru Değiştirici", icon: "🔁", type: "consumable", price: 220, effectKey: "quiz_skip", description: "Bizi Bil Bakalım'da zor gelen soruyu yanlış sayılmadan geçer." },
+            { id: "con_quiz_double", title: "Çifte Puan Kalbi", icon: "💘", type: "consumable", price: 360, effectKey: "quiz_double", description: "Bizi Bil Bakalım'da sıradaki doğru cevabı 2 doğru sayar." },
+            { id: "con_word_hint", title: "Harf Fısıltısı", icon: "🔤", type: "consumable", price: 90, effectKey: "word_hint", description: "Aşk Kelimeleri'nde doğru kelimenin ilk harfini gösterir." },
+            { id: "con_word_second", title: "İkinci Harf", icon: "✌️", type: "consumable", price: 150, effectKey: "word_second", description: "Aşk Kelimeleri'nde ikinci harfi de açar." },
+            { id: "con_word_reveal", title: "Kelime Kurtarıcı", icon: "🧩", type: "consumable", price: 420, effectKey: "word_reveal", description: "Aşk Kelimeleri'nde bir kelimeyi otomatik doğru çözer." },
+            { id: "con_reward_boost", title: "Ödül Parlatıcı", icon: "✨", type: "consumable", price: 520, effectKey: "reward_boost", description: "Bizi Bil Bakalım veya Aşk Kelimeleri ödülünü bir tur %50 artırır." },
+            { id: "con_entry_ticket", title: "Bedava Giriş Bileti", icon: "🎫", type: "consumable", price: 300, effectKey: "entry_ticket", description: "Bizi Bil Bakalım veya Aşk Kelimeleri giriş ücretini bir kez ödemez." },
+            { id: "con_rhythm_slow", title: "Sakin Kalp", icon: "💓", type: "consumable", price: 140, effectKey: "rhythm_slow", description: "Kalp Ritmi'nde bir tur kalbi daha yavaşlatır." },
             { id: "coupon_hug", title: "Sınırsız Sarılma", icon: "🫂", type: "coupon", price: 1000, effectKey: "coupon_hug", description: "Anında ve koşulsuz sımsıcak sarılma hakkı." },
             { id: "coupon_snack", title: "Atıştırmalık Kölesi", icon: "🍿", type: "coupon", price: 2500, effectKey: "coupon_snack", description: "Dizi/Film izlerken abur cubur veya su getirme hizmeti." },
             { id: "coupon_choice", title: "Seçim Hakkı", icon: "🎮", type: "coupon", price: 1200, effectKey: "coupon_choice", description: "O gün izlenecek filmi veya oynanacak oyunu sen belirlersin." },
@@ -127,9 +187,11 @@
 
         const currentUser = localStorage.getItem('active_player');
         if (!currentUser) window.location.href = 'index.html';
+        const partnerName = currentUser === 'Ayşe' ? 'Mert' : 'Ayşe';
 
         const economyRef = doc(db, 'economy', 'balances');
         const inventoryRef = doc(db, 'user_inventory', currentUser);
+        const partnerInventoryRef = doc(db, 'user_inventory', partnerName);
         const itemsRef = collection(db, 'shop_items');
         const photoItemsRef = collection(db, 'photo_market_items');
         const activityRef = collection(db, 'activity_logs');
@@ -141,7 +203,14 @@
         let inventory = { cosmetics: {}, consumables: {}, activeCosmetics: {}, purchasedPhotos: {} };
         let shopItems = [];
         let photoItems = [];
+        let spendingHistory = [];
+        let marketSearch = '';
+        let marketSort = 'default';
+        let ownedFilter = 'all';
+        let partnerInventory = {};
+        let sharedThemeLocks = [];
         let selectedPhotoTab = 'all';
+        let repairingPurchasedPhotos = false;
 
         document.getElementById('user-name').textContent = currentUser;
         document.querySelectorAll('[data-tab]').forEach(btn => {
@@ -161,6 +230,9 @@
                 renderPhotos();
             });
         });
+        document.getElementById('market-search').addEventListener('input', (e) => { marketSearch = e.target.value.trim().toLowerCase(); renderItems(); });
+        document.getElementById('market-sort').addEventListener('change', (e) => { marketSort = e.target.value; renderItems(); });
+        document.getElementById('market-owned').addEventListener('change', (e) => { ownedFilter = e.target.value; renderItems(); });
 
         async function ensureInventoryDoc() {
             const snap = await getDoc(inventoryRef);
@@ -207,24 +279,71 @@
             return inventory.consumables?.[item.effectKey] || 0;
         }
 
+        function ownsItem(item) {
+            return item.type === 'cosmetic' ? !!inventory.cosmetics?.[item.effectKey] : (getStock(item) > 0);
+        }
+
+        function getCosmeticSlot(item) {
+            if (item.slot) return item.slot;
+            if (item.effectKey?.indexOf('theme_') === 0) return 'gameTheme';
+            if (item.effectKey?.indexOf('badge_') === 0) return 'profileBadge';
+            return 'misc';
+        }
+
+        function isNewMarketItem(item) {
+            return ['cos_badge_crown', 'cos_badge_flame', 'cos_theme_gold', 'cos_theme_blue', 'con_quiz_skip', 'con_quiz_double', 'con_word_reveal', 'coupon_treat', 'coupon_right'].includes(item.id);
+        }
+
+        async function checkSharedThemeLocks() {
+            const mine = inventory.cosmetics || {};
+            const theirs = partnerInventory.cosmetics || {};
+            const sharedThemes = ['theme_rose', 'theme_gold', 'theme_blue'].filter(key => mine[key] && theirs[key]);
+            for (const theme of sharedThemes) {
+                await setDoc(doc(db, 'shared_theme_locks', theme), {
+                    theme,
+                    unlockedBy: { [currentUser]: true, [partnerName]: true },
+                    unlockedAt: serverTimestamp()
+                }, { merge: true });
+            }
+        }
+
         function renderItems() {
-            const list = shopItems.filter(item => selectedTab === 'all' ? true : item.type === selectedTab);
+            let list = shopItems
+                .filter(item => selectedTab === 'all' ? true : item.type === selectedTab)
+                .filter(item => !marketSearch || `${item.title || ''} ${item.description || ''} ${item.type || ''}`.toLowerCase().includes(marketSearch))
+                .filter(item => ownedFilter === 'all' ? true : (ownedFilter === 'owned' ? ownsItem(item) : !ownsItem(item)));
+            if (marketSort === 'price_asc') list = [...list].sort((a,b) => (a.price || 0) - (b.price || 0));
+            if (marketSort === 'price_desc') list = [...list].sort((a,b) => (b.price || 0) - (a.price || 0));
+            if (marketSort === 'owned_first') list = [...list].sort((a,b) => Number(ownsItem(b)) - Number(ownsItem(a)));
+            if (marketSort === 'not_owned_first') list = [...list].sort((a,b) => Number(ownsItem(a)) - Number(ownsItem(b)));
             gridEl.innerHTML = '';
+            if (!list.length) {
+                gridEl.innerHTML = '<div class="item-card">Aramana uygun ürün bulunamadı.</div>';
+                return;
+            }
             list.forEach(item => {
                 const stock = getStock(item);
                 const isOwnedCosmetic = item.type === 'cosmetic' && stock > 0;
+                const isActiveCosmetic = item.type === 'cosmetic' && inventory.activeCosmetics?.[getCosmeticSlot(item)] === item.effectKey;
+                const isOwned = ownsItem(item);
+                const tags = [
+                    isNewMarketItem(item) ? '<span class="item-tag new">Yeni</span>' : '',
+                    isOwned ? '<span class="item-tag owned">Sende var</span>' : '',
+                    isActiveCosmetic ? '<span class="item-tag showcase">Vitrinde</span>' : ''
+                ].join('');
                 const card = document.createElement('div');
-                card.className = 'item-card';
+                card.className = `item-card ${isActiveCosmetic ? 'active-showcase' : ''}`;
                 card.innerHTML = `
+                    <div class="item-tags">${tags}</div>
                     <div class="item-top"><div class="item-icon">${item.icon || '🛍️'}</div><div class="item-title">${item.title}</div></div>
                     <div class="item-desc">${item.description || ''}</div>
                     <div class="item-meta">
                         <span>Fiyat: ${item.price} ❤️</span>
-                        <span>${item.type === 'cosmetic' ? (isOwnedCosmetic ? 'Sahipsin' : 'Kozmetik') : `Stok: ${stock}`}</span>
+                        <span>${item.type === 'cosmetic' ? (isActiveCosmetic ? 'Aktif' : (isOwnedCosmetic ? 'Sahipsin' : 'Kozmetik')) : `Stok: ${stock}`}</span>
                     </div>
-                    <button class="buy-btn" ${isOwnedCosmetic ? 'disabled' : ''} data-id="${item.id}">${isOwnedCosmetic ? 'Alındı' : 'Satın Al'}</button>
+                    <button class="buy-btn" ${isActiveCosmetic ? 'disabled' : ''} data-id="${item.id}">${item.type === 'cosmetic' && isOwnedCosmetic ? (isActiveCosmetic ? 'Aktif' : 'Kullan') : 'Satın Al'}</button>
                 `;
-                card.querySelector('.buy-btn').addEventListener('click', () => purchaseItem(item.id));
+                card.querySelector('.buy-btn').addEventListener('click', () => isOwnedCosmetic ? activateCosmetic(item.id) : purchaseItem(item.id));
                 gridEl.appendChild(card);
             });
         }
@@ -234,23 +353,82 @@
             return !!inventory.purchasedPhotos?.[item.id];
         }
 
+        function getPurchasedPhotoRecord(photoId) {
+            const record = inventory.purchasedPhotos?.[photoId];
+            if (!record || record === true) return null;
+            return {
+                id: record.id || photoId,
+                seller: record.seller || '',
+                photoUrl: record.photoUrl || record.url,
+                title: record.title || 'Market Fotoğrafı',
+                price: record.price || 0,
+                active: true,
+                fromInventory: true
+            };
+        }
+
+        function getPhotoShowcasePayload(item) {
+            const record = getPurchasedPhotoRecord(item.id);
+            return {
+                id: item.id,
+                url: item.photoUrl || record?.photoUrl,
+                title: item.title || record?.title || 'Favori Fotoğraf',
+                seller: item.seller || record?.seller || ''
+            };
+        }
+
+        async function repairPurchasedPhotoRecords() {
+            if (repairingPurchasedPhotos || !photoItems.length) return;
+            const updates = {};
+            for (const [photoId, record] of Object.entries(inventory.purchasedPhotos || {})) {
+                if (record !== true) continue;
+                const item = photoItems.find(photo => photo.id === photoId);
+                if (!item?.photoUrl) continue;
+                updates[photoId] = {
+                    id: photoId,
+                    url: item.photoUrl,
+                    photoUrl: item.photoUrl,
+                    title: item.title || 'Market Fotoğrafı',
+                    seller: item.seller || '',
+                    price: item.price || 0
+                };
+            }
+            if (!Object.keys(updates).length) return;
+            repairingPurchasedPhotos = true;
+            try {
+                await setDoc(inventoryRef, { purchasedPhotos: updates, updatedAt: serverTimestamp() }, { merge: true });
+            } finally {
+                repairingPurchasedPhotos = false;
+            }
+        }
+
         function renderPhotos() {
             const grid = document.getElementById('photo-grid');
             grid.innerHTML = '';
-            const filtered = photoItems.filter(item => {
+            const purchasedOnly = Object.entries(inventory.purchasedPhotos || {})
+                .map(([id]) => getPurchasedPhotoRecord(id))
+                .filter(Boolean)
+                .filter(record => !photoItems.some(item => item.id === record.id));
+            const allPhotos = [...photoItems, ...purchasedOnly];
+            const filtered = allPhotos.filter(item => {
                 if (selectedPhotoTab === 'mine') return item.seller === currentUser;
                 if (selectedPhotoTab === 'purchased') return !!inventory.purchasedPhotos?.[item.id];
                 return true;
             });
+            if (!filtered.length) {
+                grid.innerHTML = '<div class="photo-card"><div class="photo-meta">Bu sekmede fotoğraf yok.</div></div>';
+                return;
+            }
             filtered.forEach(item => {
                 const card = document.createElement('div');
                 const downloadable = canDownloadPhoto(item);
                 const isOwn = item.seller === currentUser;
                 const isRevealed = downloadable || isOwn;
-                card.className = 'photo-card';
+                const isShowcase = inventory.activeCosmetics?.favoritePhoto?.id === item.id;
+                card.className = `photo-card ${isShowcase ? 'active-showcase' : ''}`;
                 card.innerHTML = `
                     ${isRevealed 
-                        ? `<img src="${item.photoUrl}" alt="market-photo">`
+                        ? `<img src="${item.photoUrl}" alt="${item.title || 'Market fotoğrafı'}">`
                         : `<div style="width:100%; height:160px; background:linear-gradient(45deg, #1a0520, #0a0208); display:flex; align-items:center; justify-content:center; font-size:3rem; border-bottom:1px solid rgba(255,255,255,0.1);">🔒</div>`
                     }
                     <div class="photo-meta">
@@ -263,6 +441,7 @@
                             ${isOwn ? `<button class="action-btn dl-btn" data-remove="${item.id}">Kaldır</button>` : ''}
                             ${downloadable ? `<a class="action-btn dl-btn" href="${item.photoUrl}" download="ask-market-${item.id}.jpg" target="_blank" rel="noopener">İndir</a>` : ''}
                         </div>
+                        ${downloadable ? `<button class="showcase-btn ${isShowcase ? 'active' : ''}" ${isShowcase ? 'disabled' : ''} data-showcase="${item.id}">${isShowcase ? 'Vitrinde' : 'Vitrine Koy'}</button>` : ''}
                     </div>
                 `;
                 const buyBtn = card.querySelector('[data-buy]');
@@ -271,8 +450,35 @@
                 if (editBtn) editBtn.addEventListener('click', () => editPhotoListing(item.id));
                 const removeBtn = card.querySelector('[data-remove]');
                 if (removeBtn) removeBtn.addEventListener('click', () => removePhotoListing(item.id));
+                const showcaseBtn = card.querySelector('[data-showcase]');
+                if (showcaseBtn) showcaseBtn.addEventListener('click', () => setFavoritePhoto(item.id));
                 grid.appendChild(card);
             });
+        }
+
+        function renderSpendingHistory() {
+            const box = document.getElementById('spending-history');
+            const rows = spendingHistory.filter(x => x.user === currentUser).slice(0, 20);
+            if (!rows.length) {
+                box.innerHTML = '<div class="history-meta">Henüz harcama yok.</div>';
+                return;
+            }
+            box.innerHTML = rows.map(tx => {
+                const item = shopItems.find(i => i.id === tx.itemId);
+                const title = item?.title || tx.itemId || tx.photoId || 'Market işlemi';
+                const when = tx.createdAt?.toDate?.() ? tx.createdAt.toDate().toLocaleString('tr-TR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
+                return `<div class="history-row"><div><strong>${title}</strong><div class="history-meta">${tx.type || 'purchase'} ${when ? '· ' + when : ''}</div></div><div>${tx.price || 0} ❤️</div></div>`;
+            }).join('');
+        }
+
+        function renderSharedThemeLocks() {
+            const box = document.getElementById('shared-theme-locks');
+            const names = { theme_rose: 'Gül Teması', theme_gold: 'Altın Gece Teması', theme_blue: 'Ay Işığı Teması' };
+            if (!sharedThemeLocks.length) {
+                box.innerHTML = '<div class="history-meta">Henüz ortak tema açılmadı.</div>';
+                return;
+            }
+            box.innerHTML = sharedThemeLocks.map(lock => `<div class="history-row"><div><strong>${names[lock.theme] || lock.theme}</strong><div class="history-meta">İkinizde de var, ortak kilit açıldı.</div></div><div>🔓</div></div>`).join('');
         }
 
         async function logActivity(type, title, meta) {
@@ -309,8 +515,9 @@
                     if (item.type === 'cosmetic') {
                         if (nextInv.cosmetics[item.effectKey]) throw new Error('Zaten sahip');
                         nextInv.cosmetics[item.effectKey] = true;
-                        if (!nextInv.activeCosmetics.gameTheme && item.effectKey.indexOf('theme_') === 0) {
-                            nextInv.activeCosmetics.gameTheme = item.effectKey;
+                        const slot = item.slot || (item.effectKey.indexOf('theme_') === 0 ? 'gameTheme' : (item.effectKey.indexOf('badge_') === 0 ? 'profileBadge' : 'misc'));
+                        if (!nextInv.activeCosmetics[slot]) {
+                            nextInv.activeCosmetics[slot] = item.effectKey;
                         }
                     } else {
                         const cur = nextInv.consumables[item.effectKey] || 0;
@@ -333,6 +540,39 @@
             } catch (e) {
                 statusEl.textContent = e?.message || 'Satın alma başarısız.';
             }
+        }
+
+        async function activateCosmetic(itemId) {
+            const item = shopItems.find(x => x.id === itemId);
+            if (!item || item.type !== 'cosmetic') return;
+            const slot = getCosmeticSlot(item);
+            statusEl.textContent = 'Kozmetik uygulanıyor...';
+            try {
+                await setDoc(inventoryRef, {
+                    activeCosmetics: { ...(inventory.activeCosmetics || {}), [slot]: item.effectKey },
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+                await logActivity('cosmetic_activated', 'Kozmetik uygulandı', { itemId, slot });
+                statusEl.textContent = 'Kozmetik aktif edildi.';
+            } catch (e) {
+                statusEl.textContent = 'Kozmetik uygulanamadı.';
+            }
+        }
+
+        async function setFavoritePhoto(photoId) {
+            const item = photoItems.find(p => p.id === photoId);
+            const record = getPurchasedPhotoRecord(photoId);
+            const photo = item || record;
+            if (!photo || !canDownloadPhoto(photo)) return;
+            const payload = getPhotoShowcasePayload(photo);
+            await setDoc(inventoryRef, {
+                activeCosmetics: {
+                    ...(inventory.activeCosmetics || {}),
+                    favoritePhoto: payload
+                },
+                updatedAt: serverTimestamp()
+            }, { merge: true });
+            statusEl.textContent = 'Fotoğraf profil vitrinine eklendi.';
         }
 
         async function uploadPhotoAndGetUrl(file) {
@@ -422,13 +662,29 @@
                     const sellerBalance = eco[photo.seller] || 0;
                     const buyerInv = buyerInvSnap.exists() ? buyerInvSnap.data() : { purchasedPhotos: {} };
                     const bought = { ...(buyerInv.purchasedPhotos || {}) };
-                    bought[photoId] = true;
+                    bought[photoId] = {
+                        id: photoId,
+                        url: photo.photoUrl,
+                        photoUrl: photo.photoUrl,
+                        title: photo.title || 'Market Fotoğrafı',
+                        seller: photo.seller,
+                        price: photo.price
+                    };
+                    const nextActiveCosmetics = { ...(buyerInv.activeCosmetics || {}) };
+                    if (!nextActiveCosmetics.favoritePhoto) {
+                        nextActiveCosmetics.favoritePhoto = {
+                            id: photoId,
+                            url: photo.photoUrl,
+                            title: photo.title || 'Market Fotoğrafı',
+                            seller: photo.seller
+                        };
+                    }
 
                     tx.update(economyRef, {
                         [currentUser]: buyerBalance - photo.price,
                         [photo.seller]: sellerBalance + photo.price
                     });
-                    tx.set(inventoryRef, { purchasedPhotos: bought, updatedAt: serverTimestamp() }, { merge: true });
+                    tx.set(inventoryRef, { purchasedPhotos: bought, activeCosmetics: nextActiveCosmetics, updatedAt: serverTimestamp() }, { merge: true });
                     tx.set(doc(collection(db, 'shop_transactions')), {
                         user: currentUser,
                         seller: photo.seller,
@@ -439,7 +695,7 @@
                     });
                 });
                 await logActivity('photo_purchased', 'Fotoğraf satın alındı', { photoId });
-                statusEl.textContent = 'Fotoğraf satın alındı. Artık indirebilirsin.';
+                statusEl.textContent = 'Fotoğraf satın alındı. İlk favori fotoğrafınsa vitrine de eklendi.';
             } catch (e) {
                 statusEl.textContent = e?.message || 'Satın alma başarısız.';
             }
@@ -457,11 +713,28 @@
             inventory = snap.data();
             renderItems();
             renderPhotos();
+            renderSpendingHistory();
+            checkSharedThemeLocks();
+            repairPurchasedPhotoRecords();
+        });
+        onSnapshot(partnerInventoryRef, (snap) => {
+            partnerInventory = snap.exists() ? snap.data() : {};
+            checkSharedThemeLocks();
         });
 
         onSnapshot(query(photoItemsRef, orderBy('createdAt', 'desc')), (snap) => {
             photoItems = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(x => x.active !== false);
             renderPhotos();
+            repairPurchasedPhotoRecords();
+        });
+
+        onSnapshot(query(collection(db, 'shop_transactions'), orderBy('createdAt', 'desc')), (snap) => {
+            spendingHistory = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderSpendingHistory();
+        });
+        onSnapshot(collection(db, 'shared_theme_locks'), (snap) => {
+            sharedThemeLocks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderSharedThemeLocks();
         });
 
         await ensureInventoryDoc();

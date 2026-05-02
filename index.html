@@ -3,8 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Sonsuz Aşkım Bebeğim</title>
     <!-- Müzik çalar ikonu için FontAwesome ve Romantik Fontlar için Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,7 +17,7 @@
     <!-- PWA Kurulum & App Ayarları -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0208">
-    <link rel="apple-touch-icon" href="icon.svg">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="OurStory">
@@ -34,8 +33,54 @@
             user-select: none;
             -webkit-user-select: none;
         }
+        .hub-notification-btn {
+            position:absolute;
+            top:8px;
+            right:-2px;
+            width:40px;
+            height:40px;
+            border:none;
+            border-radius:50%;
+            background:rgba(255,255,255,0.12);
+            color:#fff;
+            cursor:pointer;
+            font-size:1rem;
+            z-index:5;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            box-shadow:0 10px 24px rgba(0,0,0,.22);
+        }
+        .hub-notification-btn.has-unread::after {
+            content:'';
+            position:absolute;
+            top:7px;
+            right:8px;
+            width:9px;
+            height:9px;
+            border-radius:50%;
+            background:#ff4b72;
+            box-shadow:0 0 12px rgba(255,75,114,.8);
+        }
+        .hub-countdown-band {
+            margin:0 58px 16px 0;
+            border:1px solid rgba(255,255,255,.14);
+            border-radius:18px;
+            padding:12px 14px;
+            background:linear-gradient(135deg, rgba(255,75,114,.16), rgba(255,140,0,.08));
+            display:none;
+            align-items:center;
+            gap:12px;
+            text-align:left;
+            cursor:pointer;
+        }
+        .hub-countdown-band.active { display:flex; }
+        .hub-countdown-icon { font-size:1.7rem; }
+        .hub-countdown-title { font-weight:800; }
+        .hub-countdown-meta { opacity:.76; font-size:.86rem; margin-top:2px; }
     </style>
     <link rel="stylesheet" href="style.css?v=4">
+    <script src="app-bootstrap.js?v=1" defer></script>
 </head>
 
 <body>
@@ -65,24 +110,20 @@
     <div id="password-screen" style="display: none;">
         <div class="password-container" id="password-step">
             <div class="lock-icon">🔒</div>
-            <h2>Sadece O İsen Girebilirsin...</h2>
+            <h2>Hesabına Giriş Yap</h2>
 
-            <p>Sevgili olduğumuz o büyülü tarihi gir bebeğim (GG.AA.YYYY):</p>
-            <input type="text" id="love-password" placeholder="Örn: 01.01.2025" autocomplete="off">
-            <button onclick="checkPassword()" class="btn-unlock">Kilidi Aç ✨</button>
+            <p>Kim olduğunu seç, sonra şifreni gir bebeğim.</p>
+            <div class="account-selector" role="group" aria-label="Kullanıcı seçimi">
+                <button type="button" class="account-choice" data-account="Ayşe"
+                    onclick="selectLoginAccount('Ayşe')">Ayşe</button>
+                <button type="button" class="account-choice" data-account="Mert"
+                    onclick="selectLoginAccount('Mert')">Mert</button>
+            </div>
+            <input type="password" id="love-password" placeholder="Şifre" autocomplete="current-password">
+            <button onclick="loginAccount()" class="btn-unlock">Giriş Yap ✨</button>
             <div id="password-error"
                 style="color: #ff4b72; margin-top: 15px; font-weight: bold; opacity: 0; transition: 0.3s;">Şifre yanlış
                 meleğim, lütfen tekrar dene 🥺</div>
-        </div>
-
-        <div class="password-container" id="name-selection-step" style="display: none;">
-            <div class="lock-icon">💖</div>
-            <h2>Şifre Doğru Meleğim!</h2>
-            <p style="margin-bottom: 25px;">Oyuna başlamadan önce lütfen kim olduğunu seç:</p>
-            <div style="display: flex; justify-content: center; gap: 15px;">
-                <button onclick="selectUserName('Ayşe')" class="btn-unlock" style="flex: 1;">Ben Ayşe ✨</button>
-                <button onclick="selectUserName('Mert')" class="btn-unlock" style="flex: 1;">Ben Mert 😎</button>
-            </div>
         </div>
     </div>
 
@@ -176,14 +217,24 @@
     <!-- Sistem Yenileme Butonu (Sağ Üst) -->
     <div class="system-refresh-btn" onclick="location.reload()" title="Sistemi Yenile">🔄</div>
 
+    <button class="account-status-btn" id="account-status-btn" onclick="switchAccount()" title="Hesap Değiştir">
+        <span id="active-account-label">Hesap</span>
+    </button>
+
     <!-- Sihirli Menü Butonu (Kalp) -->
     <div class="magic-menu-btn" id="magic-heart" onclick="toggleHub()">💖</div>
 
     <!-- Özellikler Paneli (Hub Overlay) -->
     <div class="feature-hub-overlay" id="feature-hub">
         <div class="hub-container" style="position: relative;">
-            <button onclick="window.location.href='notification-center.html'" title="Bildirim Merkezi"
-                style="position:absolute; top:12px; right:12px; width:38px; height:38px; border:none; border-radius:50%; background:rgba(255,255,255,0.12); color:#fff; cursor:pointer; font-size:1rem; z-index:5;">🔔</button>
+            <button class="hub-notification-btn" id="hub-notification-btn" onclick="window.location.href='notification-center.html'" title="Bildirim Merkezi" aria-label="Bildirim Merkezi">🔔</button>
+            <div class="hub-countdown-band" id="hub-countdown-band" onclick="window.location.href='special-days.html'">
+                <div class="hub-countdown-icon" id="hub-countdown-icon">📅</div>
+                <div>
+                    <div class="hub-countdown-title" id="hub-countdown-title">Yaklaşan özel gün</div>
+                    <div class="hub-countdown-meta" id="hub-countdown-meta">Takvim hazırlanıyor...</div>
+                </div>
+            </div>
             <!-- Mood Tracker Section -->
             <div class="mood-section">
                 <div class="mood-title">Şu an nasılsın sevgilim? ✨</div>
@@ -251,6 +302,10 @@
                     <div class="hub-icon">✨</div>
                     <div class="hub-name">Aşk Profili</div>
                 </div>
+                <div class="hub-card" onclick="window.location.href='album.html'">
+                    <div class="hub-icon">📖</div>
+                    <div class="hub-name">Albümümüz</div>
+                </div>
                 <div class="hub-card" onclick="window.location.href='coupons.html'">
                     <div class="hub-icon">🎟️</div>
                     <div class="hub-name">Kuponlarım</div>
@@ -303,21 +358,96 @@
             }
         }
 
-        function checkPassword() {
-            var val = document.getElementById('love-password').value.trim();
-            if (['25.02.2026', '25022026', '25/02/2026', '25.02.26'].indexOf(val) !== -1) {
-                document.getElementById('password-step').style.display = 'none';
-                document.getElementById('name-selection-step').style.display = 'block';
-            } else {
-                var err = document.getElementById('password-error');
-                if (err) { err.style.opacity = '1'; setTimeout(function () { err.style.opacity = '0'; }, 3000); }
+        var selectedLoginAccount = localStorage.getItem('active_player') || '';
+        var accountPasswords = {
+            'Ayşe': ['25.02.2026', '25022026', '25/02/2026', '25.02.26'],
+            'Mert': ['25.02.2026', '25022026', '25/02/2026', '25.02.26']
+        };
+
+        function showLoginError(message) {
+            var err = document.getElementById('password-error');
+            if (err) {
+                err.textContent = message;
+                err.style.opacity = '1';
+                setTimeout(function () { err.style.opacity = '0'; }, 3000);
             }
         }
 
-        function selectUserName(name) {
+        function updateAccountButtons() {
+            document.querySelectorAll('.account-choice').forEach(function (btn) {
+                btn.classList.toggle('active', btn.dataset.account === selectedLoginAccount);
+            });
+        }
+
+        function selectLoginAccount(name) {
+            selectedLoginAccount = name;
+            updateAccountButtons();
+        }
+
+        function refreshActiveAccountLabel() {
+            var current = localStorage.getItem('active_player');
+            var btn = document.getElementById('account-status-btn');
+            var label = document.getElementById('active-account-label');
+            if (!btn || !label) return;
+            if (current) {
+                label.textContent = current + ' hesabı';
+                btn.style.display = 'flex';
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+
+        function openAccountLogin() {
+            var intro = document.getElementById('intro-screen');
+            var pass = document.getElementById('password-screen');
+            var main = document.getElementById('main-content');
+            if (intro) intro.style.display = 'none';
+            if (main) {
+                main.classList.remove('visible');
+                main.style.opacity = '0';
+                main.style.display = 'none';
+            }
+            if (pass) {
+                pass.style.display = 'flex';
+                pass.style.opacity = '1';
+            }
+            updateAccountButtons();
+            refreshActiveAccountLabel();
+        }
+
+        function switchAccount() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('active_player');
+            sessionStorage.removeItem('isLoggedIn');
+            if (window.OneSignalDeferred) {
+                window.OneSignalDeferred.push(async function (OneSignal) {
+                    if (OneSignal.logout) await OneSignal.logout();
+                });
+            }
+            openAccountLogin();
+        }
+
+        function getSafeNextPage() {
+            var next = new URLSearchParams(window.location.search).get('next');
+            if (!next || next.indexOf('://') !== -1 || next.indexOf('//') === 0) return '';
+            if (!/^[\\w./?=&%#-]+$/.test(next)) return '';
+            return next;
+        }
+
+        function completeLogin(name) {
             localStorage.setItem('active_player', name);
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('remembered_account', name);
             sessionStorage.setItem('isLoggedIn', 'true');
-            if (window.syncOneSignalUserTag) window.syncOneSignalUserTag();
+            selectedLoginAccount = name;
+            updateAccountButtons();
+            if (window.syncOneSignalUserTag) window.syncOneSignalUserTag({ requestPermission: true });
+
+            var nextPage = getSafeNextPage();
+            if (nextPage) {
+                window.location.replace(nextPage);
+                return;
+            }
 
             var pass = document.getElementById('password-screen');
             if (pass) {
@@ -327,6 +457,29 @@
                     showMainDashboardSafe();
                 }, 800);
             }
+        }
+
+        function loginAccount() {
+            var val = document.getElementById('love-password').value.trim();
+            if (!selectedLoginAccount || !accountPasswords[selectedLoginAccount]) {
+                showLoginError('Önce Ayşe ya da Mert hesabını seçmelisin.');
+                return;
+            }
+            if (accountPasswords[selectedLoginAccount].indexOf(val) === -1) {
+                showLoginError('Şifre yanlış meleğim, lütfen tekrar dene 🥺');
+                return;
+            }
+            completeLogin(selectedLoginAccount);
+        }
+
+        function checkPassword() {
+            loginAccount();
+        }
+
+        function selectUserName(name) {
+            selectedLoginAccount = name;
+            updateAccountButtons();
+            completeLogin(name);
         }
 
         function showMainDashboardSafe() {
@@ -343,6 +496,7 @@
                 if (el) el.style.display = 'flex';
             });
             if (window.initEffects) window.initEffects();
+            refreshActiveAccountLabel();
         }
 
         window.initEffects = function () {
@@ -835,12 +989,27 @@
 
         // Tıklamayı beklemeden hemen açık olanlar
         document.addEventListener('DOMContentLoaded', function () {
-            if (sessionStorage.getItem('isLoggedIn') === 'true') {
+            selectedLoginAccount = localStorage.getItem('remembered_account') || localStorage.getItem('active_player') || selectedLoginAccount;
+            updateAccountButtons();
+            refreshActiveAccountLabel();
+
+            var passwordInput = document.getElementById('love-password');
+            if (passwordInput) {
+                passwordInput.addEventListener('keydown', function (event) {
+                    if (event.key === 'Enter') loginAccount();
+                });
+            }
+
+            // Kalıcı giriş kontrolü (localStorage)
+            var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true' && localStorage.getItem('active_player');
+            if (isLoggedIn) {
                 var intro = document.getElementById('intro-screen');
                 var pass = document.getElementById('password-screen');
                 if (intro) intro.style.display = 'none';
                 if (pass) pass.style.display = 'none';
                 showMainDashboardSafe();
+                // OneSignal tag senkronizasyonu (otomatik girişte de)
+                if (window.syncOneSignalUserTag) window.syncOneSignalUserTag();
 
                 // Başka sayfadan #hub ile dönüldüyse hub'ı aç
                 if (window.location.hash === '#hub') {
@@ -860,7 +1029,7 @@
     <!-- Firebase Mood Synchronization -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, setDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, addDoc, collection, serverTimestamp, increment, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -874,8 +1043,72 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const moodDocRef = doc(db, 'p_moods', 'current');
-        const currentUser = localStorage.getItem('active_player') || 'Bilinmeyen';
+        const moodHistoryRef = collection(db, 'mood_history');
+        const specialDaysRef = collection(db, 'special_days');
+        const activityLogsRef = collection(db, 'activity_logs');
+        const staticSpecialDays = [
+            { title: "Ayşe'nin Doğum Günü", icon: "🎂", month: 6, day: 8 },
+            { title: "Mert'in Doğum Günü", icon: "🎁", month: 10, day: 20 },
+            { title: "Aşkımızın Başlangıcı", icon: "🥂", month: 1, day: 25 },
+            { title: "İlk Tanıştığımız Gün", icon: "🦋", month: 4, day: 26 }
+        ];
 
+        function dayDiff(target) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            target.setHours(0,0,0,0);
+            return Math.ceil((target - today) / 86400000);
+        }
+
+        function nextAnnualDate(month, day) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            let next = new Date(today.getFullYear(), month, day);
+            if (next < today) next.setFullYear(today.getFullYear() + 1);
+            return next;
+        }
+
+        function getNextSpecialDay(customDays) {
+            const candidates = staticSpecialDays.map(item => {
+                const next = nextAnnualDate(item.month, item.day);
+                return { ...item, next, days: dayDiff(next) };
+            });
+            customDays.forEach(item => {
+                if (!item.date) return;
+                const d = new Date(item.date + 'T00:00:00');
+                let next = d;
+                if (item.mode === 'anniversary') next = nextAnnualDate(d.getMonth(), d.getDate());
+                const days = dayDiff(next);
+                if (days >= 0) candidates.push({ title: item.title || 'Özel gün', icon: item.icon || '💖', next, days });
+            });
+            return candidates.filter(x => x.days >= 0).sort((a,b) => a.days - b.days)[0];
+        }
+
+        function renderCountdownBand(day) {
+            const band = document.getElementById('hub-countdown-band');
+            if (!band || !day || day.days > 45) {
+                if (band) band.classList.remove('active');
+                return;
+            }
+            document.getElementById('hub-countdown-icon').textContent = day.icon || '📅';
+            document.getElementById('hub-countdown-title').textContent = day.days === 0 ? `${day.title} bugün!` : `${day.title} yaklaşıyor`;
+            document.getElementById('hub-countdown-meta').textContent = day.days === 0
+                ? 'Bugün takvimde özel bir yer parlıyor.'
+                : `${day.days} gün kaldı · ${day.next.toLocaleDateString('tr-TR', { day:'numeric', month:'long' })}`;
+            band.classList.add('active');
+        }
+
+        renderCountdownBand(getNextSpecialDay([]));
+        onSnapshot(query(specialDaysRef, orderBy('ts', 'asc')), (snap) => {
+            const customDays = snap.docs.map(d => d.data());
+            renderCountdownBand(getNextSpecialDay(customDays));
+        });
+
+        onSnapshot(query(activityLogsRef, orderBy('createdAt', 'desc'), limit(1)), (snap) => {
+            const bell = document.getElementById('hub-notification-btn');
+            if (snap.empty) return;
+            bell?.classList.add('has-unread');
+        });
         // Listen for mood changes in real-time
         onSnapshot(moodDocRef, (docSnap) => {
             if (docSnap.exists()) {
@@ -887,6 +1120,7 @@
 
         // Set global function for HTML onClick
         window.setMood = async (moodType, emoji) => {
+            const currentUser = localStorage.getItem('active_player') || 'Bilinmeyen';
             if (currentUser !== 'Ayşe' && currentUser !== 'Mert') {
                 alert('Lütfen önce şifre ekranından giriş yapın.');
                 return;
@@ -894,6 +1128,18 @@
             try {
                 await setDoc(moodDocRef, {
                     [currentUser]: emoji
+                }, { merge: true });
+
+                await addDoc(moodHistoryRef, {
+                    user: currentUser,
+                    moodType,
+                    emoji,
+                    date: new Date().toISOString().split('T')[0],
+                    timestamp: serverTimestamp()
+                });
+
+                await setDoc(doc(db, 'user_stats', currentUser), {
+                    moodCheckins: increment(1)
                 }, { merge: true });
 
                 // Kapalıyken bile giden Push Bildirim Tetikleyicisi
@@ -912,16 +1158,6 @@
 
     </script>
 
-    <!-- PWA Servis Kaydı -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('PWA başarıyla aktif edildi! Kapsam: ', reg.scope))
-                    .catch(err => console.error('PWA kayıt hatası: ', err));
-            });
-        }
-    </script>
 <script type="module" src="time-tracker.js"></script>
 <script type="module" src="presence.js"></script>
 </body>

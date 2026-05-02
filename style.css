@@ -151,6 +151,35 @@ html {
     border-color: var(--primary);
 }
 
+.account-status-btn {
+    position: fixed;
+    top: 25px;
+    right: 82px;
+    min-width: 92px;
+    height: 45px;
+    padding: 0 14px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    color: #fff;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+    z-index: 1001;
+    transition: 0.3s;
+}
+
+.account-status-btn:hover {
+    background: rgba(255, 75, 114, 0.18);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
 /* Aşk Kavanozu (Memory Jar) - Yeni Yuvarlak Tasarım */
 .memory-jar-container {
     position: fixed;
@@ -1752,6 +1781,33 @@ canvas#scratch-canvas {
     font-size: 1rem;
     margin-bottom: 5px;
     line-height: 1.5;
+}
+
+.account-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.account-choice {
+    padding: 14px 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1.5px solid rgba(255, 75, 114, 0.25);
+    border-radius: 15px;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.account-choice.active,
+.account-choice:hover {
+    background: rgba(255, 75, 114, 0.18);
+    border-color: #ff4b72;
+    box-shadow: 0 10px 25px rgba(255, 75, 114, 0.25);
 }
 
 #love-password {

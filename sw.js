@@ -1,74 +1,87 @@
-const CACHE_NAME = 'askim-pwa-v14';
-const urlsToCache = [
+importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
+
+const CACHE_NAME = 'askim-pwa-v16';
+const APP_SHELL = [
   './',
   './index.html',
+  './style.css',
+  './script.js',
+  './app-bootstrap.js',
+  './onesignal-helper.js',
+  './time-tracker.js',
+  './presence.js',
+  './manifest.json',
+  './icon.svg',
+  './icon-192.png',
+  './icon-512.png',
   './chat.html',
   './diary.html',
   './bucket-list.html',
   './lists.html',
-  './jackpot.html',
   './confessions.html',
-  './confession-archive.html',
   './music.html',
   './games.html',
-  './dice.html',
-  './memory-game.html',
-  './mine-game.html',
-  './scratch-game.html',
   './special-days.html',
   './envelopes.html',
-  './envelope-archive.html',
-  './style.css',
-  './script.js',
-  './icon.svg',
-  './resim1.jpg',
-  './resim2.jpg',
-  './resim3.jpg',
-  './resim4.jpg',
-  './resim5.jpg',
-  './resim6.jpg',
-  './resim7.jpg',
-  './resim8.jpg',
-  './resim9.jpg',
-  './resim10.jpg',
-  './resim11.jpg',
-  './resim12.jpg',
-  'https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@1,600&family=Shadows+Into+Light&display=swap',
-  'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js'
+  './profile.html',
+  './notification-center.html'
 ];
 
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-  );
+const isCacheableRequest = (request) => {
+  const url = new URL(request.url);
+  return request.method === 'GET' && ['http:', 'https:'].includes(url.protocol);
+};
+
+const isSameOrigin = (request) => new URL(request.url).origin === self.location.origin;
+
+self.addEventListener('install', (event) => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    await Promise.allSettled(APP_SHELL.map((url) => cache.add(url)));
+    await self.skipWaiting();
+  })());
 });
 
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    fetch(event.request).then(response => {
-      // İnternet var ve yeni sürüm çekildiyse önbelleğe kaydet
-      if (event.request.method === 'GET') {
-        return caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, response.clone());
-          return response;
-        });
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    const names = await caches.keys();
+    await Promise.all(names.filter((name) => name !== CACHE_NAME).map((name) => caches.delete(name)));
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  if (!isCacheableRequest(request)) return;
+
+  const url = new URL(request.url);
+  if (url.hostname.includes('onesignal.com')) return;
+
+  if (request.mode === 'navigate') {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(request);
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(request, fresh.clone());
+        return fresh;
+      } catch (error) {
+        return (await caches.match(request, { ignoreSearch: true }))
+          || (await caches.match('./index.html'));
+      }
+    })());
+    return;
+  }
+
+  event.respondWith((async () => {
+    const cached = await caches.match(request, { ignoreSearch: true });
+    const network = fetch(request).then(async (response) => {
+      if (response && response.ok && isSameOrigin(request)) {
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(request, response.clone());
       }
       return response;
-    }).catch(() => {
-      // İnternet yoksa veya hata varsa önbellekten getir (URL parametrelerini görmezden gel)
-      return caches.match(event.request, { ignoreSearch: true });
-    })
-  );
-});
-// Eski önbellekleri temizle
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.filter(name => name !== CACHE_NAME)
-          .map(name => caches.delete(name))
-      );
-    })
-  );
+    }).catch(() => cached);
+
+    return cached || network;
+  })());
 });

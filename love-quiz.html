@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Bizi Bil BakalÄ±m ğŸ’Œ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg:#0a0208; --primary:#ff4b72; --gold:#ffd166; --border:rgba(255,255,255,.1); }
+        * { box-sizing: border-box; }
+        body { margin:0; min-height:100vh; font-family:'Outfit',sans-serif; color:#fff; background:radial-gradient(circle at 20% 0, rgba(255,75,114,.18), transparent 34%), radial-gradient(circle at 80% 15%, rgba(255,209,102,.12), transparent 30%), #0a0208; padding:20px; display:flex; align-items:center; justify-content:center; }
+        .back { position:fixed; top:20px; left:20px; color:#fff; text-decoration:none; background:rgba(255,255,255,.07); border:1px solid var(--border); border-radius:24px; padding:10px 16px; }
+        .wallet { position:fixed; top:20px; right:20px; color:var(--gold); background:rgba(255,209,102,.12); border:1px solid rgba(255,209,102,.4); border-radius:24px; padding:10px 16px; font-weight:700; }
+        .game { width:min(620px,100%); background:rgba(255,255,255,.055); border:1px solid var(--border); border-radius:22px; padding:24px; box-shadow:0 20px 55px rgba(0,0,0,.38); text-align:center; }
+        h1 { font-family:'Playfair Display',serif; color:var(--primary); font-size:2.4rem; margin:0 0 8px; }
+        .meta { opacity:.72; margin-bottom:18px; }
+        .question { font-size:1.25rem; font-weight:700; line-height:1.35; margin:18px 0; }
+        .answers { display:grid; gap:10px; }
+        .answer { border:1px solid var(--border); border-radius:16px; padding:13px; color:#fff; background:rgba(255,255,255,.07); cursor:pointer; font:inherit; }
+        .answer:disabled { opacity:.38; cursor:not-allowed; }
+        .answer.correct { background:rgba(30,215,96,.18); border-color:#1ed760; }
+        .answer.wrong { background:rgba(255,75,95,.18); border-color:#ff4b5f; }
+        .actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:18px; }
+        .btn { border:0; border-radius:999px; padding:12px 18px; font-weight:700; color:#fff; background:linear-gradient(45deg,#ff4b72,#ff8c00); cursor:pointer; }
+        .btn.alt { background:rgba(255,255,255,.09); border:1px solid var(--border); }
+        .status { min-height:24px; margin-top:14px; color:rgba(255,255,255,.76); }
+        @media (max-width:640px){ body{align-items:flex-start;padding-top:86px}.wallet{top:auto;bottom:18px;right:18px}.game{padding:18px}h1{font-size:2rem} }
+    </style>
+    <script src="app-bootstrap.js?v=1" defer></script>
+</head>
+<body>
+    <a class="back" href="games.html">â† Oyunlara DÃ¶n</a>
+    <div class="wallet" id="wallet">0 â¤ï¸</div>
+    <main class="game">
+        <h1>Bizi Bil BakalÄ±m ğŸ’Œ</h1>
+        <div class="meta">GiriÅŸ: 80 â¤ï¸ | 7 soruda 6 doÄŸru: 260 â¤ï¸ | 7 doÄŸru: 420 â¤ï¸</div>
+        <div id="panel">
+            <p>Biraz romantik, biraz eÄŸlenceli mini quiz. Ä°pucu kullanÄ±rsan bir yanlÄ±ÅŸ ÅŸÄ±k kapanÄ±r.</p>
+            <button class="btn" onclick="startGame()">80 â¤ï¸ Oyna</button>
+        </div>
+        <div class="status" id="status"></div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, setDoc, addDoc, collection, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        const firebaseConfig = { apiKey:"AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU", authDomain:"ayseye-surpriz.firebaseapp.com", projectId:"ayseye-surpriz", storageBucket:"ayseye-surpriz.firebasestorage.app", messagingSenderId:"531177459988", appId:"1:531177459988:web:09060a95bea0b06f197201" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const currentUser = localStorage.getItem('active_player');
+        if (!currentUser) location.href = 'index.html';
+        const ecoRef = doc(db, 'economy', 'balances');
+        const invRef = doc(db, 'user_inventory', currentUser);
+        const progressRef = doc(db, 'game_progress', currentUser);
+        const QUESTIONS_PER_GAME = 7;
+        let balance = 0, inventoryData = {}, hintStock = 0, skipStock = 0, doubleStock = 0, ticketStock = 0, boostStock = 0, round = 0, score = 0, usedHint = false, doubleActive = false, questions = [];
+        const BANK = [
+            { q:'Birbirinizi Ã¶zleyince en hÄ±zlÄ± Ã§Ã¶zÃ¼m hangisi?', a:['Gurur yapmak','Mesaj atmak','Trip atmak','Uyuyup geÃ§mek'], c:1 },
+            { q:'En romantik kÃ¼Ã§Ã¼k jest hangisi?', a:['GÃ¼naydÄ±n mesajÄ±','Åifre istemek','CevapsÄ±z bÄ±rakmak','Sessize almak'], c:0 },
+            { q:'AÅŸk marketinde en tatlÄ± yatÄ±rÄ±m?', a:['Kalp biriktirmek','Hepsini kaybetmek','Rastgele inat','Bildirim kaÃ§Ä±rmak'], c:0 },
+            { q:'KÃ¶tÃ¼ gÃ¼n ilacÄ± hangisi?', a:['TatlÄ± sÃ¶z','SoÄŸuk cevap','GÃ¶rmezden gelmek','Ä°nat skoru'], c:0 },
+            { q:'Sohbette saklanacak mesaj ne olur?', a:['YÄ±ldÄ±zlÄ± mesaj','Silinen mesaj','BoÅŸ mesaj','YanlÄ±ÅŸlÄ±kla atÄ±lan'], c:0 },
+            { q:'Beraber geÃ§irilen zaman neye dÃ¶nÃ¼ÅŸÃ¼r?', a:['Ä°statistiÄŸe ve anÄ±ya','Borca','SessizliÄŸe','KarmaÅŸaya'], c:0 },
+            { q:'En gÃ¼venli cevap?', a:['HaklÄ±sÄ±n aÅŸkÄ±m','Bilmiyorum ya','Sonra bakarÄ±m','GÃ¶rdÃ¼m sandÄ±m'], c:0 }
+        ];
+        const QUIZ_TOPICS = ['ozlem','guven','kucuk jest','barisma','gunaydin','iyi geceler','ani saklama','mood','yildizli mesaj','ask marketi','profil rozeti','birlikte zaman','foto anisi','sarilma','tatli soz','rituel','sabir','sadakat','espri','surpriz','destek','kalp parasi','oyun gecesi','film secimi','kahve molasi','uzaklik','yakinlik','ilgi','sefkat','hatira','gulmek','dinlemek','anlamak','beklemek','paylasmak','opucuk','mesaj','not','sarki','sessizlik','heyecan','huzur','yagmur','sahil','gokyuzu','gece','sabah','tatli','kahve','sinema','itiraf','kiskanclik','gurur','telafi','sorumluluk','sadelesmek','plan yapmak','beklenmedik gun','anlasilmak','kalp ritmi','ozel gun','hediye secimi','ortak sir','eski ani','gelecek hayali','mesafe','uyum','ince dusunce','duygusal zeka','zor konusma'];
+        const QUIZ_RULES = [
+            { ask:'Hangisi daha romantik bir tepki olur?', good:'Nazik ve net bir sevgi cumlesi kurmak', bad:['Goruldu atmak','Inat edip susmak','Konuyu degistirmek'] },
+            { ask:'Zor bir anda en iyi davranis hangisi?', good:'Once dinleyip sonra sarilmak', bad:['Hemen savunmaya gecmek','Konu kapandi demek','Cevabi geciktirmek'] },
+            { ask:'En kalici aniya hangisi donusur?', good:'Icinden gelen kucuk not birakmak', bad:['Sadece emoji atmak','Yanlis zamanda saka yapmak','Unutmus gibi davranmak'] },
+            { ask:'Bu durumda en iyi oyun hamlesi hangisi?', good:'Risk almadan kalbi korumak', bad:['Tum bakiyeyi tek elde basmak','Gucu stokta unutmak','Kurali okumadan baslamak'] },
+            { ask:'Ask profilini en guzel besleyen sey hangisi?', good:'Duzenli girip anilari cogaltmak', bad:['Rozetleri hic kontrol etmemek','Modu rastgele basmak','Mesajlari hic saklamamak'] },
+            { ask:'Sohbet icinde ozel bir cumle gorunce ne yapilir?', good:'Yildizlayip ani defterine saklamak', bad:['Hemen silmek','Gormemis gibi yapmak','Yanlis kisiye atmak'] },
+            { ask:'Kucuk bir kirginlikta en olgun secim hangisi?', good:'Tatli bir dille anlatmak', bad:['Sessiz ceza vermek','Skor tutmak','Eski konulari acmak'] },
+            { ask:'Birlikte oynarken en tatli tutum hangisi?', good:'Kazansa da kaybetse de gulmek', bad:['Kaybedince oyunu kapatmak','Hile aramak','Odule trip atmak'] },
+            { ask:'Bir gun cok yogunsa en guzel isaret hangisi?', good:'Kisa ama icten bir mesaj atmak', bad:['Tum gun kaybolmak','Soguk cevap vermek','Bahane yaristirmak'] },
+            { ask:'Surpriz hazirlarken en iyi detay hangisi?', good:'Onun sevdigi seyi hatirlamak', bad:['Kendi istedigini almak','Son dakikaya birakmak','Sadece fiyatina bakmak'] },
+            { ask:'Mood dusukse ilk adim hangisi?', good:'Yumusak bir soru sormak', bad:['Neden boylesin demek','Cozumu dayatmak','Konuyu hafife almak'] },
+            { ask:'Uzakta olunan gunde en iyi bag kurma sekli?', good:'Kucuk bir ses veya mesaj birakmak', bad:['Yarisa girmek','Sadece beklemek','Inatla yazmamak'] },
+            { ask:'Bir ani sayfasina en cok ne yakisir?', good:'Tarih, his ve minik detay', bad:['Bos baslik','Rastgele sayi','Anlamsiz not'] },
+            { ask:'Kalp parasi harcarken en mantikli secim?', good:'Oynayacagin oyuna uygun guc almak', bad:['Ne aldigini okumamak','Hepsini tek urune basmak','Stoku unutmak'] },
+            { ask:'Sevgi dili karisinca ne yapmak iyi olur?', good:'Ne iyi gelir diye sormak', bad:['Tahmin edip diretmek','Alinganlik yapmak','Kiyaslamak'] },
+            { ask:'Guzel bir gunu kapatmanin en tatli yolu?', good:'Bugunun en sevdigim ani buydu demek', bad:['Telefonu sessize almak','Cevap vermeden uyumak','Konuyu yarida kesmek'] },
+            { ask:'Oyun gecesinde en iyi takim ruhu?', good:'Birbirini motive etmek', bad:['Hatayi buyutmek','Surekli elestirmek','Kazanani kiskandirmak'] },
+            { ask:'Bir mesaj neden yildizlanir?', good:'Sonra tekrar okuyunca ic isitsin diye', bad:['Yanlislikla kaybolsun diye','Sadece menu acildi diye','Silmek zor olsun diye'] },
+            { ask:'Ask marketindeki kuponlar ne icin?', good:'Kucuk romantik haklari eglenceli yapmak', bad:['Tartisma baslatmak','Bakiyeyi saklamak','Oyunu bozmak'] },
+            { ask:'En zor ama en degerli sey hangisi?', good:'Karsindakini gercekten duymak', bad:['Son sozu almak','Hep hakli cikmak','Duyguyu ertelemek'] },
+            { ask:'Bir hatadan sonra en iyi onarim?', good:'Ozur dileyip davranisi duzeltmek', bad:['Konuyu sakaya vurmak','Karsi hatayi saymak','Hic olmamis gibi yapmak'] },
+            { ask:'Uzun vadede iliskiyi ne guclendirir?', good:'Tutarlilik ve guven vermek', bad:['Tahmin ettirmek','Kucuk oyunlar oynamak','Sadece buyuk jest beklemek'] },
+            { ask:'Cevaplar birbirine yakin dururken en dogru secim hangisi?', good:'Duyguyu kabul edip net bir adim onermek', bad:['Sadece hak verdigini soylemek','Konuyu daha sonra acmayi belirsiz birakmak','Kendi niyetini uzun uzun savunmak'] },
+            { ask:'En zor anda sevgiyi en az yoran tavir hangisi?', good:'Kisa, sakin ve sorumluluk alan cumle kurmak', bad:['Cok tatli ama konudan kacan soz soylemek','Sessiz kalip anlamasini beklemek','Hizli cozum diye duyguyu kapatmak'] },
+            { ask:'Bir yanlis anlasilma buyumeden nasil cozulur?', good:'Neyi kastettigini ve ne hissettigini ayirmak', bad:['Sadece saka yaptim demek','Uzun mesajla haklilik kurmak','Cevap geciktirip havanin gecmesini beklemek'] },
+            { ask:'Kucuk bir jest ne zaman gercekten kiymetli olur?', good:'Onun ihtiyacina ve zamanina denk gelince', bad:['Herkes gorecek kadar buyuk olunca','Pahali ve dikkat cekici olunca','Son anda telasla yapilinca'] },
+            { ask:'Birlikte karar verirken en saglam yol hangisi?', good:'Ikisinin de onem verdigi noktayi masaya koymak', bad:['Cabuk bitsin diye ilk fikri secmek','Karari en istekli olana birakmak','Eski tartismalari hatirlatmak'] },
+            { ask:'Ozlem cok arttiginda en olgun hamle hangisi?', good:'Bagi guclendiren kucuk ve gercekci plan yapmak', bad:['Surekli test eder gibi sormak','Trip atarak ilgiyi olcmek','Tamamen icine kapanmak'] },
+            { ask:'Bir sozun kalici olmasini ne saglar?', good:'Sozle davranisin ayni yonde kalmasi', bad:['Cok romantik kelimeler secilmesi','Mesajin uzun ve suslu yazilmasi','Hemen ardindan yeni soz verilmesi'] },
+            { ask:'Zor bir soruya sevgiyle cevap vermek ne demek?', good:'Dogruluktan kacmadan kirici olmamayi secmek', bad:['Tatli gorunmek icin eksik anlatmak','Konu kapanana kadar susmak','Sadece karsi tarafi rahatlatacak sey soylemek'] }
+        ];
+        const QUIZ_BANK = QUIZ_TOPICS.flatMap((topic) => QUIZ_RULES.map((rule, idx) => ({ id: `${topic}_${idx}`, q: `${topic.toLocaleUpperCase('tr-TR')} konusunda: ${rule.ask}`, a: [rule.good, ...rule.bad], c: 0 })));
+        onSnapshot(ecoRef, s => { balance = s.data()?.[currentUser] || 0; document.getElementById('wallet').textContent = `${balance} â¤ï¸`; });
+        onSnapshot(invRef, s => {
+            inventoryData = s.data() || {};
+            const cons = inventoryData.consumables || {};
+            hintStock = cons.quiz_hint || 0;
+            skipStock = cons.quiz_skip || 0;
+            doubleStock = cons.quiz_double || 0;
+            ticketStock = cons.entry_ticket || 0;
+            boostStock = cons.reward_boost || 0;
+        });
+        function shuffle(arr){ return [...arr].sort(() => Math.random() - .5); }
+        async function changeBalance(delta){ await setDoc(ecoRef, { [currentUser]: increment(delta) }, { merge:true }); }
+        async function consumeItem(key){
+            let ok = false;
+            await runTransaction(db, async tx => {
+                const snap = await tx.get(invRef);
+                const data = snap.exists() ? snap.data() : {};
+                const cur = data.consumables?.[key] || 0;
+                if (cur <= 0) return;
+                tx.set(invRef, { consumables:{ ...(data.consumables || {}), [key]: cur - 1 }, updatedAt: serverTimestamp() }, { merge:true });
+                ok = true;
+            });
+            return ok;
+        }
+        async function consumeHint(){ return consumeItem('quiz_hint'); }
+        window.startGame = async function(){
+            const canUseTicket = ticketStock > 0;
+            if (balance < 80 && !canUseTicket) { status('Yetersiz bakiye'); return; }
+            try {
+                let picked = [];
+                await runTransaction(db, async tx => {
+                    const progressSnap = await tx.get(progressRef);
+                    const progress = progressSnap.exists() ? progressSnap.data() : {};
+                    const seen = new Set(progress.loveQuizSeen || []);
+                    const available = QUIZ_BANK.filter(item => !seen.has(item.id));
+                    if (available.length === 0) throw new Error('QUESTIONS_DONE');
+                    picked = shuffle(available).slice(0, Math.min(QUESTIONS_PER_GAME, available.length));
+                    tx.set(progressRef, {
+                        loveQuizSeen: [...seen, ...picked.map(item => item.id)],
+                        loveQuizTotal: QUIZ_BANK.length,
+                        updatedAt: serverTimestamp()
+                    }, { merge:true });
+                });
+                const usedTicket = canUseTicket && await consumeItem('entry_ticket');
+                if (!usedTicket && balance < 80) throw new Error('Yetersiz bakiye');
+                if (!usedTicket) await changeBalance(-80);
+                questions = picked;
+                round = 0; score = 0; doubleActive = false;
+                if (usedTicket) status('Bedava Giris Bileti kullanildi.');
+                renderQuestion();
+            } catch(e) {
+                if (e.message === 'QUESTIONS_DONE') {
+                    document.getElementById('panel').innerHTML = '<h2>Baska soru kalmadi</h2><p>Bu kullanici icin cikabilecek tum sorular oynandi.</p>';
+                    status('Quiz havuzu senin icin tamamlandi.');
+                } else {
+                    console.error(e);
+                    status(e.message || 'Oyun baslatilamadi.');
+                }
+            }
+        };
+        function renderQuestion(){
+            usedHint = false;
+            const item = questions[round];
+            const answerSet = shuffle(item.a.map((text, idx) => ({ text, correct: idx === item.c })));
+            item.viewCorrect = answerSet.findIndex(answer => answer.correct);
+            document.getElementById('panel').innerHTML = `
+                <div class="meta">Soru ${round + 1}/${questions.length} | DoÄŸru: ${score}</div>
+                <div class="question">${item.q}</div>
+                <div class="answers">${answerSet.map((answer,i)=>`<button class="answer" data-i="${i}">${answer.text}</button>`).join('')}</div>
+                <div class="actions">
+                    <button class="btn alt" onclick="useHint()">💡 İpucu Kullan (${hintStock})</button>
+                    <button class="btn alt" onclick="skipQuestion()">🔁 Soru Değiştir (${skipStock})</button>
+                    <button class="btn alt" onclick="useDouble()">💘 Çifte Puan (${doubleStock})</button>
+                </div>
+            `;
+            document.querySelectorAll('.answer').forEach(btn => btn.onclick = () => answer(Number(btn.dataset.i)));
+        }
+        window.useHint = async function(){
+            if (usedHint) return;
+            if (!(await consumeHint())) { status('Quiz Ä°pucu stokta yok. Marketten alabilirsin.'); return; }
+            usedHint = true;
+            const item = questions[round];
+            const wrong = [...document.querySelectorAll('.answer')].filter(b => Number(b.dataset.i) !== item.viewCorrect && !b.disabled);
+            wrong[Math.floor(Math.random() * wrong.length)].disabled = true;
+            status('Bir yanlÄ±ÅŸ ÅŸÄ±k kapandÄ± ğŸ’¡');
+        };
+        window.skipQuestion = async function(){
+            if (!(await consumeItem('quiz_skip'))) { status('Soru Degistirici stokta yok.'); return; }
+            status('Soru gecildi, yanlis sayilmadi.');
+            setTimeout(() => { round++; round >= questions.length ? finish() : renderQuestion(); }, 500);
+        };
+        window.useDouble = async function(){
+            if (doubleActive) { status('Cifte puan zaten hazir.'); return; }
+            if (!(await consumeItem('quiz_double'))) { status('Cifte Puan Kalbi stokta yok.'); return; }
+            doubleActive = true;
+            status('Siradaki dogru cevap 2 sayilacak.');
+        };
+        function answer(i){
+            const item = questions[round];
+            document.querySelectorAll('.answer').forEach(b => { b.disabled = true; b.classList.toggle('correct', Number(b.dataset.i) === item.viewCorrect); });
+            if (i === item.viewCorrect) {
+                score += doubleActive ? 2 : 1;
+            } else {
+                document.querySelector(`[data-i="${i}"]`)?.classList.add('wrong');
+            }
+            doubleActive = false;
+            setTimeout(() => { round++; round >= questions.length ? finish() : renderQuestion(); }, 900);
+        }
+        async function finish(){
+            const ratio = score / questions.length;
+            let reward = ratio >= 1 ? 420 : ratio >= 0.8 ? 260 : ratio >= 0.6 ? 80 : 0;
+            const boosted = reward > 0 && boostStock > 0 && await consumeItem('reward_boost');
+            if (boosted) reward = Math.round(reward * 1.5);
+            if (reward) await changeBalance(reward);
+            await addDoc(collection(db,'activity_logs'), { type:'love_quiz', user:currentUser, score, reward, boosted, timestamp:serverTimestamp() });
+            document.getElementById('panel').innerHTML = `<h2>${score}/${questions.length} doÄŸru</h2><p>${reward ? `${reward} â¤ï¸ kazandÄ±n!${boosted ? ' Ödül Parlatıcı çalıştı.' : ''}` : 'Bu tur olmadÄ± ama tatlÄ±ydÄ±.'}</p><button class="btn" onclick="startGame()">Tekrar Oyna</button>`;
+        }
+        function status(text){ document.getElementById('status').textContent = text; setTimeout(()=>document.getElementById('status').textContent='',2600); }
+    </script>
+<script type="module" src="time-tracker.js"></script>
+<script type="module" src="presence.js"></script>
+</body>
+</html>
