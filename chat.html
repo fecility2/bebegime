@@ -343,12 +343,12 @@
             background: rgba(15, 5, 10, 0.98);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
-            padding: 12px 14px;
-            padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
+            padding: 10px 12px;
+            padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
             display: flex;
-            flex-wrap: wrap;
-            align-items: flex-end;
-            gap: 10px;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 8px;
             border-top: 1px solid var(--border);
             position: fixed;
             bottom: 0;
@@ -356,6 +356,9 @@
             width: 100%;
             z-index: 1000;
             box-shadow: 0 -5px 25px rgba(0,0,0,0.5);
+            height: auto;
+            min-height: 56px;
+            max-height: 56px;
         }
         .typing-indicator {
             display: none;

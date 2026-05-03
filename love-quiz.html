@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="OurStory">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <title>Bizi Bil BakalÄ±m ğŸ’Œ</title>
+    <title>Bizi Bil Bakalım 💕</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
     <style>
         :root { --bg:#0a0208; --primary:#ff4b72; --gold:#ffd166; --border:rgba(255,255,255,.1); }
@@ -35,14 +35,14 @@
     <script src="app-bootstrap.js?v=1" defer></script>
 </head>
 <body>
-    <a class="back" href="games.html">â† Oyunlara DÃ¶n</a>
-    <div class="wallet" id="wallet">0 â¤ï¸</div>
+    <a class="back" href="games.html">← Oyunlara Dön</a>
+    <div class="wallet" id="wallet">0 ❤️</div>
     <main class="game">
-        <h1>Bizi Bil BakalÄ±m ğŸ’Œ</h1>
-        <div class="meta">GiriÅŸ: 80 â¤ï¸ | 7 soruda 6 doÄŸru: 260 â¤ï¸ | 7 doÄŸru: 420 â¤ï¸</div>
+        <h1>Bizi Bil Bakalım 💕</h1>
+        <div class="meta">Giriş: 80 ❤️ | 7 soruda 6 doğru: 260 ❤️ | 7 doğru: 420 ❤️</div>
         <div id="panel">
-            <p>Biraz romantik, biraz eÄŸlenceli mini quiz. Ä°pucu kullanÄ±rsan bir yanlÄ±ÅŸ ÅŸÄ±k kapanÄ±r.</p>
-            <button class="btn" onclick="startGame()">80 â¤ï¸ Oyna</button>
+            <p>Biraz romantik, biraz eğlenceli mini quiz. İpucu kullanırsan bir yanlış şık kapanır.</p>
+            <button class="btn" onclick="startGame()">80 ❤️ Oyna</button>
         </div>
         <div class="status" id="status"></div>
     </main>
@@ -61,13 +61,13 @@
         const QUESTIONS_PER_GAME = 7;
         let balance = 0, inventoryData = {}, hintStock = 0, skipStock = 0, doubleStock = 0, ticketStock = 0, boostStock = 0, round = 0, score = 0, usedHint = false, doubleActive = false, questions = [];
         const BANK = [
-            { q:'Birbirinizi Ã¶zleyince en hÄ±zlÄ± Ã§Ã¶zÃ¼m hangisi?', a:['Gurur yapmak','Mesaj atmak','Trip atmak','Uyuyup geÃ§mek'], c:1 },
-            { q:'En romantik kÃ¼Ã§Ã¼k jest hangisi?', a:['GÃ¼naydÄ±n mesajÄ±','Åifre istemek','CevapsÄ±z bÄ±rakmak','Sessize almak'], c:0 },
-            { q:'AÅŸk marketinde en tatlÄ± yatÄ±rÄ±m?', a:['Kalp biriktirmek','Hepsini kaybetmek','Rastgele inat','Bildirim kaÃ§Ä±rmak'], c:0 },
-            { q:'KÃ¶tÃ¼ gÃ¼n ilacÄ± hangisi?', a:['TatlÄ± sÃ¶z','SoÄŸuk cevap','GÃ¶rmezden gelmek','Ä°nat skoru'], c:0 },
-            { q:'Sohbette saklanacak mesaj ne olur?', a:['YÄ±ldÄ±zlÄ± mesaj','Silinen mesaj','BoÅŸ mesaj','YanlÄ±ÅŸlÄ±kla atÄ±lan'], c:0 },
-            { q:'Beraber geÃ§irilen zaman neye dÃ¶nÃ¼ÅŸÃ¼r?', a:['Ä°statistiÄŸe ve anÄ±ya','Borca','SessizliÄŸe','KarmaÅŸaya'], c:0 },
-            { q:'En gÃ¼venli cevap?', a:['HaklÄ±sÄ±n aÅŸkÄ±m','Bilmiyorum ya','Sonra bakarÄ±m','GÃ¶rdÃ¼m sandÄ±m'], c:0 }
+            { q:'Birbirinizi özleyince en hızlı çözüm hangisi?', a:['Gurur yapmak','Mesaj atmak','Trip atmak','Uyuyup geçmek'], c:1 },
+            { q:'En romantik küçük jest hangisi?', a:['Günaydın mesajı','Şifre istemek','Cevapsız bırakmak','Sessize almak'], c:0 },
+            { q:'Aşk marketinde en tatlı yatırım?', a:['Kalp biriktirmek','Hepsini kaybetmek','Rastgele inat','Bildirim kaçırmak'], c:0 },
+            { q:'Kötü gün ilacı hangisi?', a:['Tatlı söz','Soğuk cevap','Görmezden gelmek','İnat skoru'], c:0 },
+            { q:'Sohbette saklanacak mesaj ne olur?', a:['Yıldızlı mesaj','Silinen mesaj','Boş mesaj','Yanlışlıkla atılan'], c:0 },
+            { q:'Beraber geçirilen zaman neye dönüşür?', a:['İstatistiğe ve anıya','Borca','Sessizliğe','Karmaşaya'], c:0 },
+            { q:'En güvenli cevap?', a:['Haklısın aşkım','Bilmiyorum ya','Sonra bakarım','Gördüm sandım'], c:0 }
         ];
         const QUIZ_TOPICS = ['ozlem','guven','kucuk jest','barisma','gunaydin','iyi geceler','ani saklama','mood','yildizli mesaj','ask marketi','profil rozeti','birlikte zaman','foto anisi','sarilma','tatli soz','rituel','sabir','sadakat','espri','surpriz','destek','kalp parasi','oyun gecesi','film secimi','kahve molasi','uzaklik','yakinlik','ilgi','sefkat','hatira','gulmek','dinlemek','anlamak','beklemek','paylasmak','opucuk','mesaj','not','sarki','sessizlik','heyecan','huzur','yagmur','sahil','gokyuzu','gece','sabah','tatli','kahve','sinema','itiraf','kiskanclik','gurur','telafi','sorumluluk','sadelesmek','plan yapmak','beklenmedik gun','anlasilmak','kalp ritmi','ozel gun','hediye secimi','ortak sir','eski ani','gelecek hayali','mesafe','uyum','ince dusunce','duygusal zeka','zor konusma'];
         const QUIZ_RULES = [
@@ -103,7 +103,7 @@
             { ask:'Zor bir soruya sevgiyle cevap vermek ne demek?', good:'Dogruluktan kacmadan kirici olmamayi secmek', bad:['Tatli gorunmek icin eksik anlatmak','Konu kapanana kadar susmak','Sadece karsi tarafi rahatlatacak sey soylemek'] }
         ];
         const QUIZ_BANK = QUIZ_TOPICS.flatMap((topic) => QUIZ_RULES.map((rule, idx) => ({ id: `${topic}_${idx}`, q: `${topic.toLocaleUpperCase('tr-TR')} konusunda: ${rule.ask}`, a: [rule.good, ...rule.bad], c: 0 })));
-        onSnapshot(ecoRef, s => { balance = s.data()?.[currentUser] || 0; document.getElementById('wallet').textContent = `${balance} â¤ï¸`; });
+        onSnapshot(ecoRef, s => { balance = s.data()?.[currentUser] || 0; document.getElementById('wallet').textContent = `${balance} ❤️`; });
         onSnapshot(invRef, s => {
             inventoryData = s.data() || {};
             const cons = inventoryData.consumables || {};
@@ -151,15 +151,15 @@
                 if (!usedTicket) await changeBalance(-80);
                 questions = picked;
                 round = 0; score = 0; doubleActive = false;
-                if (usedTicket) status('Bedava Giris Bileti kullanildi.');
+                if (usedTicket) status('Bedava Giriş Bileti kullanıldı.');
                 renderQuestion();
             } catch(e) {
                 if (e.message === 'QUESTIONS_DONE') {
-                    document.getElementById('panel').innerHTML = '<h2>Baska soru kalmadi</h2><p>Bu kullanici icin cikabilecek tum sorular oynandi.</p>';
-                    status('Quiz havuzu senin icin tamamlandi.');
+                    document.getElementById('panel').innerHTML = '<h2>Başka soru kalmadı</h2><p>Bu kullanıcı için çıkabilecek tüm sorular oynandı.</p>';
+                    status('Quiz havuzu senin için tamamlandı.');
                 } else {
                     console.error(e);
-                    status(e.message || 'Oyun baslatilamadi.');
+                    status(e.message || 'Oyun başlatılamadı.');
                 }
             }
         };
@@ -169,7 +169,7 @@
             const answerSet = shuffle(item.a.map((text, idx) => ({ text, correct: idx === item.c })));
             item.viewCorrect = answerSet.findIndex(answer => answer.correct);
             document.getElementById('panel').innerHTML = `
-                <div class="meta">Soru ${round + 1}/${questions.length} | DoÄŸru: ${score}</div>
+                <div class="meta">Soru ${round + 1}/${questions.length} | Doğru: ${score}</div>
                 <div class="question">${item.q}</div>
                 <div class="answers">${answerSet.map((answer,i)=>`<button class="answer" data-i="${i}">${answer.text}</button>`).join('')}</div>
                 <div class="actions">
@@ -182,23 +182,23 @@
         }
         window.useHint = async function(){
             if (usedHint) return;
-            if (!(await consumeHint())) { status('Quiz Ä°pucu stokta yok. Marketten alabilirsin.'); return; }
+            if (!(await consumeHint())) { status('Quiz İpucu stokta yok. Marketten alabilirsin.'); return; }
             usedHint = true;
             const item = questions[round];
             const wrong = [...document.querySelectorAll('.answer')].filter(b => Number(b.dataset.i) !== item.viewCorrect && !b.disabled);
             wrong[Math.floor(Math.random() * wrong.length)].disabled = true;
-            status('Bir yanlÄ±ÅŸ ÅŸÄ±k kapandÄ± ğŸ’¡');
+            status('Bir yanlış şık kapandı 💡');
         };
         window.skipQuestion = async function(){
-            if (!(await consumeItem('quiz_skip'))) { status('Soru Degistirici stokta yok.'); return; }
-            status('Soru gecildi, yanlis sayilmadi.');
+            if (!(await consumeItem('quiz_skip'))) { status('Soru Değiştirici stokta yok.'); return; }
+            status('Soru geçildi, yanlış sayılmadı.');
             setTimeout(() => { round++; round >= questions.length ? finish() : renderQuestion(); }, 500);
         };
         window.useDouble = async function(){
-            if (doubleActive) { status('Cifte puan zaten hazir.'); return; }
-            if (!(await consumeItem('quiz_double'))) { status('Cifte Puan Kalbi stokta yok.'); return; }
+            if (doubleActive) { status('Çifte puan zaten hazır.'); return; }
+            if (!(await consumeItem('quiz_double'))) { status('Çifte Puan Kalbi stokta yok.'); return; }
             doubleActive = true;
-            status('Siradaki dogru cevap 2 sayilacak.');
+            status('Sıradaki doğru cevap 2 sayılacak.');
         };
         function answer(i){
             const item = questions[round];
@@ -218,7 +218,7 @@
             if (boosted) reward = Math.round(reward * 1.5);
             if (reward) await changeBalance(reward);
             await addDoc(collection(db,'activity_logs'), { type:'love_quiz', user:currentUser, score, reward, boosted, timestamp:serverTimestamp() });
-            document.getElementById('panel').innerHTML = `<h2>${score}/${questions.length} doÄŸru</h2><p>${reward ? `${reward} â¤ï¸ kazandÄ±n!${boosted ? ' Ödül Parlatıcı çalıştı.' : ''}` : 'Bu tur olmadÄ± ama tatlÄ±ydÄ±.'}</p><button class="btn" onclick="startGame()">Tekrar Oyna</button>`;
+            document.getElementById('panel').innerHTML = `<h2>${score}/${questions.length} doğru</h2><p>${reward ? `${reward} ❤️ kazandın!${boosted ? ' Ödül Parlatıcı çalıştı.' : ''}` : 'Bu tur olmadı ama tatlıydı.'}</p><button class="btn" onclick="startGame()">Tekrar Oyna</button>`;
         }
         function status(text){ document.getElementById('status').textContent = text; setTimeout(()=>document.getElementById('status').textContent='',2600); }
     </script>

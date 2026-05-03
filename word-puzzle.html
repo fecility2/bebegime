@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="OurStory">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <title>AÅŸk Kelimeleri ğŸ”¤</title>
+    <title>Aşk Kelimeleri </title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
     <style>
         :root { --bg:#0a0208; --primary:#ff4b72; --blue:#4facfe; --gold:#ffd166; --border:rgba(255,255,255,.1); }
@@ -32,14 +32,14 @@
     <script src="app-bootstrap.js?v=1" defer></script>
 </head>
 <body>
-    <a class="back" href="games.html">â† Oyunlara DÃ¶n</a>
-    <div class="wallet" id="wallet">0 â¤ï¸</div>
+    <a class="back" href="games.html">Oyunlara Dön</a>
+    <div class="wallet" id="wallet">0 </div>
     <main class="game">
-        <h1>AÅŸk Kelimeleri ğŸ”¤</h1>
-        <div class="meta">GiriÅŸ: 60 â¤ï¸ | 4 kelimeyi Ã§Ã¶z, 260 â¤ï¸ kazan</div>
+        <h1>Aşk Kelimeleri </h1>
+        <div class="meta">Giriş: 60  | 4 kelimeyi çöz, 260  kazan</div>
         <section id="panel">
-            <p>Harfler karÄ±ÅŸtÄ±, aÅŸk kelimesini bul. Harf FÄ±sÄ±ltÄ±sÄ± ilk harfi gÃ¶sterir.</p>
-            <button class="btn" onclick="startGame()">60 â¤ï¸ Oyna</button>
+            <p>Harfler karıştı, aşk kelimesini bul. Harf Fısıltısı ilk harfi gösterir.</p>
+            <button class="btn" onclick="startGame()">60  Oyna</button>
         </section>
         <div class="status" id="status"></div>
     </main>
@@ -78,7 +78,7 @@
             return bank;
         })();
         let balance=0, hintStock=0, secondStock=0, revealStock=0, ticketStock=0, boostStock=0, words=[], round=0, score=0, hinted=false, secondHinted=false, solved=false;
-        onSnapshot(ecoRef, s => { balance = s.data()?.[currentUser] || 0; document.getElementById('wallet').textContent = `${balance} â¤ï¸`; });
+        onSnapshot(ecoRef, s => { balance = s.data()?.[currentUser] || 0; document.getElementById('wallet').textContent = `${balance} ❤️`; });
         onSnapshot(invRef, s => {
             const cons = s.data()?.consumables || {};
             hintStock = cons.word_hint || 0;
@@ -123,14 +123,14 @@
                 if (!usedTicket && balance < 60) throw new Error('Yetersiz bakiye');
                 if (!usedTicket) await changeBalance(-60);
                 words=picked; round=0; score=0; render();
-                if (usedTicket) status('Bedava Giris Bileti kullanildi.');
+                if (usedTicket) status('Bedava Giriş Bileti kullanıldı.');
             } catch(e) {
                 if (e.message === 'WORDS_DONE') {
-                    document.getElementById('panel').innerHTML = '<h2>Kelimeler bitti</h2><p>Bu kullanÄ±cÄ± iÃ§in Ã§Ä±kabilecek tÃ¼m kelimeler oynandÄ±.</p>';
-                    status('Bu oyun havuzu senin iÃ§in tamamlandÄ±.');
+                    document.getElementById('panel').innerHTML = '<h2>Başka kelime kalmadı</h2><p>Bu kullanıcı için çıkabilecek tüm kelimeler oynandı.</p>';
+                    status('Bu oyun havuzu senin için tamamlandı.');
                 } else {
                     console.error(e);
-                    status(e.message || 'Oyun baslatilamadi.');
+                    status(e.message || 'Oyun başlatılamadı.');
                 }
             }
         };
@@ -140,13 +140,13 @@
             solved=false;
             const word=words[round].word;
             document.getElementById('panel').innerHTML = `
-                <div class="meta">Kelime ${round+1}/${words.length} | DoÄŸru: ${score}</div>
+                <div class="meta">Kelime ${round + 1}/${WORDS_PER_GAME} | Doğru: ${score}</div>
                 <div class="scramble">${[...scramble(word)].map(l=>`<div class="letter">${l}</div>`).join('')}</div>
-                <input id="guess" autocomplete="off" placeholder="CevabÄ±nÄ± yaz">
+                <input id="guess" autocomplete="off" placeholder="Cevabını yaz">
                 <div class="actions">
                     <button class="btn" onclick="submitGuess()">Kontrol Et</button>
-                    <button class="btn alt" onclick="useHint()">ğŸ”¤ Harf FÄ±sÄ±ltÄ±sÄ± (${hintStock})</button>
-                    <button class="btn alt" onclick="useSecondHint()">✌️ Ikinci Harf (${secondStock})</button>
+                    <button class="btn alt" onclick="useHint()">🔤 Harf Fısıltısı (${hintStock})</button>
+                    <button class="btn alt" onclick="useSecondHint()">✌️ İkinci Harf (${secondStock})</button>
                     <button class="btn alt" onclick="revealWord()">🧩 Kelime Kurtar (${revealStock})</button>
                 </div>
             `;
@@ -155,28 +155,28 @@
         }
         window.useHint = async function(){
             if(hinted) return;
-            if(!(await consumeHint())){ status('Harf Fisiltisi yok. Marketten alabilirsin.'); return; }
+            if (!(await consumeHint())) { status('Harf Fısıltısı stokta yok. Marketten alabilirsin.'); return; }
             hinted=true;
-            status(`Ilk harf: ${words[round].word[0]}`);
+            status(`İlk harf: ${words[round].word[0]}`);
         };
         window.useSecondHint = async function(){
             if(secondHinted) return;
-            if(!(await consumeItem('word_second'))){ status('Ikinci Harf stokta yok.'); return; }
+            if (!(await consumeItem('word_second'))) { status('İkinci Harf stokta yok.'); return; }
             secondHinted=true;
-            status(`Ikinci harf: ${words[round].word[1]}`);
+            status(`İkinci harf: ${words[round].word[1]}`);
         };
         window.revealWord = async function(){
             if(solved) return;
-            if(!(await consumeItem('word_reveal'))){ status('Kelime Kurtarici stokta yok.'); return; }
+            if (!(await consumeItem('word_reveal'))) { status('Kelime Kurtarıcı stokta yok.'); return; }
             solved=true;
             score++;
-            status(`Kelime kurtarildi: ${words[round].word}`);
+            status(`Kelime kurtarıldı: ${words[round].word}`);
             setTimeout(()=>{ round++; round >= words.length ? finish() : render(); }, 900);
         };
         window.submitGuess = function(){
             if(solved) return;
             const guess = document.getElementById('guess').value.trim().toLocaleUpperCase('tr-TR');
-            if(guess === words[round].word.toLocaleUpperCase('tr-TR')) { score++; status('Dogru!'); }
+            if(guess === words[round].word.toLocaleUpperCase('tr-TR')) { score++; status('Doğru!'); }
             else status(`Cevap: ${words[round].word}`);
             setTimeout(()=>{ round++; round >= words.length ? finish() : render(); }, 900);
         };
@@ -187,7 +187,7 @@
             if (boosted) reward = Math.round(reward * 1.5);
             if(reward) await changeBalance(reward);
             await addDoc(collection(db,'activity_logs'), { type:'word_puzzle', user:currentUser, score, reward, boosted, timestamp:serverTimestamp() });
-            document.getElementById('panel').innerHTML = `<h2>${score}/${words.length} doÄŸru</h2><p>${reward ? `${reward} â¤ï¸ kazandÄ±n!` : 'Bir dahaki tur daha iyi olur.'}</p><button class="btn" onclick="startGame()">Tekrar Oyna</button>`;
+            document.getElementById('panel').innerHTML = `<h2>${score}/${words.length} doğru</h2><p>${reward ? `${reward} ❤️ kazandın!${boosted ? ' Ödül Parlatıcı çalıştı.' : ''}` : 'Bu tur olmadı ama dahaki tur daha iyi olur.'}</p><button class="btn" onclick="startGame()">Tekrar Oyna</button>`;
         }
         function status(t){ document.getElementById('status').textContent=t; setTimeout(()=>document.getElementById('status').textContent='',2400); }
     </script>
