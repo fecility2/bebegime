@@ -40,10 +40,14 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding-top: max(16px, env(safe-area-inset-top));
+            padding-top: max(72px, calc(env(safe-area-inset-top) + 56px));
             margin-bottom: 20px;
         }
         .back {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -141,8 +145,8 @@
 </head>
 <body>
     <main class="page">
+        <a class="back" href="chat.html">‹</a>
         <header class="header">
-            <a class="back" href="chat.html">‹</a>
             <div>
                 <h1>Yıldızlı Mesajlar ⭐</h1>
                 <div class="sub">Sakladığın en güzel mesajlar burada</div>

@@ -27,8 +27,8 @@
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding: 16px; max-width: 600px; margin: 0 auto; min-height: 100vh; padding-bottom: 80px; }
         #bg-canvas { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, #1a0520 0%, #0a0208 100%); }
         
-        .header { display: flex; align-items: center; justify-content: center; margin-bottom: 24px; margin-top: max(50px, env(safe-area-inset-top)); position: relative; min-height: 60px; }
-        .back-nav { position: absolute; top: 0; left: 0; background: rgba(255,255,255,.06); padding: 9px 15px; border-radius: 25px; color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,.16); z-index: 100; backdrop-filter: blur(5px); transition: all 0.3s; font-size: 0.82rem; white-space: nowrap; }
+        .header { display: flex; align-items: center; justify-content: center; margin-bottom: 24px; margin-top: max(72px, calc(env(safe-area-inset-top) + 56px)); }
+        .back-nav { position: fixed; top: 20px; left: 20px; background: rgba(255,255,255,.06); padding: 9px 15px; border-radius: 25px; color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,.16); z-index: 1000; backdrop-filter: blur(5px); transition: all 0.3s; font-size: 0.82rem; white-space: nowrap; }
         .back-nav:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.3); }
         h1 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--primary); text-align: center; margin: 0; text-shadow: 0 0 15px rgba(255,75,114,0.4); }
         .subtitle { font-size: 0.75rem; text-align: center; opacity: 0.6; margin-top: 4px; }
@@ -56,9 +56,9 @@
 </head>
 <body>
     <div id="bg-canvas"></div>
+    <a href="profile.html" class="back-nav">← Profile Dön</a>
     
     <div class="header">
-        <a href="profile.html" class="back-nav">← Profile Dön</a>
         <div>
             <h1>Geçirilen Süreler ⏳</h1>
             <div class="subtitle">Aşk Dünyasının İstatistikleri</div>

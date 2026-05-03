@@ -3,22 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Liderlik Ekranı</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Liderlik Ekranı 🏆</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
     <style>
-        :root { --primary:#ff4b72; --gold:#ffd166; --border:rgba(255,255,255,.12); }
+        :root { --primary:#ff4b72; --gold:#ffd166; --border:rgba(255,255,255,.12); --surface:rgba(255,255,255,.055); }
         * { box-sizing:border-box; }
-        body { margin:0; min-height:100vh; font-family:Outfit,sans-serif; color:#fff; background:radial-gradient(circle at 20% 0, rgba(255,75,114,.18), transparent 34%), radial-gradient(circle at 80% 10%, rgba(255,209,102,.13), transparent 30%), #0a0208; padding:22px; }
-        .back { position:fixed; top:18px; left:18px; color:#fff; text-decoration:none; background:rgba(255,255,255,.07); border:1px solid var(--border); border-radius:999px; padding:10px 15px; }
+        body { margin:0; min-height:100vh; font-family:Outfit,sans-serif; color:#fff; background:radial-gradient(circle at 20% 0, rgba(255,75,114,.18), transparent 34%), radial-gradient(circle at 80% 10%, rgba(255,209,102,.13), transparent 30%), #0a0208; padding:22px; padding-bottom:60px; }
+        .back { position:fixed; top:18px; left:18px; color:#fff; text-decoration:none; background:rgba(255,255,255,.07); border:1px solid var(--border); border-radius:999px; padding:10px 15px; z-index:1000; backdrop-filter:blur(10px); transition:all 0.3s; }
+        .back:hover { background:rgba(255,255,255,.13); }
         header { text-align:center; margin:64px auto 28px; }
         h1 { margin:0; color:var(--primary); font-family:'Playfair Display',serif; font-size:2.7rem; }
-        .board { max-width:980px; margin:0 auto; display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:16px; }
-        .card { background:rgba(255,255,255,.055); border:1px solid var(--border); border-radius:16px; padding:18px; }
+        .subtitle { opacity:.76; margin-top:8px; }
+
+        /* Genel istatistik kartları */
+        .board { max-width:980px; margin:0 auto 32px; display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:16px; }
+        .card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px; }
         .player { font-size:1.35rem; font-weight:800; margin-bottom:12px; color:var(--gold); }
         .stat { display:flex; justify-content:space-between; gap:12px; border-top:1px solid rgba(255,255,255,.08); padding:10px 0; }
         .stat:first-of-type { border-top:0; }
-        .winner { margin-top:12px; padding:10px; border-radius:12px; background:rgba(255,209,102,.12); border:1px solid rgba(255,209,102,.25); text-align:center; font-weight:800; }
-        @media (max-width:760px){ .board{grid-template-columns:1fr} h1{font-size:2.2rem} }
+        .winner { margin-top:10px; padding:10px; border-radius:12px; background:rgba(255,209,102,.12); border:1px solid rgba(255,209,102,.25); text-align:center; font-weight:800; }
+
+        /* Oyun bazında tablo */
+        .section-title { max-width:980px; margin:0 auto 14px; font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--primary); }
+        .game-table { max-width:980px; margin:0 auto 32px; background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+        .game-table table { width:100%; border-collapse:collapse; }
+        .game-table th { background:rgba(255,255,255,.06); padding:12px 16px; text-align:left; font-size:.85rem; opacity:.7; font-weight:600; border-bottom:1px solid var(--border); }
+        .game-table td { padding:12px 16px; border-top:1px solid rgba(255,255,255,.06); font-size:.95rem; }
+        .game-table tr:first-child td { border-top:0; }
+        .game-table .game-name { font-weight:700; display:flex; align-items:center; gap:8px; }
+        .game-table .winner-cell { color:var(--gold); font-weight:800; }
+        .tie-badge { font-size:.75rem; background:rgba(255,255,255,.1); border-radius:999px; padding:2px 8px; margin-left:4px; }
+
+        /* Yükleniyor */
+        .loading { text-align:center; padding:40px; opacity:.6; }
+
+        @media (max-width:760px){
+            .board { grid-template-columns:1fr; }
+            h1 { font-size:2.2rem; }
+            .game-table th, .game-table td { padding:10px 12px; font-size:.85rem; }
+        }
     </style>
     <script src="app-bootstrap.js?v=1" defer></script>
 </head>
@@ -26,54 +55,155 @@
     <a class="back" href="games.html">← Oyunlara Dön</a>
     <header>
         <h1>Liderlik Ekranı 🏆</h1>
-        <p style="opacity:.76">Oyun, doğru cevap, kazanç ve harcama rekabeti.</p>
+        <p class="subtitle">Oyun, doğru cevap, kazanç ve harcama rekabeti.</p>
     </header>
-    <main class="board" id="board"></main>
+
+    <main class="board" id="board"><div class="loading" style="grid-column:1/-1">Yükleniyor... ✨</div></main>
+
+    <div class="section-title" id="game-breakdown-title" style="display:none">Oyun Bazında Detay</div>
+    <div class="game-table" id="game-table" style="display:none">
+        <table>
+            <thead>
+                <tr>
+                    <th>Oyun</th>
+                    <th>Ayşe — Oynama</th>
+                    <th>Ayşe — Kazanç ❤️</th>
+                    <th>Mert — Oynama</th>
+                    <th>Mert — Kazanç ❤️</th>
+                    <th>Kazanan</th>
+                </tr>
+            </thead>
+            <tbody id="game-rows"></tbody>
+        </table>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey:"AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU", authDomain:"ayseye-surpriz.firebaseapp.com", projectId:"ayseye-surpriz", storageBucket:"ayseye-surpriz.firebasestorage.app", messagingSenderId:"531177459988", appId:"1:531177459988:web:09060a95bea0b06f197201" };
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+            authDomain: "ayseye-surpriz.firebaseapp.com",
+            projectId: "ayseye-surpriz",
+            storageBucket: "ayseye-surpriz.firebasestorage.app",
+            messagingSenderId: "531177459988",
+            appId: "1:531177459988:web:09060a95bea0b06f197201"
+        };
         const db = getFirestore(initializeApp(firebaseConfig));
         const players = ['Ayşe', 'Mert'];
         let logs = [];
         let txs = [];
 
+        // Oyun tipi → görünen ad + emoji eşlemesi
+        // type:'game_win' olan kayıtlar meta.game ile ayırt edilir
+        // type:'love_quiz','word_puzzle','heart_rhythm' doğrudan type ile gelir
+        const GAME_META = {
+            dice:         { label: 'Şans Zarı',       emoji: '🎲' },
+            jackpot:      { label: 'Aşk Jackpot',     emoji: '🎰' },
+            memory:       { label: 'Aşk Hafızası',    emoji: '🃏' },
+            mine:         { label: 'Kalp Avcısı',     emoji: '💣' },
+            scratch:      { label: 'Aşk Kazı-Kazan',  emoji: '🎟️' },
+            love_quiz:    { label: 'Bizi Bil Bakalım', emoji: '💌' },
+            word_puzzle:  { label: 'Aşk Kelimeleri',  emoji: '🔤' },
+            heart_rhythm: { label: 'Kalp Ritmi',      emoji: '💓' },
+        };
+
+        // Bir log kaydından oyun anahtarını çıkar
+        function getGameKey(log) {
+            // game_win tipi: meta.game alanına bak
+            if (log.type === 'game_win') {
+                return log.meta?.game || null;
+            }
+            // Doğrudan tip olan oyunlar
+            if (['love_quiz', 'word_puzzle', 'heart_rhythm'].includes(log.type)) {
+                return log.type;
+            }
+            return null;
+        }
+
+        // Bir log kaydından kazanılan ödülü çıkar
+        function getReward(log) {
+            // game_win tipi: meta.reward
+            if (log.type === 'game_win') return Number(log.meta?.reward || 0);
+            // Diğerleri: doğrudan reward alanı
+            return Number(log.reward || 0);
+        }
+
+        // Bir log kaydından skoru çıkar (love_quiz, word_puzzle için anlamlı)
+        function getScore(log) {
+            return Number(log.score || 0);
+        }
+
         function emptyStats() {
-            return { games:0, correct:0, earned:0, spent:0, gifts:0, messages:0 };
+            return { games: 0, correct: 0, earned: 0, spent: 0, gifts: 0, messages: 0 };
+        }
+
+        function emptyGameStats() {
+            return { plays: 0, earned: 0 };
         }
 
         function calculate() {
             const stats = Object.fromEntries(players.map(p => [p, emptyStats()]));
+
+            // Oyun bazında istatistik: { gameKey: { Ayşe: {plays,earned}, Mert: {plays,earned} } }
+            const gameStats = {};
+            Object.keys(GAME_META).forEach(k => {
+                gameStats[k] = Object.fromEntries(players.map(p => [p, emptyGameStats()]));
+            });
+
             logs.forEach(log => {
                 const user = log.user;
                 if (!stats[user]) return;
-                if (['love_quiz','word_puzzle','heart_rhythm','memory_game','mine_game','scratch_game','jackpot','dice'].includes(log.type)) {
+
+                const gameKey = getGameKey(log);
+
+                if (gameKey && GAME_META[gameKey]) {
+                    // Genel istatistikler
                     stats[user].games++;
-                    stats[user].correct += Number(log.score || 0);
-                    stats[user].earned += Number(log.reward || 0);
+                    stats[user].correct += getScore(log);
+                    stats[user].earned += getReward(log);
+
+                    // Oyun bazında istatistikler
+                    gameStats[gameKey][user].plays++;
+                    gameStats[gameKey][user].earned += getReward(log);
                 }
+
                 if (log.type === 'gift_sent') stats[user].gifts++;
                 if (log.type === 'message') stats[user].messages++;
             });
+
             txs.forEach(tx => {
                 if (stats[tx.user]) stats[tx.user].spent += Number(tx.price || 0);
             });
-            return stats;
+
+            return { stats, gameStats };
         }
 
         function leaderFor(stats, key) {
-            const sorted = [...players].sort((a,b) => stats[b][key] - stats[a][key]);
+            const sorted = [...players].sort((a, b) => stats[b][key] - stats[a][key]);
             if (stats[sorted[0]][key] === stats[sorted[1]][key]) return 'Berabere';
             return sorted[0];
         }
 
+        function gameWinner(gameStats, gameKey) {
+            const a = gameStats[gameKey]['Ayşe'];
+            const m = gameStats[gameKey]['Mert'];
+            if (a.plays === 0 && m.plays === 0) return '—';
+            // Önce kazanca bak, eşitse oynama sayısına bak
+            if (a.earned > m.earned) return 'Ayşe';
+            if (m.earned > a.earned) return 'Mert';
+            if (a.plays > m.plays) return 'Ayşe';
+            if (m.plays > a.plays) return 'Mert';
+            return 'Berabere';
+        }
+
         function render() {
-            const stats = calculate();
+            const { stats, gameStats } = calculate();
+
+            // --- Genel kartlar ---
             document.getElementById('board').innerHTML = players.map(player => `
                 <section class="card">
-                    <div class="player">${player}</div>
+                    <div class="player">${player === 'Ayşe' ? '👸🏻' : '🤴🏻'} ${player}</div>
                     <div class="stat"><span>Oynanan oyun</span><strong>${stats[player].games}</strong></div>
                     <div class="stat"><span>Doğru/puan toplamı</span><strong>${stats[player].correct}</strong></div>
                     <div class="stat"><span>Kazanılan kalp</span><strong>${stats[player].earned} ❤️</strong></div>
@@ -83,18 +213,47 @@
                 </section>
             `).join('') + `
                 <section class="card" style="grid-column:1/-1">
-                    <div class="player">Özet</div>
+                    <div class="player">🏅 Özet</div>
                     <div class="winner">En çok oynayan: ${leaderFor(stats, 'games')}</div>
                     <div class="winner">En çok doğru/puan: ${leaderFor(stats, 'correct')}</div>
                     <div class="winner">En çok kazanan: ${leaderFor(stats, 'earned')}</div>
                     <div class="winner">En çok harcayan: ${leaderFor(stats, 'spent')}</div>
                 </section>`;
+
+            // --- Oyun bazında tablo ---
+            const hasAnyGame = Object.values(gameStats).some(g =>
+                players.some(p => g[p].plays > 0)
+            );
+
+            if (hasAnyGame) {
+                document.getElementById('game-breakdown-title').style.display = 'block';
+                document.getElementById('game-table').style.display = 'block';
+
+                document.getElementById('game-rows').innerHTML = Object.entries(GAME_META).map(([key, meta]) => {
+                    const ayse = gameStats[key]['Ayşe'];
+                    const mert = gameStats[key]['Mert'];
+                    if (ayse.plays === 0 && mert.plays === 0) return '';
+                    const winner = gameWinner(gameStats, key);
+                    const winnerCell = winner === 'Berabere'
+                        ? `<span class="tie-badge">Berabere</span>`
+                        : `<span class="winner-cell">${winner === 'Ayşe' ? '👸🏻' : '🤴🏻'} ${winner}</span>`;
+                    return `<tr>
+                        <td><span class="game-name">${meta.emoji} ${meta.label}</span></td>
+                        <td>${ayse.plays} kez</td>
+                        <td>${ayse.earned} ❤️</td>
+                        <td>${mert.plays} kez</td>
+                        <td>${mert.earned} ❤️</td>
+                        <td>${winnerCell}</td>
+                    </tr>`;
+                }).join('');
+            }
         }
 
         onSnapshot(collection(db, 'activity_logs'), snap => {
             logs = snap.docs.map(d => d.data());
             render();
         });
+
         onSnapshot(query(collection(db, 'shop_transactions'), orderBy('createdAt', 'desc')), snap => {
             txs = snap.docs.map(d => d.data());
             render();
