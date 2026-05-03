@@ -18,6 +18,7 @@ $pages = @(
     'music.html',
     'notification-center.html',
     'profile.html',
+    'sans-carki.html',
     'scratch-game.html',
     'special-days.html',
     'theme-editor.html',

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -8,6 +8,8 @@
     <meta name="theme-color" content="#0a0208">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,225 +19,329 @@
             --bg-primary: #0a0208;
             --bg-secondary: #1a0a1a;
             --glass: rgba(255, 255, 255, 0.08);
+            --polaroid-bg: #f5f0e8;
+            --polaroid-shadow: rgba(0,0,0,0.55);
+            --tape-color: rgba(255,230,180,0.72);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, #0a0208 0%, #1a0a1a 50%, #0f0510 100%);
+            background:
+                radial-gradient(ellipse at 20% 0%, rgba(255,75,114,0.18) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(180,79,255,0.12) 0%, transparent 50%),
+                linear-gradient(160deg, #0d0208 0%, #1a0a1a 45%, #0f0510 100%);
             min-height: 100vh;
             color: #fff;
             padding: 20px;
-            padding-bottom: 100px;
-            padding-top: env(safe-area-inset-top);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
+            padding-bottom: 120px;
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-left: max(20px, env(safe-area-inset-left));
+            padding-right: max(20px, env(safe-area-inset-right));
             overflow-x: hidden;
+        }
+
+        /* Sayfa dokusu */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 1px 1px, rgba(255,255,255,0.025) 1px, transparent 0);
+            background-size: 28px 28px;
+            pointer-events: none;
+            z-index: 0;
         }
 
         /* Header */
         .header {
             text-align: center;
-            padding: 20px 0 30px;
+            padding: 20px 0 36px;
+            position: relative;
+            z-index: 1;
         }
 
         .back-btn {
             position: fixed;
             top: 20px;
             left: 20px;
-            background: var(--glass);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.18);
             color: #fff;
             padding: 10px 18px;
             border-radius: 25px;
             text-decoration: none;
             font-size: 0.9rem;
-            backdrop-filter: blur(10px);
-            z-index: 100;
+            backdrop-filter: blur(14px);
+            z-index: 200;
             transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
         }
 
         .back-btn:hover {
-            background: rgba(255, 75, 114, 0.3);
+            background: rgba(255, 75, 114, 0.22);
             border-color: var(--primary);
-        }
-
-        .header h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1rem;
+            transform: translateX(-2px);
         }
 
         .header-icon {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            font-size: 3.5rem;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 4px 12px rgba(255,75,114,0.4));
+            display: block;
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .header h1 {
+            font-family: 'Caveat', cursive;
+            font-size: 2.8rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ffd6e0, var(--accent-pink), var(--accent-purple));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 0.95rem;
+            font-style: italic;
         }
 
         /* Stats Container */
         .stats-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 14px;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
         }
 
         @media (max-width: 640px) {
-            .stats-container {
-                grid-template-columns: 1fr;
-            }
+            .stats-container { grid-template-columns: 1fr; }
         }
 
         /* Aktivite Paneli */
         .activity-panel {
-            background: var(--glass);
+            background: rgba(255,255,255,0.045);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.09);
             border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 25px;
+            padding: 18px 20px;
             text-align: center;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 8px 24px rgba(0,0,0,0.25);
         }
 
         .activity-panel h3 {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 15px;
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 14px;
+            font-weight: 500;
         }
 
         .activity-stats {
             display: flex;
             justify-content: center;
-            gap: 30px;
+            gap: 24px;
             flex-wrap: wrap;
         }
 
-        .activity-stat {
-            text-align: center;
-        }
+        .activity-stat { text-align: center; }
 
         .activity-stat .value {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 700;
             color: var(--accent-pink);
+            line-height: 1;
         }
 
         .activity-stat .label {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 4px;
         }
 
         /* Fotoğraf Ekleme */
         .add-photo-section {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 2px dashed rgba(255, 75, 114, 0.4);
-            border-radius: 20px;
-            padding: 30px;
+            background: rgba(255,75,114,0.06);
+            backdrop-filter: blur(16px);
+            border: 2px dashed rgba(255,75,114,0.35);
+            border-radius: 22px;
+            padding: 28px 20px;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 36px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.35s cubic-bezier(0.175,0.885,0.32,1.275);
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 4px 20px rgba(255,75,114,0.08);
         }
 
         .add-photo-section:hover {
-            background: rgba(255, 75, 114, 0.1);
+            background: rgba(255,75,114,0.13);
             border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(255,75,114,0.18);
         }
 
+        .add-photo-section:active { transform: scale(0.98); }
+
         .add-photo-section .icon {
-            font-size: 3rem;
+            font-size: 2.6rem;
             margin-bottom: 10px;
+            display: block;
         }
 
         .add-photo-section p {
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255,255,255,0.75);
             font-size: 1rem;
+            font-weight: 500;
         }
 
-        #photo-input {
-            display: none;
+        .add-photo-section small {
+            display: block;
+            color: rgba(255,255,255,0.38);
+            font-size: 0.78rem;
+            margin-top: 5px;
         }
 
-        /* Albüm Grid */
+        #photo-input { display: none; }
+
+        /* ===== ALBÜM SAYFASI ===== */
+        .album-page-wrap {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Albüm başlık bandı */
+        .album-section-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .album-section-label::before,
+        .album-section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,75,114,0.3), transparent);
+        }
+
+        .album-section-label span {
+            font-family: 'Caveat', cursive;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.5);
+            white-space: nowrap;
+        }
+
+        /* Albüm Grid — masaüstü dağınık, mobil 2 sütun */
         .album-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 20px;
-            padding: 0 5px;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 28px 22px;
+            padding: 10px 4px 20px;
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 520px) {
             .album-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
+                gap: 20px 14px;
             }
         }
 
-        /* Polaroid Kart */
+        /* ===== POLAROİD KART ===== */
         .polaroid-card {
-            background: #1a1a1a;
-            border-radius: 12px;
-            padding: 12px 12px 50px 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            background: #1c1c1e;
+            border-radius: 3px;
+            padding: 10px 10px 52px 10px;
+            box-shadow:
+                0 2px 4px rgba(0,0,0,0.4),
+                0 8px 20px rgba(0,0,0,0.55),
+                0 20px 40px rgba(0,0,0,0.3),
+                inset 0 1px 0 rgba(255,255,255,0.06);
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             transform: rotate(var(--rotation, 0deg));
+            transform-origin: center bottom;
+            will-change: transform;
         }
 
-        .polaroid-card:nth-child(odd) {
-            --rotation: -2deg;
-        }
-
-        .polaroid-card:nth-child(even) {
-            --rotation: 2deg;
-        }
+        /* Farklı rotasyonlar */
+        .polaroid-card:nth-child(4n+1) { --rotation: -3.2deg; }
+        .polaroid-card:nth-child(4n+2) { --rotation: 2.1deg; }
+        .polaroid-card:nth-child(4n+3) { --rotation: -1.4deg; }
+        .polaroid-card:nth-child(4n+4) { --rotation: 3.5deg; }
 
         .polaroid-card:hover {
-            transform: rotate(0deg) scale(1.05) translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 75, 114, 0.3);
-            z-index: 10;
+            transform: rotate(0deg) scale(1.06) translateY(-8px);
+            box-shadow:
+                0 4px 8px rgba(0,0,0,0.4),
+                0 16px 40px rgba(0,0,0,0.6),
+                0 32px 60px rgba(0,0,0,0.35),
+                0 0 0 1px rgba(255,75,114,0.2);
+            z-index: 20;
+        }
+
+        /* Bant efekti */
+        .polaroid-card::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-1deg);
+            width: 48px;
+            height: 22px;
+            background: var(--tape-color);
+            border-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .polaroid-card:nth-child(3n+2)::before {
+            left: 30%;
+            transform: translateX(-50%) rotate(8deg);
+        }
+        .polaroid-card:nth-child(3n+3)::before {
+            left: 70%;
+            transform: translateX(-50%) rotate(-6deg);
         }
 
         .polaroid-image {
             width: 100%;
-            height: 140px;
+            height: 150px;
             object-fit: cover;
-            border-radius: 8px;
-            background: #2a2a2a;
+            border-radius: 1px;
+            background: #111;
             display: block;
         }
 
-        @media (max-width: 480px) {
-            .polaroid-image {
-                height: 120px;
-            }
+        @media (max-width: 520px) {
+            .polaroid-image { height: 130px; }
         }
 
+        /* Polaroid alt yazı */
         .polaroid-caption {
             position: absolute;
-            bottom: 12px;
-            left: 12px;
-            right: 12px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.85rem;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            font-family: 'Caveat', cursive;
+            font-size: 1rem;
             font-weight: 500;
-            color: #fff;
+            color: rgba(255,255,255,0.75);
             text-align: center;
             line-height: 1.3;
             white-space: nowrap;
@@ -243,18 +349,39 @@
             text-overflow: ellipsis;
         }
 
+        /* Tarih */
         .polaroid-date {
             position: absolute;
-            top: 18px;
-            right: 18px;
-            background: rgba(0, 0, 0, 0.7);
-            color: #fff;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            backdrop-filter: blur(5px);
+            top: 14px;
+            right: 14px;
+            background: rgba(0,0,0,0.6);
+            color: rgba(255,255,255,0.8);
+            padding: 2px 7px;
+            border-radius: 8px;
+            font-size: 0.65rem;
+            backdrop-filter: blur(4px);
+            z-index: 3;
+            font-family: 'Outfit', sans-serif;
         }
 
+        /* Partner rozeti */
+        .polaroid-owner {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            font-size: 1rem;
+            z-index: 3;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Sil butonu */
         .delete-photo {
             position: absolute;
             top: -10px;
@@ -264,181 +391,238 @@
             border-radius: 50%;
             background: var(--primary);
             color: #fff;
-            border: none;
+            border: 2px solid #1c1c1e;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.85rem;
             display: flex;
             align-items: center;
             justify-content: center;
             opacity: 0;
-            transition: all 0.3s;
-            z-index: 20;
+            transition: all 0.25s;
+            z-index: 30;
+            box-shadow: 0 2px 8px rgba(255,75,114,0.5);
         }
 
-        .polaroid-card:hover .delete-photo {
-            opacity: 1;
-        }
+        .polaroid-card:hover .delete-photo { opacity: 1; }
 
+        /* Yükleniyor */
         .uploading-indicator {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0,0,0,0.82);
             color: #fff;
-            padding: 10px 15px;
+            padding: 10px 16px;
             border-radius: 20px;
             font-size: 0.8rem;
             display: flex;
             align-items: center;
             gap: 8px;
+            z-index: 10;
         }
 
         .spinner {
             width: 16px;
             height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255,255,255,0.3);
             border-top-color: #fff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Boş Albüm */
+        /* ===== Albüm Araç Çubuğu ===== */
+        .album-toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            align-items: center;
+        }
+        .album-search-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 22px;
+            padding: 8px 14px;
+        }
+        .album-search-icon { font-size: 1rem; opacity: 0.6; flex-shrink: 0; }
+        .album-search-input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .album-search-input::placeholder { color: rgba(255,255,255,0.35); }
+        .album-sort-select {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 18px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.82rem;
+            padding: 8px 12px;
+            outline: none;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .album-sort-select option { background: #1a0a1a; }
+
+        /* ===== Boş Albüm ===== */
         .empty-album {
             text-align: center;
-            padding: 60px 20px;
-            color: rgba(255, 255, 255, 0.5);
+            padding: 70px 20px;
+            color: rgba(255,255,255,0.4);
+            position: relative;
+            z-index: 1;
         }
 
         .empty-album .icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 1000;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .modal.active {
+            font-size: 4.5rem;
+            margin-bottom: 18px;
+            opacity: 0.4;
             display: block;
         }
 
+        .empty-album p { font-size: 1rem; line-height: 1.6; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(16px);
+            z-index: 1000;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            animation: fadeInModal 0.25s ease;
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.active { display: block; }
+
         .modal-content {
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            padding: 25px;
-            max-width: 500px;
-            width: 90%;
+            background: linear-gradient(160deg, #1e0e1e, #140a14);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 28px;
+            max-width: 520px;
+            width: 92%;
             margin: 40px auto;
             position: relative;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.07);
+            animation: slideUpModal 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+        }
+
+        @keyframes slideUpModal {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         @media (max-width: 480px) {
-            .modal-content {
-                width: 95%;
-                margin: 20px auto;
-                padding: 20px;
-            }
+            .modal-content { width: 95%; margin: 16px auto; padding: 20px; }
         }
 
         .modal-close {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 14px;
+            right: 14px;
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
             color: #fff;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
-        .modal-close:hover {
-            background: var(--primary);
-        }
+        .modal-close:hover { background: var(--primary); transform: rotate(90deg); }
 
         .modal-image-container {
             width: 100%;
-            max-height: 60vh;
+            max-height: 58vh;
             overflow: hidden;
-            border-radius: 12px;
+            border-radius: 14px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: #0a0a0a;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
         }
 
         .modal-image-container img {
             max-width: 100%;
-            max-height: 60vh;
+            max-height: 58vh;
             object-fit: contain;
         }
 
         .modal-input {
             width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 14px;
+            padding: 14px 16px;
             color: #fff;
             font-size: 1rem;
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Caveat', cursive;
+            font-size: 1.1rem;
             margin-bottom: 20px;
             resize: none;
+            transition: border-color 0.2s;
         }
 
         .modal-input:focus {
             outline: none;
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255,75,114,0.5);
+            background: rgba(255,255,255,0.07);
         }
 
         .modal-btn {
-            padding: 12px 30px;
+            padding: 12px 28px;
             border-radius: 25px;
             border: none;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.25s;
             font-family: 'Outfit', sans-serif;
         }
 
         .modal-btn-primary {
             background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
             color: #fff;
+            box-shadow: 0 4px 16px rgba(255,75,114,0.3);
         }
 
         .modal-btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255, 75, 114, 0.3);
+            box-shadow: 0 8px 24px rgba(255,75,114,0.4);
         }
 
         .modal-btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.8);
             margin-left: 10px;
         }
 
@@ -449,20 +633,20 @@
             right: 20px;
             background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
             color: #fff;
-            padding: 15px 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            padding: 14px 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(255,75,114,0.35);
             z-index: 2000;
-            transform: translateX(400px);
+            transform: translateX(420px);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             max-width: 300px;
             font-size: 0.9rem;
+            font-weight: 500;
         }
 
-        .notification.show {
-            transform: translateX(0);
-        }
+        .notification.show { transform: translateX(0); }
     </style>
+    <script src="app-bootstrap.js?v=1" defer></script>
 </head>
 <body>
     <a href="index.html#hub" class="back-btn">← Geri</a>
@@ -514,10 +698,30 @@
     <div class="add-photo-section" onclick="document.getElementById('photo-input').click()">
         <div class="icon">📷</div>
         <p>Yeni Fotoğraf Ekle</p>
+        <small>Birden fazla fotoğraf seçebilirsin</small>
     </div>
     <input type="file" id="photo-input" accept="image/*" multiple onchange="handlePhotoUpload(event)">
 
-    <div class="album-grid" id="album-grid"></div>
+    <!-- Arama & Sıralama Araç Çubuğu -->
+    <div class="album-toolbar">
+        <div class="album-search-wrap">
+            <span class="album-search-icon">🔍</span>
+            <input type="search" id="album-search" class="album-search-input" placeholder="Açıklamada ara..." oninput="filterAlbum(this.value)">
+        </div>
+        <div class="album-sort-wrap">
+            <select id="album-sort" class="album-sort-select" onchange="sortAlbum(this.value)">
+                <option value="newest">En Yeni</option>
+                <option value="oldest">En Eski</option>
+                <option value="mine">Benimkiler</option>
+                <option value="partner">Sevgilimin</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="album-page-wrap">
+        <div class="album-section-label"><span>📸 Anılarımız</span></div>
+        <div class="album-grid" id="album-grid"></div>
+    </div>
 
     <div class="empty-album" id="empty-album" style="display: none;">
         <div class="icon">🖼️</div>
@@ -529,8 +733,11 @@
     <div class="modal" id="photo-modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal()">✕</button>
-            <div class="modal-image-container">
+            <div class="modal-image-container" id="modal-img-container">
                 <img id="modal-image" src="" alt="Fotoğraf">
+            </div>
+            <div style="display:flex; gap:8px; margin-bottom:14px;">
+                <a id="modal-download-btn" class="modal-btn modal-btn-secondary" download="anim.jpg" style="text-decoration:none; display:flex; align-items:center; gap:6px; flex:1; justify-content:center;">⬇️ İndir</a>
             </div>
             <textarea class="modal-input" id="modal-caption" rows="3" placeholder="Bu fotoğraf hakkında bir şeyler yaz..."></textarea>
             <div style="text-align: center;">
@@ -544,372 +751,275 @@
     <div class="notification" id="notification"></div>
 
     <!-- Firebase & ImgBB -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    
-    <script>
-        // =================== CONFIG (from diary.html) ===================
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
         const IMGBB_API_KEY = '7916dd11376f59a547ed252799f1328a';
-        
+
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
             authDomain: "ayseye-surpriz.firebaseapp.com",
             projectId: "ayseye-surpriz",
             storageBucket: "ayseye-surpriz.firebasestorage.app",
             messagingSenderId: "531177459988",
-            appId: "1:531177459988:web:09060a95bea0b06f197201",
-            measurementId: "G-2LBSDG1KDB"
+            appId: "1:531177459988:web:09060a95bea0b06f197201"
         };
-        
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         // =================== GLOBALS ===================
         let photos = [];
         let currentPhotoIndex = -1;
-        let currentUser = localStorage.getItem('active_player') || 'guest';
+        const currentUser = localStorage.getItem('active_player') || 'guest';
         let sessionStartTime = Date.now();
         let totalTimeSpent = 0;
-        
-        // =================== ACTIVITY TRACKING (Aşk Profili ile entegre) ===================
-        // Bugünün tarihi
+        let lastSavedSessionMinutes = 0;
+
+        // =================== ACTIVITY TRACKING ===================
         function getTodayString() {
             return new Date().toISOString().split('T')[0];
         }
-        
-        // Geçirilen süreyi hesapla ve göster
+
         function trackActivity() {
-            const now = Date.now();
-            const currentSessionMinutes = Math.floor((now - sessionStartTime) / 60000);
-            
-            // Toplam süre = Önceki kayıtlı süre + Mevcut oturum süresi
+            const currentSessionMinutes = Math.floor((Date.now() - sessionStartTime) / 60000);
             const totalMinutes = totalTimeSpent + currentSessionMinutes;
-            
-            // Ekranda göster
             document.getElementById('time-spent').textContent = totalMinutes + ' dk';
-            
-            // Her dakika Firestore'a kaydet (değişiklik varsa)
             if (currentSessionMinutes > lastSavedSessionMinutes) {
                 lastSavedSessionMinutes = currentSessionMinutes;
                 saveActivityData(totalMinutes);
             }
         }
-        
-        let lastSavedSessionMinutes = 0; // Son kaydedilen oturum süresi
-        
+
         async function saveActivityData(totalMinutes = null) {
             if (totalMinutes === null) {
                 const currentSessionMinutes = Math.floor((Date.now() - sessionStartTime) / 60000);
                 totalMinutes = totalTimeSpent + currentSessionMinutes;
             }
-            
             const today = getTodayString();
-            const userStatsRef = db.collection('user_stats').doc(currentUser);
-            
             try {
-                // Aşk Profili'ndeki timeSpent alanını güncelle (album sayfası için)
-                await userStatsRef.set({
+                await setDoc(doc(db, 'user_stats', currentUser), {
                     [`timeSpent.album`]: totalMinutes,
-                    [`lastActivity.album`]: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastVisit: firebase.firestore.FieldValue.serverTimestamp()
+                    [`lastActivity.album`]: serverTimestamp(),
+                    lastVisit: serverTimestamp()
                 }, { merge: true });
-                
-                // Ayrıca albüm_activity koleksiyonuna da kaydet (albüm için özel)
-                await db.collection('album_activity').doc(`${currentUser}_${today}`).set({
-                    user: currentUser,
-                    date: today,
-                    timeSpent: totalMinutes,
-                    photoCount: photos.length,
-                    lastVisit: firebase.firestore.FieldValue.serverTimestamp()
+                await setDoc(doc(db, 'album_activity', `${currentUser}_${today}`), {
+                    user: currentUser, date: today,
+                    timeSpent: totalMinutes, photoCount: photos.length,
+                    lastVisit: serverTimestamp()
                 }, { merge: true });
-                
-                console.log('✅ Süre kaydedildi:', totalMinutes, 'dk');
             } catch (error) {
-                console.error('❌ Süre kaydedilemedi:', error);
+                console.error('Süre kaydedilemedi:', error);
             }
         }
-        
+
         async function loadActivityData() {
             const today = getTodayString();
-            
             try {
-                // Aşk Profili'nden kullanıcının timeSpent verilerini yükle
-                const userStatsDoc = await db.collection('user_stats').doc(currentUser).get();
-                
-                if (userStatsDoc.exists) {
-                    const statsData = userStatsDoc.data();
-                    
-                    // Bugünün kaydını kontrol et
-                    const todayDoc = await db.collection('album_activity').doc(`${currentUser}_${today}`).get();
-                    if (todayDoc.exists && todayDoc.data().timeSpent !== undefined) {
-                        totalTimeSpent = todayDoc.data().timeSpent;
-                    } else {
-                        // Bugün için yeni kayıt, önceki toplamı al
-                        totalTimeSpent = statsData.timeSpent?.album || 0;
-                    }
-                    
-                    // Ekranda göster (mevcut oturum süresi henüz eklenmedi, sadece kayıtlı süre)
+                const userStatsSnap = await getDoc(doc(db, 'user_stats', currentUser));
+                if (userStatsSnap.exists()) {
+                    const statsData = userStatsSnap.data();
+                    const todaySnap = await getDoc(doc(db, 'album_activity', `${currentUser}_${today}`));
+                    totalTimeSpent = (todaySnap.exists() && todaySnap.data().timeSpent !== undefined)
+                        ? todaySnap.data().timeSpent
+                        : (statsData.timeSpent?.album || 0);
                     document.getElementById('time-spent').textContent = totalTimeSpent + ' dk';
-                    
-                    // Son ziyaret bilgisi (lastVisit veya lastActivity.album'dan al)
-                    let lastVisitTimestamp = statsData.lastVisit;
-                    if (!lastVisitTimestamp && statsData.lastActivity?.album) {
-                        lastVisitTimestamp = statsData.lastActivity.album;
-                    }
-                    
-                    if (lastVisitTimestamp) {
-                        const lastVisit = lastVisitTimestamp.toDate ? 
-                            lastVisitTimestamp.toDate() : new Date(lastVisitTimestamp);
-                        
-                        // Tarih formatla
-                        const day = lastVisit.getDate().toString().padStart(2, '0');
-                        const month = (lastVisit.getMonth() + 1).toString().padStart(2, '0');
-                        const hours = lastVisit.getHours().toString().padStart(2, '0');
-                        const minutes = lastVisit.getMinutes().toString().padStart(2, '0');
-                        
-                        document.getElementById('last-visit').textContent = `${day}/${month} ${hours}:${minutes}`;
+                    const lastVisitTs = statsData.lastVisit || statsData.lastActivity?.album;
+                    if (lastVisitTs) {
+                        const d = lastVisitTs.toDate ? lastVisitTs.toDate() : new Date(lastVisitTs);
+                        document.getElementById('last-visit').textContent =
+                            `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
                     } else {
                         document.getElementById('last-visit').textContent = 'İlk ziyaret';
                     }
                 } else {
-                    // İlk ziyaret
-                    totalTimeSpent = 0;
                     document.getElementById('last-visit').textContent = 'İlk ziyaret';
                 }
-                
-                // Partner (Ayşe) verilerini yükle
+
                 const partnerId = currentUser === 'Ayşe' ? 'Mert' : 'Ayşe';
-                const partnerStatsDoc = await db.collection('user_stats').doc(partnerId).get();
-                
-                if (partnerStatsDoc.exists) {
-                    const partnerData = partnerStatsDoc.data();
-                    const partnerTodayDoc = await db.collection('album_activity').doc(`${partnerId}_${today}`).get();
-                    
-                    let partnerAlbumTime = 0;
-                    if (partnerTodayDoc.exists && partnerTodayDoc.data().timeSpent !== undefined) {
-                        partnerAlbumTime = partnerTodayDoc.data().timeSpent;
-                    } else {
-                        partnerAlbumTime = partnerData.timeSpent?.album || 0;
-                    }
-                    
-                    document.getElementById('partner-time-spent').textContent = partnerAlbumTime + ' dk';
-                    document.getElementById('partner-photo-count').textContent = partnerData.photoCount || 0;
-                    
-                    // Partner son ziyaret
-                    let partnerLastVisit = partnerData.lastVisit;
-                    if (!partnerLastVisit && partnerData.lastActivity?.album) {
-                        partnerLastVisit = partnerData.lastActivity.album;
-                    }
-                    
-                    if (partnerLastVisit) {
-                        const lastVisitDate = partnerLastVisit.toDate ? 
-                            partnerLastVisit.toDate() : new Date(partnerLastVisit);
-                        const day = lastVisitDate.getDate().toString().padStart(2, '0');
-                        const month = (lastVisitDate.getMonth() + 1).toString().padStart(2, '0');
-                        const hours = lastVisitDate.getHours().toString().padStart(2, '0');
-                        const minutes = lastVisitDate.getMinutes().toString().padStart(2, '0');
-                        document.getElementById('partner-last-visit').textContent = `${day}/${month} ${hours}:${minutes}`;
+                const partnerSnap = await getDoc(doc(db, 'user_stats', partnerId));
+                if (partnerSnap.exists()) {
+                    const pd = partnerSnap.data();
+                    const partnerTodaySnap = await getDoc(doc(db, 'album_activity', `${partnerId}_${today}`));
+                    const partnerTime = (partnerTodaySnap.exists() && partnerTodaySnap.data().timeSpent !== undefined)
+                        ? partnerTodaySnap.data().timeSpent : (pd.timeSpent?.album || 0);
+                    document.getElementById('partner-time-spent').textContent = partnerTime + ' dk';
+                    document.getElementById('partner-photo-count').textContent = pd.photoCount || 0;
+                    const pLastVisit = pd.lastVisit || pd.lastActivity?.album;
+                    if (pLastVisit) {
+                        const d = pLastVisit.toDate ? pLastVisit.toDate() : new Date(pLastVisit);
+                        document.getElementById('partner-last-visit').textContent =
+                            `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
                     } else {
                         document.getElementById('partner-last-visit').textContent = '-';
                     }
                 }
-                
-                // Kullanıcı adını güncelle
-                document.getElementById('current-user-name').textContent = currentUser === 'Ayşe' ? 'Ayşe' : 'Sen';
-                
+                document.getElementById('current-user-name').textContent = currentUser;
             } catch (error) {
                 console.error('Aktivite verileri yüklenemedi:', error);
             }
         }
-        
+
         // =================== PHOTOS ===================
         async function loadPhotos() {
             try {
-                // Firestore'dan yükle
-                const doc = await db.collection('couple_album').doc(currentUser).get();
-                
-                if (doc.exists && doc.data().photos) {
-                    photos = doc.data().photos;
+                const snap = await getDoc(doc(db, 'couple_album', currentUser));
+                if (snap.exists() && snap.data().photos) {
+                    photos = snap.data().photos.map(p => ({ ...p, owner: currentUser }));
                 } else {
-                    // Varsayılan fotoğraflar
                     photos = [
-                        {
-                            id: 'default_1',
-                            url: 'r1.jpg',
-                            caption: 'İlk anımız 🌹',
-                            date: new Date().toISOString(),
-                            isMarketPhoto: true,
-                            seller: 'Aşk Marketi',
-                            title: 'İlk anımız'
-                        },
-                        {
-                            id: 'default_2',
-                            url: 'r2.jpg',
-                            caption: 'Romantik akşam 🕯️',
-                            date: new Date(Date.now() - 86400000).toISOString(),
-                            isMarketPhoto: true,
-                            seller: 'Aşk Marketi',
-                            title: 'Romantik akşam'
-                        },
-                        {
-                            id: 'default_3',
-                            url: 'r3.jpg',
-                            caption: 'Sahildeki anımız 🌊',
-                            date: new Date(Date.now() - 172800000).toISOString(),
-                            isMarketPhoto: true,
-                            seller: 'Aşk Marketi',
-                            title: 'Sahildeki anımız'
-                        }
+                        { id: 'default_1', url: 'r1.jpg', caption: 'İlk anımız 🌹', date: new Date().toISOString(), isMarketPhoto: true, seller: 'Aşk Marketi', title: 'İlk anımız', owner: currentUser },
+                        { id: 'default_2', url: 'r2.jpg', caption: 'Romantik akşam 🕯️', date: new Date(Date.now() - 86400000).toISOString(), isMarketPhoto: true, seller: 'Aşk Marketi', title: 'Romantik akşam', owner: currentUser },
+                        { id: 'default_3', url: 'r3.jpg', caption: 'Sahildeki anımız 🌊', date: new Date(Date.now() - 172800000).toISOString(), isMarketPhoto: true, seller: 'Aşk Marketi', title: 'Sahildeki anımız', owner: currentUser }
                     ];
                     await savePhotos();
                 }
-                
-                // Market fotoğraflarını ekle
+                // Partner fotoğraflarını da yükle (ortak albüm)
+                const partner = currentUser === 'Ayşe' ? 'Mert' : 'Ayşe';
+                const partnerSnap = await getDoc(doc(db, 'couple_album', partner));
+                if (partnerSnap.exists() && partnerSnap.data().photos) {
+                    const partnerPhotos = partnerSnap.data().photos.map(p => ({ ...p, owner: partner, readOnly: true }));
+                    photos = [...photos, ...partnerPhotos];
+                }
                 await loadMarketPhotos();
-                
                 updateAlbumDisplay();
                 updatePhotoCount();
             } catch (error) {
                 console.error('Fotoğraflar yüklenemedi:', error);
-                showNotification('Fotoğraflar yüklenemedi', 'error');
+                showNotification('Fotoğraflar yüklenemedi');
             }
         }
-        
+
         async function loadMarketPhotos() {
             try {
-                const userDoc = await db.collection('user_inventory').doc(currentUser).get();
-                
-                if (userDoc.exists && userDoc.data().photos) {
-                    const marketPhotos = userDoc.data().photos;
-                    
-                    marketPhotos.forEach(mp => {
-                        const exists = photos.find(p => p.id === mp.id);
-                        if (!exists) {
-                            photos.push({
-                                id: mp.id,
-                                url: mp.url || mp.photoUrl,
-                                caption: mp.caption || mp.title || 'Aşk Marketi 💝',
-                                date: mp.date || new Date().toISOString(),
-                                isMarketPhoto: true,
-                                seller: mp.seller,
-                                title: mp.title
-                            });
+                const snap = await getDoc(doc(db, 'user_inventory', currentUser));
+                if (snap.exists() && snap.data().photos) {
+                    snap.data().photos.forEach(mp => {
+                        if (!photos.find(p => p.id === mp.id)) {
+                            photos.push({ id: mp.id, url: mp.url || mp.photoUrl, caption: mp.caption || mp.title || 'Aşk Marketi 💝', date: mp.date || new Date().toISOString(), isMarketPhoto: true, seller: mp.seller, title: mp.title });
                         }
                     });
-                    
                     await savePhotos();
                 }
             } catch (error) {
                 console.error('Market fotoğrafları yüklenemedi:', error);
             }
         }
-        
+
         async function savePhotos() {
             try {
-                await db.collection('couple_album').doc(currentUser).set({
-                    photos: photos,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                // Local backup
+                await setDoc(doc(db, 'couple_album', currentUser), { photos, updatedAt: serverTimestamp() });
                 localStorage.setItem('album_photos_backup', JSON.stringify(photos));
             } catch (error) {
                 console.error('Kaydetme hatası:', error);
-                // Sadece local'e kaydet
                 localStorage.setItem('album_photos_backup', JSON.stringify(photos));
             }
         }
-        
+
         // =================== DISPLAY ===================
-        function updateAlbumDisplay() {
+        let currentFilter = '';
+        let currentSort = 'newest';
+        let allPhotos = []; // partner dahil tüm fotoğraflar
+
+        function getDisplayPhotos() {
+            let list = [...allPhotos];
+            // Filtre
+            if (currentFilter) {
+                list = list.filter(p => (p.caption || '').toLowerCase().includes(currentFilter.toLowerCase()));
+            }
+            // Sıralama
+            if (currentSort === 'newest') list.sort((a, b) => new Date(b.date) - new Date(a.date));
+            else if (currentSort === 'oldest') list.sort((a, b) => new Date(a.date) - new Date(b.date));
+            else if (currentSort === 'mine') list = list.filter(p => p.owner === currentUser || !p.owner);
+            else if (currentSort === 'partner') {
+                const partner = currentUser === 'Ayşe' ? 'Mert' : 'Ayşe';
+                list = list.filter(p => p.owner === partner);
+            }
+            return list;
+        }
+
+        window.filterAlbum = function(val) {
+            currentFilter = val;
+            renderGrid();
+        };
+
+        window.sortAlbum = function(val) {
+            currentSort = val;
+            renderGrid();
+        };
+
+        function renderGrid() {
             const grid = document.getElementById('album-grid');
             const empty = document.getElementById('empty-album');
-            
-            if (photos.length === 0) {
+            const list = getDisplayPhotos();
+            if (list.length === 0) {
                 grid.style.display = 'none';
                 empty.style.display = 'block';
                 return;
             }
-            
             grid.style.display = 'grid';
             empty.style.display = 'none';
-            
-            grid.innerHTML = photos.map((photo, index) => {
-                const caption = photo.isMarketPhoto 
+            grid.innerHTML = list.map((photo, index) => {
+                const caption = photo.isMarketPhoto
                     ? `${photo.caption} - ${photo.seller || 'Aşk Marketi'} 💝`
                     : photo.caption;
-                
+                const ownerBadge = photo.owner && photo.owner !== currentUser
+                    ? `<div class="polaroid-owner">${photo.owner === 'Ayşe' ? '🎀' : '💙'}</div>` : '';
                 return `
-                    <div class="polaroid-card" onclick="openPhotoModal(${index})">
+                    <div class="polaroid-card" onclick="openPhotoModal(${index}, true)">
+                        ${ownerBadge}
                         <div class="polaroid-date">${formatDate(photo.date)}</div>
                         ${photo.isUploading ? '<div class="uploading-indicator"><div class="spinner"></div>Yükleniyor...</div>' : ''}
                         <img src="${photo.url}" alt="${caption}" class="polaroid-image" loading="lazy">
                         <div class="polaroid-caption" title="${caption}">${caption}</div>
-                        ${!photo.isMarketPhoto ? `<button class="delete-photo" onclick="deletePhoto(event, ${index})">✕</button>` : ''}
-                    </div>
-                `;
+                        ${(!photo.isMarketPhoto && (!photo.owner || photo.owner === currentUser)) ? `<button class="delete-photo" onclick="deletePhoto(event, ${index}, true)">✕</button>` : ''}
+                    </div>`;
             }).join('');
         }
-        
+
+        function updateAlbumDisplay() {
+            // Kendi fotoğraflarını allPhotos'a ekle (owner tag ile)
+            allPhotos = photos.map(p => ({ ...p, owner: p.owner || currentUser }));
+            renderGrid();
+        }
+
         function updatePhotoCount() {
             document.getElementById('photo-count').textContent = photos.length;
         }
-        
+
         function formatDate(dateString) {
             if (!dateString) return '';
-            const date = new Date(dateString);
-            const day = date.getDate();
-            const month = date.toLocaleString('tr-TR', { month: 'short' });
-            return `${day} ${month}`;
+            const d = new Date(dateString);
+            return `${d.getDate()} ${d.toLocaleString('tr-TR', { month: 'short' })}`;
         }
-        
+
         // =================== UPLOAD ===================
         async function handlePhotoUpload(event) {
             const files = Array.from(event.target.files);
-            
             for (const file of files) {
                 if (!file.type.startsWith('image/')) continue;
-                
                 const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                
-                // Önce local preview
                 const reader = new FileReader();
                 reader.onload = async (e) => {
-                    const newPhoto = {
-                        id: photoId,
-                        url: e.target.result,
-                        caption: 'Yeni anı 📸',
-                        date: new Date().toISOString(),
-                        isMarketPhoto: false,
-                        isUploading: true
-                    };
-                    
+                    const newPhoto = { id: photoId, url: e.target.result, caption: 'Yeni anı 📸', date: new Date().toISOString(), isMarketPhoto: false, isUploading: true };
                     photos.unshift(newPhoto);
                     updateAlbumDisplay();
                     showNotification('Fotoğraf yükleniyor... ☁️');
-                    
-                    // ImgBB'ye yükle
                     try {
                         const formData = new FormData();
                         formData.append('image', file);
                         formData.append('key', IMGBB_API_KEY);
                         formData.append('name', `album_${photoId}`);
-                        
-                        const response = await fetch('https://api.imgbb.com/1/upload', {
-                            method: 'POST',
-                            body: formData
-                        });
-                        
+                        const response = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
                         const data = await response.json();
-                        
                         if (data.success) {
-                            const index = photos.findIndex(p => p.id === photoId);
-                            if (index !== -1) {
-                                photos[index].url = data.data.url;
-                                photos[index].isUploading = false;
-                                photos[index].imgbbUrl = data.data.url;
-                                photos[index].imgbbDeleteUrl = data.data.delete_url;
-                                
+                            const idx = photos.findIndex(p => p.id === photoId);
+                            if (idx !== -1) {
+                                photos[idx].url = data.data.url;
+                                photos[idx].isUploading = false;
+                                photos[idx].imgbbUrl = data.data.url;
+                                photos[idx].imgbbDeleteUrl = data.data.delete_url;
                                 await savePhotos();
                                 updateAlbumDisplay();
                                 updatePhotoCount();
@@ -920,101 +1030,139 @@
                         }
                     } catch (error) {
                         console.error('ImgBB hatası:', error);
-                        const index = photos.findIndex(p => p.id === photoId);
-                        if (index !== -1) {
-                            photos[index].isUploading = false;
-                            photos[index].uploadError = true;
-                        }
+                        const idx = photos.findIndex(p => p.id === photoId);
+                        if (idx !== -1) { photos[idx].isUploading = false; photos[idx].uploadError = true; }
                         updateAlbumDisplay();
                         showNotification('❌ Bulut yüklemesi başarısız, yerel olarak kaydedildi');
                     }
                 };
                 reader.readAsDataURL(file);
             }
-            
             event.target.value = '';
         }
-        
-        // =================== MODAL ===================
-        function openPhotoModal(index) {
+
+        // =================== MODAL + PINCH ZOOM ===================
+        function openPhotoModal(index, fromGrid = false) {
+            const list = fromGrid ? getDisplayPhotos() : photos;
             currentPhotoIndex = index;
-            const photo = photos[index];
-            const modal = document.getElementById('photo-modal');
-            
-            document.getElementById('modal-image').src = photo.url;
+            const photo = list[index];
+            const img = document.getElementById('modal-image');
+            img.src = photo.url;
+            img.style.transform = '';
             document.getElementById('modal-caption').value = photo.caption || '';
-            
-            modal.classList.add('active');
+            // İndirme butonu
+            const dlBtn = document.getElementById('modal-download-btn');
+            if (dlBtn) {
+                dlBtn.href = photo.url;
+                dlBtn.download = (photo.caption || 'ani') + '.jpg';
+            }
+            document.getElementById('photo-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            setupPinchZoom(img);
+            if (window.haptic) window.haptic(20);
         }
-        
+
+        // Pinch-to-zoom
+        function setupPinchZoom(img) {
+            let scale = 1, startDist = 0, startScale = 1;
+            img.addEventListener('touchstart', e => {
+                if (e.touches.length === 2) {
+                    startDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    startScale = scale;
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            img.addEventListener('touchmove', e => {
+                if (e.touches.length === 2) {
+                    const dist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    scale = Math.min(Math.max(startScale * (dist / startDist), 1), 4);
+                    img.style.transform = `scale(${scale})`;
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            img.addEventListener('touchend', e => {
+                if (e.touches.length < 2 && scale < 1.1) {
+                    scale = 1;
+                    img.style.transform = '';
+                }
+            });
+            // Çift tıklama ile zoom reset
+            img.addEventListener('dblclick', () => {
+                scale = scale > 1 ? 1 : 2;
+                img.style.transition = 'transform 0.3s';
+                img.style.transform = scale > 1 ? `scale(${scale})` : '';
+                setTimeout(() => img.style.transition = '', 300);
+            });
+        }
+
         function closeModal() {
-            const modal = document.getElementById('photo-modal');
-            modal.classList.remove('active');
+            document.getElementById('photo-modal').classList.remove('active');
             document.body.style.overflow = '';
             currentPhotoIndex = -1;
         }
-        
+
         async function savePhotoDetails() {
             if (currentPhotoIndex < 0) return;
-            
-            const caption = document.getElementById('modal-caption').value.trim();
-            photos[currentPhotoIndex].caption = caption || 'Anılarımız 💕';
+            photos[currentPhotoIndex].caption = document.getElementById('modal-caption').value.trim() || 'Anılarımız 💕';
             photos[currentPhotoIndex].updatedAt = new Date().toISOString();
-            
             await savePhotos();
             updateAlbumDisplay();
             closeModal();
             showNotification('✅ Açıklama kaydedildi!');
         }
-        
-        // =================== DELETE ===================
-        async function deletePhoto(event, index) {
+
+        async function deletePhoto(event, index, fromGrid = false) {
             event.stopPropagation();
-            
             if (!confirm('Bu fotoğrafı silmek istediğinize emin misiniz?')) return;
-            
-            photos.splice(index, 1);
+            const list = fromGrid ? getDisplayPhotos() : photos;
+            const photo = list[index];
+            // Sadece kendi fotoğraflarını silebilir
+            const myPhotos = photos.filter(p => p.owner === currentUser || !p.owner);
+            const myIdx = myPhotos.findIndex(p => p.id === photo.id);
+            if (myIdx === -1) { showNotification('Partnerin fotoğrafını silemezsin 💕'); return; }
+            myPhotos.splice(myIdx, 1);
+            photos = [...myPhotos, ...photos.filter(p => p.owner !== currentUser && p.owner)];
             await savePhotos();
             updateAlbumDisplay();
             updatePhotoCount();
             showNotification('🗑️ Fotoğraf silindi');
+            if (window.haptic) window.haptic([30, 20, 30]);
         }
-        
+
         // =================== NOTIFICATION ===================
         function showNotification(message) {
             const notif = document.getElementById('notification');
             notif.textContent = message;
             notif.classList.add('show');
-            
-            setTimeout(() => {
-                notif.classList.remove('show');
-            }, 3000);
+            setTimeout(() => notif.classList.remove('show'), 3000);
         }
-        
+
         // =================== INIT ===================
         document.addEventListener('DOMContentLoaded', () => {
             loadPhotos();
             loadActivityData();
-            
-            // Aktivite takibi
-            setInterval(trackActivity, 60000); // Her dakika
-            
-            // Sayfa kapanırken kaydet
-            window.addEventListener('beforeunload', () => {
-                saveActivityData();
+            setInterval(trackActivity, 60000);
+            window.addEventListener('beforeunload', () => saveActivityData());
+            document.getElementById('photo-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'photo-modal') closeModal();
             });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
         });
-        
-        // Modal dışına tıklama
-        document.getElementById('photo-modal').addEventListener('click', (e) => {
-            if (e.target.id === 'photo-modal') closeModal();
-        });
-        
-        // ESC tuşu
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
+
+        // Global fonksiyonlar (HTML onclick için)
+        window.openPhotoModal = openPhotoModal;
+        window.closeModal = closeModal;
+        window.savePhotoDetails = savePhotoDetails;
+        window.deletePhoto = deletePhoto;
+        window.handlePhotoUpload = handlePhotoUpload;
     </script>
+<script type="module" src="time-tracker.js"></script>
+<script type="module" src="presence.js"></script>
 </body>
 </html>

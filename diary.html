@@ -530,10 +530,80 @@
             box-shadow: 0 5px 20px rgba(123, 143, 247, 0.4);
         }
 
+        /* ===== Ruh Hali Seçici ===== */
+        .mood-picker {
+            margin: 10px 0;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+        }
+        .mood-picker-label {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.5);
+            display: block;
+            margin-bottom: 8px;
+        }
+        .mood-options {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .mood-opt {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            background: rgba(255,255,255,0.06);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.18s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mood-opt:hover { background: rgba(255,255,255,0.12); transform: scale(1.15); }
+        .mood-opt.selected {
+            border-color: var(--primary);
+            background: rgba(255,75,114,0.2);
+            transform: scale(1.2);
+        }
+
+        /* ===== Günlük Arama ===== */
+        .diary-search-wrap {
+            flex: 1;
+        }
+        .diary-search-input {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 18px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.82rem;
+            padding: 6px 12px;
+            outline: none;
+        }
+        .diary-search-input::placeholder { color: rgba(255,255,255,0.3); }
+
+        /* Paylaşılan not rozeti */
+        .note-shared-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.72rem;
+            background: rgba(255,75,114,0.15);
+            border: 1px solid rgba(255,75,114,0.3);
+            border-radius: 999px;
+            padding: 2px 8px;
+            color: var(--primary);
+            margin-left: 6px;
+        }
+
         .notes-list {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
         }
 
         .note-card {
@@ -808,6 +878,21 @@
             <div class="write-box-label">✏️ Ayşe yazıyor...</div>
             <textarea id="textarea-ayse" placeholder="Bugün neler oldu? 🎀"></textarea>
 
+            <!-- Ruh Hali Seçici -->
+            <div class="mood-picker" id="mood-picker-ayse">
+                <span class="mood-picker-label">Bugün nasıl hissediyorsun?</span>
+                <div class="mood-options">
+                    <button class="mood-opt" data-mood="😍" onclick="selectMood('ayse','😍')">😍</button>
+                    <button class="mood-opt" data-mood="😊" onclick="selectMood('ayse','😊')">😊</button>
+                    <button class="mood-opt" data-mood="🥰" onclick="selectMood('ayse','🥰')">🥰</button>
+                    <button class="mood-opt" data-mood="😔" onclick="selectMood('ayse','😔')">😔</button>
+                    <button class="mood-opt" data-mood="😢" onclick="selectMood('ayse','😢')">😢</button>
+                    <button class="mood-opt" data-mood="😡" onclick="selectMood('ayse','😡')">😡</button>
+                    <button class="mood-opt" data-mood="😴" onclick="selectMood('ayse','😴')">😴</button>
+                    <button class="mood-opt" data-mood="🤩" onclick="selectMood('ayse','🤩')">🤩</button>
+                </div>
+            </div>
+
             <div class="photo-preview-container" id="preview-container-ayse">
                 <img src="" class="photo-preview-img" id="preview-img-ayse">
                 <div class="photo-remove" onclick="removePhoto('ayse')">✕</div>
@@ -825,14 +910,21 @@
                     <button class="voice-rec-btn" id="voice-btn-ayse" onclick="toggleRecording('ayse')">
                         <span id="voice-icon-ayse">🎤</span> <span id="voice-text-ayse">Sesli Not</span>
                     </button>
+                    <label class="upload-trigger" style="background:rgba(255,75,114,0.15); border-color:rgba(255,75,114,0.3);">
+                        <input type="checkbox" id="share-ayse" style="display:none;" onchange="toggleShare('ayse',this)">
+                        <span id="share-label-ayse">💌 Paylaş</span>
+                    </label>
                     <span class="upload-loading" id="loading-ayse">⏳ İşlemde...</span>
                 </div>
                 <button class="save-btn" id="save-ayse" onclick="saveNote('ayse')">💾 Kaydet</button>
             </div>
         </div>
-        <div class="notes-header" style="margin-bottom:15px; display:flex; justify-content:space-between;">
+        <div class="notes-header" style="margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
             <span style="font-weight:600;">Geçmiş Notlar</span>
-            <span id="count-ayse" style="opacity:0.6;">0 not</span>
+            <div class="diary-search-wrap">
+                <input type="search" class="diary-search-input" placeholder="🔍 Ara..." oninput="searchDiary('ayse', this.value)">
+            </div>
+            <span id="count-ayse" style="opacity:0.6; white-space:nowrap;">0 not</span>
         </div>
         <div class="notes-list" id="list-ayse"></div>
     </div>
@@ -842,6 +934,21 @@
         <div class="write-box mert-box">
             <div class="write-box-label">✏️ Mert yazıyor...</div>
             <textarea id="textarea-mert" placeholder="Bugün neler oldu? 💙"></textarea>
+
+            <!-- Ruh Hali Seçici -->
+            <div class="mood-picker" id="mood-picker-mert">
+                <span class="mood-picker-label">Bugün nasıl hissediyorsun?</span>
+                <div class="mood-options">
+                    <button class="mood-opt" data-mood="😍" onclick="selectMood('mert','😍')">😍</button>
+                    <button class="mood-opt" data-mood="😊" onclick="selectMood('mert','😊')">😊</button>
+                    <button class="mood-opt" data-mood="🥰" onclick="selectMood('mert','🥰')">🥰</button>
+                    <button class="mood-opt" data-mood="😔" onclick="selectMood('mert','😔')">😔</button>
+                    <button class="mood-opt" data-mood="😢" onclick="selectMood('mert','😢')">😢</button>
+                    <button class="mood-opt" data-mood="😡" onclick="selectMood('mert','😡')">😡</button>
+                    <button class="mood-opt" data-mood="😴" onclick="selectMood('mert','😴')">😴</button>
+                    <button class="mood-opt" data-mood="🤩" onclick="selectMood('mert','🤩')">🤩</button>
+                </div>
+            </div>
 
             <div class="photo-preview-container" id="preview-container-mert">
                 <img src="" class="photo-preview-img" id="preview-img-mert">
@@ -860,14 +967,21 @@
                     <button class="voice-rec-btn" id="voice-btn-mert" onclick="toggleRecording('mert')">
                         <span id="voice-icon-mert">🎤</span> <span id="voice-text-mert">Sesli Not</span>
                     </button>
+                    <label class="upload-trigger" style="background:rgba(123,143,247,0.15); border-color:rgba(123,143,247,0.3);">
+                        <input type="checkbox" id="share-mert" style="display:none;" onchange="toggleShare('mert',this)">
+                        <span id="share-label-mert">💌 Paylaş</span>
+                    </label>
                     <span class="upload-loading" id="loading-mert">⏳ İşlemde...</span>
                 </div>
                 <button class="save-btn" id="save-mert" onclick="saveNote('mert')">💾 Kaydet</button>
             </div>
         </div>
-        <div class="notes-header" style="margin-bottom:15px; display:flex; justify-content:space-between;">
+        <div class="notes-header" style="margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
             <span style="font-weight:600;">Geçmiş Notlar</span>
-            <span id="count-mert" style="opacity:0.6;">0 not</span>
+            <div class="diary-search-wrap">
+                <input type="search" class="diary-search-input" placeholder="🔍 Ara..." oninput="searchDiary('mert', this.value)">
+            </div>
+            <span id="count-mert" style="opacity:0.6; white-space:nowrap;">0 not</span>
         </div>
         <div class="notes-list" id="list-mert"></div>
     </div>
@@ -905,6 +1019,54 @@
         const mediaRecorders = { ayse: null, mert: null };
         const audioChunks = { ayse: [], mert: [] };
         let activeStream = null;
+        const selectedMoods = { ayse: '', mert: '' };
+        const sharedFlags = { ayse: false, mert: false };
+        const noteCache = { ayse: [], mert: [] }; // arama için
+
+        // ===== Ruh Hali =====
+        window.selectMood = function(who, mood) {
+            selectedMoods[who] = selectedMoods[who] === mood ? '' : mood;
+            document.querySelectorAll(`#mood-picker-${who} .mood-opt`).forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.mood === selectedMoods[who]);
+            });
+            if (window.haptic) window.haptic(20);
+        };
+
+        // ===== Paylaşma =====
+        window.toggleShare = function(who, checkbox) {
+            sharedFlags[who] = checkbox.checked;
+            const label = document.getElementById('share-label-' + who);
+            if (label) label.textContent = checkbox.checked ? '✅ Paylaşılacak' : '💌 Paylaş';
+        };
+
+        // ===== Arama =====
+        window.searchDiary = function(who, term) {
+            const list = document.getElementById('list-' + who);
+            if (!term.trim()) {
+                renderNotes(who, noteCache[who]);
+                return;
+            }
+            const filtered = noteCache[who].filter(d =>
+                (d.text || '').toLowerCase().includes(term.toLowerCase())
+            );
+            renderNotes(who, filtered, term);
+        };
+
+        // ===== Hatırlatıcı =====
+        function checkDiaryReminder() {
+            const today = new Date().toDateString();
+            const lastWrite = localStorage.getItem('diary_last_write_' + (localStorage.getItem('active_player') || ''));
+            if (lastWrite !== today) {
+                const hour = new Date().getHours();
+                if (hour >= 20) { // Akşam 20:00'den sonra hatırlat
+                    if (window.sendLoveNotification) {
+                        window.sendLoveNotification('📓 Günlüğünü unuttun!', 'Bugün henüz günlüğüne yazmadın. Nasıl geçti bugün? ✨');
+                    }
+                }
+            }
+        }
+        // Sayfa açılınca kontrol et
+        setTimeout(checkDiaryReminder, 5000);
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -1171,43 +1333,49 @@
             showToast('Fotoğraf kaldırıldı 🗑️');
         };
 
+        function renderNotes(who, docs, highlight = '') {
+            var list = document.getElementById('list-' + who);
+            list.innerHTML = '';
+            if (!docs.length) {
+                var emoji = who === 'ayse' ? '🎀' : '💙';
+                list.innerHTML = '<div class="empty-state"><div class="empty-icon">' + emoji + '</div><p>Henüz hiç not yok...<br>İlk notunu yaz! ✨</p></div>';
+                return;
+            }
+            docs.forEach(function (data) {
+                let photoHtml = '';
+                if (data.photo) {
+                    photoHtml = `<div class="note-photo-btn" onclick="openImageModal('${data.photo}')"><i>🖼️</i> Fotoğrafa Bak</div>`;
+                }
+                let audioHtml = '';
+                if (data.audio) {
+                    audioHtml = `<div class="audio-note-container"><div style="font-size:0.75rem; margin-bottom:5px; opacity:0.6;">🎤 Sesli Not</div><audio src="${data.audio}" controls style="width:100%;"></audio></div>`;
+                }
+                const moodBadge = data.mood ? `<span style="font-size:1.1rem; margin-left:6px;">${data.mood}</span>` : '';
+                const sharedBadge = data.shared ? `<span class="note-shared-badge">💌 Paylaşıldı</span>` : '';
+                let bodyText = esc(data.text || '');
+                if (highlight) {
+                    const re = new RegExp('(' + highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+                    bodyText = bodyText.replace(re, '<mark style="background:rgba(255,75,114,0.3);border-radius:3px;padding:0 2px;">$1</mark>');
+                }
+                var content = `<div class="note-timestamp">✨ ${data.ts ? formatDate(data.ts) : '...'}${moodBadge}${sharedBadge}</div>`;
+                content += `<div class="note-body">${bodyText}</div>`;
+                content += audioHtml + photoHtml;
+                content += `<button class="note-delete" onclick="deleteNote('${who}','${data._id}')">🗑️</button>`;
+                var card = document.createElement('div');
+                card.className = 'note-card ' + who + '-note';
+                card.innerHTML = content;
+                list.appendChild(card);
+            });
+        }
+
         function listenNotes(who) {
             var q = query(collection(db, 'diary_' + who), orderBy('ts', 'desc'));
             onSnapshot(q, function (snap) {
-                var list = document.getElementById('list-' + who);
                 document.getElementById('count-' + who).innerText = snap.size + ' not';
-                list.innerHTML = '';
                 setSync('connected', 'Buluta bağlı ☁️ (Yazı: Firebase, Resim: ImgBB)');
-                if (snap.empty) {
-                    var emoji = who === 'ayse' ? '🎀' : '💙';
-                    list.innerHTML = '<div class="empty-state"><div class="empty-icon">' + emoji + '</div><p>Henüz hiç not yok...<br>İlk notunu yaz! ✨</p></div>';
-                    return;
-                }
-                snap.forEach(function (docSnap) {
-                    var data = docSnap.data();
-                    let photoHtml = '';
-                    if (data.photo) {
-                        photoHtml = `<div class="note-photo-btn" onclick="openImageModal('${data.photo}')"><i>🖼️</i> Fotoğrafa Bak</div>`;
-                    }
-                    let audioHtml = '';
-                    if (data.audio) {
-                        audioHtml = `
-                            <div class="audio-note-container">
-                                <div style="font-size:0.75rem; margin-bottom:5px; opacity:0.6;">🎤 Sesli Not</div>
-                                <audio src="${data.audio}" controls style="width:100%;"></audio>
-                            </div>
-                        `;
-                    }
-                    var content = '<div class="note-timestamp">✨ ' + (data.ts ? formatDate(data.ts) : '...') + '</div>';
-                    content += '<div class="note-body">' + esc(data.text || '') + '</div>';
-                    content += audioHtml + photoHtml;
-                    content += '<button class="note-delete" onclick="deleteNote(\'' + who + '\',\'' + docSnap.id + '\')">🗑️</button>';
-
-                    var card = document.createElement('div');
-                    card.className = 'note-card ' + who + '-note';
-                    card.innerHTML = content;
-                    list.appendChild(card);
-                });
+                const docs = snap.docs.map(d => ({ ...d.data(), _id: d.id }));
+                noteCache[who] = docs;
+                renderNotes(who, docs);
             }, function (err) {
                 setSync('error', 'Hata oluştu ⚠️');
                 console.error(err);
@@ -1248,6 +1416,8 @@
                     text,
                     photo: photoUrl,
                     audio: audioUrl,
+                    mood: selectedMoods[who] || null,
+                    shared: sharedFlags[who] || false,
                     pendingPhoto: isOfflinePhoto ? true : false,
                     ts: serverTimestamp()
                 });
@@ -1275,6 +1445,16 @@
                 uploadedPhotos[who + '_offline'] = false;
                 removePhoto(who);
                 removeVoice(who);
+                // Mood ve shared sıfırla
+                selectedMoods[who] = '';
+                sharedFlags[who] = false;
+                document.querySelectorAll(`#mood-picker-${who} .mood-opt`).forEach(b => b.classList.remove('selected'));
+                const shareLabel = document.getElementById('share-label-' + who);
+                if (shareLabel) shareLabel.textContent = '💌 Paylaş';
+                const shareCheck = document.getElementById('share-' + who);
+                if (shareCheck) shareCheck.checked = false;
+                // Hatırlatıcı için bugünü kaydet
+                localStorage.setItem('diary_last_write_' + (localStorage.getItem('active_player') || ''), new Date().toDateString());
                 showToast('Hatıran kalbimize mühürlendi! ✨❤️');
             } catch (e) {
                 console.error(e);

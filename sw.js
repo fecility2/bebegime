@@ -1,6 +1,6 @@
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
-const CACHE_NAME = 'askim-pwa-v16';
+const CACHE_NAME = 'askim-pwa-v17';
 const APP_SHELL = [
   './',
   './index.html',
