@@ -1684,13 +1684,16 @@
         }
         .emoji-key:hover { background: rgba(255,255,255,0.1); transform: scale(1.15); }
         .emoji-key:active { transform: scale(0.9); }
+
+        /* ===== Hızlı İfade Düzenleyici Modal ===== */
+        .emoji-edit-overlay {
             display: none;
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.65);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
-            z-index: 3000;
+            z-index: 5000;
             align-items: flex-end;
             justify-content: center;
         }
