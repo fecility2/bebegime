@@ -371,12 +371,33 @@
             box-shadow: 0 -5px 25px rgba(0,0,0,0.5);
         }
 
-        /* input-row: textarea kutusu + dış buton yan yana */
+        /* input-row: sol butonlar + textarea kutusu + dış buton yan yana */
         .input-row {
             display: flex;
             align-items: flex-end;
-            gap: 8px;
+            gap: 6px;
+            position: relative;
         }
+
+        /* Sol taraftaki fotoğraf ve efekt butonları */
+        .input-left-btn {
+            flex-shrink: 0;
+            width: 38px;
+            height: 38px;
+            color: rgba(255,255,255,0.6);
+            font-size: 1.25rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: 0.2s;
+            padding: 0;
+        }
+        .input-left-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .input-left-btn:active { transform: scale(0.9); }
         .typing-indicator {
             display: none;
             position: fixed;
@@ -614,8 +635,8 @@
         .message-effects {
             display:none;
             position:absolute;
-            left:10px;
-            bottom:62px;
+            left:44px;
+            bottom:54px;
             z-index:30;
             min-width:210px;
             flex-direction:column;
@@ -1918,15 +1939,44 @@
             
             /* Input */
             .chat-input-bar {
-                padding: 6px 10px;
+                padding: 6px 8px;
                 padding-bottom: max(6px, env(safe-area-inset-bottom, 6px));
             }
+            .input-row {
+                gap: 4px;
+            }
             .input-container {
-                padding: 4px 6px 4px 10px;
-                min-height: 44px;
+                padding: 4px 4px 4px 10px;
+                min-height: 42px;
+                min-width: 0;
             }
             .chat-textarea {
                 font-size: 16px;
+            }
+            .input-left-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 1.15rem;
+            }
+            .send-mic-wrapper {
+                width: 42px;
+                height: 42px;
+            }
+            .mic-btn,
+            .send-btn {
+                width: 42px;
+                height: 42px;
+            }
+        }
+
+        /* Çok dar ekranlar (320px) */
+        @media (max-width: 360px) {
+            /* Fotoğraf butonunu da gizle, sadece textarea + emoji + hediye + mic/send kalsın */
+            label[for="chat-file"] {
+                display: none;
+            }
+            .input-container {
+                padding: 4px 4px 4px 10px;
             }
         }
 
@@ -2194,18 +2244,19 @@
         </div>
 
         <div class="input-row">
-            <div class="input-container">
-                <label for="chat-file" class="action-icon" title="Fotoğraf ekle" aria-label="Fotoğraf ekle">➕</label>
-                <input type="file" id="chat-file" hidden accept="image/*" onchange="handlePhoto()">
-                <button class="action-icon" id="effect-menu-btn" type="button" onclick="toggleEffectMenu()" title="Mesaj türü" aria-label="Mesaj türü">⋯</button>
-                <div class="message-effects" id="message-effects" aria-label="Mesaj efekti seç">
-                    <button class="effect-chip active" type="button" data-effect="none">Normal mesaj</button>
-                    <button class="effect-chip" type="button" data-effect="heart_rain">Kalp yağmuru</button>
-                    <button class="effect-chip" type="button" data-effect="glow">Parlayan mesaj</button>
-                    <button class="effect-chip" type="button" data-effect="secret">Gizli mesaj</button>
-                    <button class="effect-chip" type="button" data-effect="tap_reveal">Dokununca açılan mesaj</button>
-                </div>
+            <!-- Sol butonlar: fotoğraf + efekt -->
+            <label for="chat-file" class="action-icon input-left-btn" title="Fotoğraf ekle" aria-label="Fotoğraf ekle">➕</label>
+            <input type="file" id="chat-file" hidden accept="image/*" onchange="handlePhoto()">
+            <button class="action-icon input-left-btn" id="effect-menu-btn" type="button" onclick="toggleEffectMenu()" title="Mesaj türü" aria-label="Mesaj türü">⋯</button>
+            <div class="message-effects" id="message-effects" aria-label="Mesaj efekti seç">
+                <button class="effect-chip active" type="button" data-effect="none">Normal mesaj</button>
+                <button class="effect-chip" type="button" data-effect="heart_rain">Kalp yağmuru</button>
+                <button class="effect-chip" type="button" data-effect="glow">Parlayan mesaj</button>
+                <button class="effect-chip" type="button" data-effect="secret">Gizli mesaj</button>
+                <button class="effect-chip" type="button" data-effect="tap_reveal">Dokununca açılan mesaj</button>
+            </div>
 
+            <div class="input-container">
                 <textarea id="chat-textarea" class="chat-textarea" placeholder="Mesajını yaz meleğim..." rows="1"></textarea>
 
                 <div class="voice-waves" id="voice-waves">
