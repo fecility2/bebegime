@@ -605,7 +605,7 @@
             height: 48px;
             border-radius: 50%;
             border: none;
-            background: linear-gradient(135deg, #ff4b72, #ff6b35);
+            background: linear-gradient(135deg, #ff4b72, #e91e8c);
             color: #fff;
             cursor: pointer;
             display: flex;
@@ -2854,7 +2854,7 @@
 
             const btn = document.getElementById('send-btn');
             btn.disabled = true;
-            btn.innerText = '⏳';
+            btn.style.opacity = '0.6';
 
             try {
                 let audioUrl = null;
@@ -2912,7 +2912,7 @@
                 console.error('[SendMessage] Hata:', e);
                 showToast('Mesaj gönderilemedi: ' + (e.message || 'Bilinmeyen hata') + ' 😔');
             }
-            finally { btn.disabled = false; updateSendButton(); }
+            finally { btn.disabled = false; btn.style.opacity = ''; updateSendButton(); }
         };
 
         // Helper function to get date label for sticky header
