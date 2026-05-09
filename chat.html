@@ -195,7 +195,7 @@
             padding: 15px 8px;
             display: flex;
             flex-direction: column;
-            scroll-behavior: smooth;
+            scroll-behavior: auto;
             position: relative;
             padding-bottom: 80px;
             background: transparent;
@@ -3109,60 +3109,65 @@
             const btn = document.getElementById('send-btn');
             btn.disabled = true;
             btn.style.opacity = '0.6';
+            const outgoing = {
+                text,
+                photo: media.photo,
+                voice: media.voice,
+                replyTo: replyTarget,
+                effect: selectedMessageEffect
+            };
+
+            ta.value = '';
+            ta.style.height = 'auto';
+            cancelMedia();
+            clearReply();
+            resetMessageEffect();
+            setTypingState(false);
+            updateSendButton();
+            setTimeout(() => ta.focus(), 0);
 
             try {
                 let audioUrl = null;
-                if (media.voice) audioUrl = await uploadAudio(media.voice);
+                if (outgoing.voice) audioUrl = await uploadAudio(outgoing.voice);
 
                 await addDoc(collection(db, 'chat_messages'), {
                     sender: currentUser,
-                    text: text,
-                    photo: media.photo,
+                    text: outgoing.text,
+                    photo: outgoing.photo,
                     audio: audioUrl,
-                    replyTo: replyTarget ? {
-                        id: replyTarget.id,
-                        sender: replyTarget.sender,
-                        text: getMessagePreview(replyTarget).slice(0, 160)
+                    replyTo: outgoing.replyTo ? {
+                        id: outgoing.replyTo.id,
+                        sender: outgoing.replyTo.sender,
+                        text: getMessagePreview(outgoing.replyTo).slice(0, 160)
                     } : null,
                     reactions: {},
                     readBy: { [currentUser]: true }, // Gönderen otomatik okudu
-                    messageEffect: selectedMessageEffect !== 'none' ? selectedMessageEffect : null,
+                    messageEffect: outgoing.effect !== 'none' ? outgoing.effect : null,
                     timestamp: serverTimestamp()
                 });
-                await addDoc(collection(db, 'activity_logs'), {
-                    type: 'message',
-                    title: 'Yeni mesaj gönderildi',
-                    user: currentUser,
-                    meta: { hasText: !!text, hasPhoto: !!media.photo, hasAudio: !!audioUrl },
-                    createdAt: serverTimestamp()
-                });
-
-                // Aktivite sayacını artır (geçirilen süreye dahil)
-                await recordActivity('message');
-
-                // --- Kapalıyken Giden Push Bildirimi ---
-                if (window.sendLoveNotification && currentUser !== 'Bilinmeyen') {
-                    let notifMsg = text;
-                    if (selectedMessageEffect === 'secret' || selectedMessageEffect === 'tap_reveal') {
-                        notifMsg = selectedMessageEffect === 'secret' ? '🔒 Sana gizli bir mesaj gönderdi.' : '👆 Sana dokununca açılan bir mesaj gönderdi.';
-                    } else if (!text) {
-                        if (media.voice) notifMsg = "🎤 Sana bir sesli mesaj gönderdi.";
-                        else if (media.photo) notifMsg = "📷 Sana bir fotoğraf gönderdi.";
-                    } else if (media.voice || media.photo) {
-                        notifMsg += " (Medyalı Mesaj)";
-                    }
-                    window.sendLoveNotification("Yeni Bir Mesajın Var 💌", `${currentUser}: ${notifMsg}`);
-                }
-
-                ta.value = '';
-                ta.style.height = 'auto';
-                cancelMedia();
-                clearReply();
-                resetMessageEffect();
-                setTypingState(false);
-                updateSendButton();
-                // Klavye açık kalsın — mobilde focus geri ver
-                setTimeout(() => ta.focus(), 50);
+                Promise.allSettled([
+                    addDoc(collection(db, 'activity_logs'), {
+                        type: 'message',
+                        title: 'Yeni mesaj gönderildi',
+                        user: currentUser,
+                        meta: { hasText: !!outgoing.text, hasPhoto: !!outgoing.photo, hasAudio: !!audioUrl },
+                        createdAt: serverTimestamp()
+                    }),
+                    recordActivity('message'),
+                    (async () => {
+                        if (!window.sendLoveNotification || currentUser === 'Bilinmeyen') return;
+                        let notifMsg = outgoing.text;
+                        if (outgoing.effect === 'secret' || outgoing.effect === 'tap_reveal') {
+                            notifMsg = outgoing.effect === 'secret' ? '🔒 Sana gizli bir mesaj gönderdi.' : '👆 Sana dokununca açılan bir mesaj gönderdi.';
+                        } else if (!outgoing.text) {
+                            if (outgoing.voice) notifMsg = "🎤 Sana bir sesli mesaj gönderdi.";
+                            else if (outgoing.photo) notifMsg = "📷 Sana bir fotoğraf gönderdi.";
+                        } else if (outgoing.voice || outgoing.photo) {
+                            notifMsg += " (Medyalı Mesaj)";
+                        }
+                        window.sendLoveNotification("Yeni Bir Mesajın Var 💌", `${currentUser}: ${notifMsg}`);
+                    })()
+                ]).catch((error) => console.warn('[SendMessage] Yan işler tamamlanamadı:', error));
                 showToast('Mesaj gönderildi! 💌');
             } catch (e) {
                 console.error('[SendMessage] Hata:', e);
@@ -3242,7 +3247,11 @@
         // --- Messaging Logic ---
         function renderMessages() {
             console.log('[Chat] renderMessages çağrıldı, mesaj sayısı:', messageCache.length);
-            chatFlow.innerHTML = '';
+            const previousScrollHeight = chatFlow.scrollHeight;
+            const previousScrollTop = chatFlow.scrollTop;
+            const distanceFromBottom = previousScrollHeight - previousScrollTop - chatFlow.clientHeight;
+            const shouldStickToBottom = previousScrollHeight === 0 || distanceFromBottom < 140;
+            const fragment = document.createDocumentFragment();
             let lastDate = null;
             sharedPhotos = [];
             sharedAudios = [];
@@ -3279,7 +3288,7 @@
                     else if (currDate === yesterdayStr) divider.innerText = 'Dün';
                     else divider.innerText = currDate;
                     
-                    chatFlow.appendChild(divider);
+                    fragment.appendChild(divider);
                     lastDate = currDate;
                 }
 
@@ -3539,20 +3548,25 @@
                     swipeTriggered = false;
                 };
 
-                chatFlow.appendChild(wrap);
+                fragment.appendChild(wrap);
                 
                 // Okunmamış mesajları okundu olarak işaretle (görünürse)
                 if (!isMe && (!msg.readBy || !msg.readBy[currentUser])) {
                     markAsRead(id);
                 }
             });
+            chatFlow.replaceChildren(fragment);
+            dateDividers = [];
             const targetFromHash = window.location.hash && document.querySelector(window.location.hash);
             if (targetFromHash) {
                 targetFromHash.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 targetFromHash.classList.add('search-hit');
                 setTimeout(() => targetFromHash.classList.remove('search-hit'), 1800);
-            } else {
+            } else if (shouldStickToBottom) {
                 chatFlow.scrollTop = chatFlow.scrollHeight;
+            } else {
+                const heightDelta = chatFlow.scrollHeight - previousScrollHeight;
+                chatFlow.scrollTop = Math.max(0, previousScrollTop + heightDelta);
             }
         }
         
@@ -4634,7 +4648,8 @@
         // Mobile Scroll Optimization
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', () => {
-                chatFlow.scrollTop = chatFlow.scrollHeight;
+                const distanceFromBottom = chatFlow.scrollHeight - chatFlow.scrollTop - chatFlow.clientHeight;
+                if (distanceFromBottom < 160) chatFlow.scrollTop = chatFlow.scrollHeight;
             });
         }
 
@@ -4675,18 +4690,21 @@
             chatFlow.scrollTop = chatFlow.scrollHeight;
         }
 
+        function isChatNearBottom(threshold = 160) {
+            return chatFlow.scrollHeight - chatFlow.scrollTop - chatFlow.clientHeight < threshold;
+        }
+
         // Android/Mobile Keyboard & Bottom Bar Fix
         function adjustViewport() {
             if (window.visualViewport) {
+                const shouldKeepBottom = isChatNearBottom();
                 let viewHeight = window.visualViewport.height;
                 document.body.style.height = viewHeight + 'px';
-                window.scrollTo(0, 0);
-                scrollToBottom();
+                if (shouldKeepBottom) scrollToBottom();
             }
         }
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', adjustViewport);
-            window.visualViewport.addEventListener('scroll', adjustViewport);
         }
         window.addEventListener('load', adjustViewport);
 
