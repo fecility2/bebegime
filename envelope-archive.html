@@ -147,6 +147,35 @@
             letter-spacing: 0.02em;
         }
 
+        .modal-attachment {
+            display: none;
+            margin-top: 22px;
+            line-height: normal;
+        }
+
+        .modal-attachment.active { display: block; }
+        .modal-attachment img {
+            width: 100%;
+            max-height: 360px;
+            object-fit: contain;
+            border-radius: 10px;
+            border: 1px solid rgba(26,2,16,0.14);
+            background: rgba(255,255,255,0.38);
+            display: block;
+        }
+
+        .modal-attachment audio {
+            width: 100%;
+            height: 40px;
+        }
+
+        .attachment-label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #b04060;
+            margin-bottom: 8px;
+        }
+
         @media (max-width: 768px) {
             .header h1 { font-size: 2.5rem; }
             .archive-grid { grid-template-columns: 1fr; padding: 10px; }
@@ -175,6 +204,14 @@
             <div style="font-size: 4rem; margin-bottom: 10px;">💌</div>
             <div class="modal-sender" id="m-sender">Kimden</div>
             <div class="modal-text" id="m-text">Mesaj içeriği...</div>
+            <div class="modal-attachment" id="m-photo-wrap">
+                <div class="attachment-label">Eklenen Resim</div>
+                <img id="m-photo" src="" alt="Zaman kapsülü resmi">
+            </div>
+            <div class="modal-attachment" id="m-audio-wrap">
+                <div class="attachment-label">Eklenen Ses</div>
+                <audio id="m-audio" controls></audio>
+            </div>
         </div>
     </div>
 
@@ -228,6 +265,7 @@
                         <button class="delete-btn" onclick="window.removeEnv('${env.id}')">🗑️</button>
                         <div class="env-icon">${isReady ? '💌' : '📦'}</div>
                         <div class="env-meta">
+                            ${env.title ? `<strong>${env.title}</strong><br>` : ''}
                             <strong>Gönderen:</strong> ${env.sender}<br>
                             <strong>Alıcı:</strong> ${env.receiver}
                         </div>
@@ -251,7 +289,26 @@
             const found = envelopes.find(e => e.id === id);
             if (found) {
                 document.getElementById('m-sender').innerText = "Gönderen: " + found.sender + " 💖";
-                document.getElementById('m-text').innerText = found.message;
+                document.getElementById('m-text').innerText = found.message || '';
+                const photoWrap = document.getElementById('m-photo-wrap');
+                const photo = document.getElementById('m-photo');
+                if (found.photo) {
+                    photo.src = found.photo;
+                    photoWrap.classList.add('active');
+                } else {
+                    photo.removeAttribute('src');
+                    photoWrap.classList.remove('active');
+                }
+
+                const audioWrap = document.getElementById('m-audio-wrap');
+                const audio = document.getElementById('m-audio');
+                if (found.audio) {
+                    audio.src = found.audio;
+                    audioWrap.classList.add('active');
+                } else {
+                    audio.removeAttribute('src');
+                    audioWrap.classList.remove('active');
+                }
                 document.getElementById('readModal').style.display = 'flex';
                 document.body.style.overflow = 'hidden'; // Kaydırmayı engelle
             }
@@ -259,6 +316,9 @@
 
         window.closeRead = () => {
             document.getElementById('readModal').style.display = 'none';
+            const audio = document.getElementById('m-audio');
+            audio.pause();
+            audio.removeAttribute('src');
             document.body.style.overflow = 'auto';
         };
 

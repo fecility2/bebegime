@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -625,13 +625,29 @@
         }
         .send-btn:active { transform: scale(0.88) !important; }
         .gift-card { margin-top: 6px; padding: 10px; border-radius: 14px; background: rgba(255,209,102,.12); border: 1px solid rgba(255,209,102,.28); font-weight: 700; }
-        .gift-modal { position: fixed; inset: 0; background: rgba(0,0,0,.72); z-index: 4000; display: none; align-items: center; justify-content: center; padding: 18px; }
+        .gift-modal { position: fixed; inset: 0; background: rgba(0,0,0,.78); z-index: 7000; display: none; align-items: center; justify-content: center; padding: 18px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .gift-modal.active { display: flex; }
-        .gift-box { width: min(420px, 100%); background: #160816; border: 1px solid rgba(255,255,255,.16); border-radius: 18px; padding: 18px; box-shadow: 0 20px 55px rgba(0,0,0,.5); }
-        .gift-box input, .gift-box select, .gift-box textarea { width: 100%; margin-top: 9px; border: 1px solid rgba(255,255,255,.16); border-radius: 12px; background: rgba(255,255,255,.08); color: #fff; padding: 11px; font: inherit; }
+        .gift-box { width: min(420px, 100%); max-height: calc(100dvh - 36px); overflow-y: auto; position: relative; background: #160816; border: 1px solid rgba(255,255,255,.16); border-radius: 18px; padding: 18px; padding-top: 54px; box-shadow: 0 20px 55px rgba(0,0,0,.5); }
+        .gift-title { position: sticky; top: -54px; margin: -54px -18px 12px; min-height: 46px; display: flex; align-items: center; padding: 0 58px 0 18px; background: rgba(22,8,22,.96); backdrop-filter: blur(14px); border-radius: 18px 18px 0 0; color: var(--primary); z-index: 2; }
+        .gift-close { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.1); color: #fff; font-size: 1.35rem; line-height: 1; cursor: pointer; z-index: 3; display: flex; align-items: center; justify-content: center; }
+        .gift-close:active { transform: scale(.92); }
+        .gift-box input, .gift-box select, .gift-box textarea { width: 100%; margin-top: 9px; border: 1px solid rgba(255,255,255,.16); border-radius: 12px; background: rgba(255,255,255,.08); color: #fff; padding: 11px; font: inherit; font-size: 16px; }
+        .gift-box select {
+            background: #050005;
+            color: #ff6b9d;
+            border-color: rgba(255,75,114,.42);
+            color-scheme: dark;
+        }
+        .gift-box select option {
+            background: #050005;
+            color: #ff6b9d;
+        }
+        .gift-box textarea { resize: vertical; min-height: 72px; }
         .gift-actions { display:flex; gap:10px; margin-top:12px; }
         .gift-actions button { flex:1; border:0; border-radius:12px; padding:11px; color:#fff; background:linear-gradient(45deg,#ff4b72,#ff8c00); font-weight:800; cursor:pointer; }
+        .gift-actions button:disabled { opacity:.55; cursor:not-allowed; }
         .gift-actions .alt { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); }
+        .gift-status { min-height:20px; margin-top:10px; font-size:.88rem; color:#ffd166; }
         .message-effects {
             display:none;
             position:absolute;
@@ -1676,8 +1692,29 @@
             border-top-left-radius: 24px; border-top-right-radius: 24px;
             border: 1px solid rgba(255,255,255,0.1); border-bottom: none;
             padding: 0 12px 16px; max-height: 55vh; overflow-y: auto;
+            position: relative;
             animation: emojiSheetUp 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
         }
+        .emoji-keyboard-close {
+            position: sticky;
+            top: 8px;
+            left: calc(100% - 42px);
+            width: 36px;
+            height: 36px;
+            margin: 8px 0 -36px auto;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            font-size: 1.25rem;
+            line-height: 1;
+            cursor: pointer;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .emoji-keyboard-close:active { transform: scale(.92); }
         .emoji-keyboard-handle {
             width: 36px; height: 4px; background: rgba(255,255,255,0.2);
             border-radius: 2px; margin: 10px auto 12px;
@@ -1966,6 +2003,35 @@
             .send-btn {
                 width: 42px;
                 height: 42px;
+            }
+            .gift-modal {
+                align-items: flex-end;
+                padding: 10px;
+                padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
+            }
+            .gift-box {
+                width: 100%;
+                max-height: calc(100dvh - max(20px, env(safe-area-inset-top)) - max(10px, env(safe-area-inset-bottom)) - 16px);
+                overflow-y: auto;
+                border-radius: 22px 22px 16px 16px;
+                padding: 16px;
+                padding-top: 56px;
+            }
+            .gift-title {
+                top: -56px;
+                margin: -56px -16px 12px;
+                border-radius: 22px 22px 0 0;
+            }
+            .gift-actions {
+                position: sticky;
+                bottom: 0;
+                background: linear-gradient(180deg, rgba(22,8,22,0), #160816 28%);
+                padding-top: 12px;
+            }
+            .gift-btn {
+                width: 38px;
+                height: 38px;
+                min-width: 38px;
             }
         }
 
@@ -2282,9 +2348,12 @@
             </div>
         </div>
 
+    </div>
+
     <div class="gift-modal" id="gift-modal" onclick="closeGiftModal()">
         <div class="gift-box" onclick="event.stopPropagation()">
-            <h3 style="margin:0 0 8px;color:var(--primary);">Hediye Gönder</h3>
+            <button class="gift-close" type="button" onclick="closeGiftModal()" title="Kapat" aria-label="Hediye ekranını kapat">×</button>
+            <h3 class="gift-title">Hediye Gönder</h3>
             <select id="gift-type" onchange="renderGiftFields()">
                 <option value="heart">Kalp gönder</option>
                 <option value="coupon">Kupon gönder</option>
@@ -2292,8 +2361,9 @@
             </select>
             <div id="gift-fields"></div>
             <textarea id="gift-note" rows="2" maxlength="160" placeholder="Minik not (opsiyonel)"></textarea>
+            <div class="gift-status" id="gift-status" aria-live="polite"></div>
             <div class="gift-actions">
-                <button onclick="sendGift()">Gönder</button>
+                <button id="gift-send-btn" onclick="sendGift()">Gönder</button>
                 <button class="alt" onclick="closeGiftModal()">Kapat</button>
             </div>
         </div>
@@ -2368,6 +2438,7 @@
     <!-- Emoji Klavyesi -->
     <div class="emoji-keyboard-overlay" id="emoji-keyboard-overlay" onclick="closeEmojiKeyboard()">
         <div class="emoji-keyboard" onclick="event.stopPropagation()">
+            <button class="emoji-keyboard-close" type="button" onclick="closeEmojiKeyboard()" title="Kapat" aria-label="Emoji klavyesini kapat">×</button>
             <div class="emoji-keyboard-handle"></div>
             <div class="emoji-keyboard-cats" id="emoji-kb-cats"></div>
             <div class="emoji-keyboard-grid" id="emoji-kb-grid"></div>
@@ -2428,7 +2499,7 @@
         console.log('[Chat] Aktif kullanıcı:', currentUser);
         const inventoryRef = doc(db, 'user_inventory', currentUser);
         const currentStatsRef = doc(db, 'user_stats', currentUser);
-        const partnerName = currentUser === 'Ayşe' || currentUser === 'Ayşe' ? 'Mert' : 'Ayşe';
+        const partnerName = currentUser === 'Mert' ? 'Ayşe' : 'Mert';
         const partnerInventoryRef = doc(db, 'user_inventory', partnerName);
         const economyRef = doc(db, 'economy', 'balances');
         let currentInventory = {};
@@ -3026,7 +3097,7 @@
                 // Okundu bilgisi (sadece kendi mesajlarımda göster)
                 let readReceipt = '';
                 if (isMe) {
-                    const partnerName = currentUser === 'Ayşe' ? 'Mert' : 'Ayşe';
+        const partnerName = currentUser === 'Mert' ? 'Ayşe' : 'Mert';
                     const isRead = msg.readBy && msg.readBy[partnerName];
                     const readStatusClass = isRead ? 'read' : 'delivered';
                     readReceipt = `<span class="read-status ${readStatusClass}"><span class="tick"></span></span>`;
@@ -3319,18 +3390,43 @@
 
         window.openGiftModal = function() {
             document.getElementById('gift-modal').classList.add('active');
+            setGiftStatus('');
             renderGiftFields();
+            setTimeout(() => {
+                const firstInput = document.querySelector('#gift-fields input, #gift-fields select');
+                firstInput?.focus?.();
+            }, 60);
         };
 
         window.closeGiftModal = function() {
             document.getElementById('gift-modal').classList.remove('active');
+            setGiftStatus('');
+            setGiftBusy(false);
         };
+
+        function setGiftStatus(message, isError = false) {
+            const status = document.getElementById('gift-status');
+            if (!status) return;
+            status.textContent = message || '';
+            status.style.color = isError ? '#ff8c00' : '#ffd166';
+        }
+
+        function setGiftBusy(isBusy) {
+            const btn = document.getElementById('gift-send-btn');
+            const closeBtn = document.querySelector('.gift-actions .alt');
+            if (btn) {
+                btn.disabled = isBusy;
+                btn.textContent = isBusy ? 'Gönderiliyor...' : 'Gönder';
+            }
+            if (closeBtn) closeBtn.disabled = isBusy;
+        }
 
         window.renderGiftFields = function() {
             const type = document.getElementById('gift-type').value;
             const box = document.getElementById('gift-fields');
+            setGiftStatus('');
             if (type === 'heart') {
-                box.innerHTML = '<input id="gift-heart-amount" type="number" min="1" step="1" placeholder="Kaç kalp gönderilsin?">';
+                box.innerHTML = '<input id="gift-heart-amount" type="number" min="1" step="1" inputmode="numeric" placeholder="Kaç kalp gönderilsin?">';
                 return;
             }
             if (type === 'coupon') {
@@ -3346,13 +3442,21 @@
         };
 
         window.sendGift = async function() {
+            if (document.getElementById('gift-send-btn')?.disabled) return;
+            if (!['Ayşe', 'Mert'].includes(currentUser)) {
+                showToast('Önce oyuncu seçmelisin.');
+                return;
+            }
             const type = document.getElementById('gift-type').value;
             const note = document.getElementById('gift-note').value.trim();
             let gift = { type, note };
+            setGiftBusy(true);
+            setGiftStatus('Hediye hazırlanıyor...');
             try {
                 if (type === 'heart') {
                     const amount = parseInt(document.getElementById('gift-heart-amount').value, 10);
                     if (!amount || amount < 1) throw new Error('Geçerli kalp miktarı gir.');
+                    setGiftStatus('Kalpler aktarılıyor...');
                     await runTransaction(db, async (tx) => {
                         const snap = await tx.get(economyRef);
                         const data = snap.exists() ? snap.data() : {};
@@ -3364,6 +3468,7 @@
                 } else if (type === 'coupon') {
                     const key = document.getElementById('gift-coupon-key')?.value;
                     if (!key) throw new Error('Gönderecek kupon yok.');
+                    setGiftStatus('Kupon aktarılıyor...');
                     await runTransaction(db, async (tx) => {
                         const mySnap = await tx.get(inventoryRef);
                         const partnerSnap = await tx.get(partnerInventoryRef);
@@ -3380,6 +3485,7 @@
                     throw new Error('Mini not boş olamaz.');
                 }
 
+                setGiftStatus('Mesaja ekleniyor...');
                 await addDoc(collection(db, 'chat_messages'), {
                     sender: currentUser,
                     text: '',
@@ -3394,7 +3500,11 @@
                 showToast('Hediye gönderildi 🎁');
                 playGiftBurst(gift.type === 'heart' ? '💖' : (gift.type === 'coupon' ? '🎟️' : '🎈'));
             } catch (e) {
-                showToast(e.message || 'Hediye gönderilemedi.');
+                const message = e.message || 'Hediye gönderilemedi.';
+                setGiftStatus(message, true);
+                showToast(message);
+            } finally {
+                setGiftBusy(false);
             }
         };
 
@@ -3458,7 +3568,7 @@
                     ? msg.timestamp.toDate().toLocaleString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
                     : '';
                 return `<div class="chat-search-result" onclick="goToMessage('${id}')">
-                    <div class="chat-search-meta">${escapeHTML(msg.sender)} · ${escapeHTML(when)}</div>
+                    <div class="chat-search-meta">${escapeHTML(msg.sender)} Â· ${escapeHTML(when)}</div>
                     <div>${escapeHTML(getMessagePreview(msg)).slice(0, 120)}</div>
                 </div>`;
             }).join('');

@@ -31,10 +31,11 @@
 
         /* Oyun bazında tablo */
         .section-title { max-width:980px; margin:0 auto 14px; font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--primary); }
-        .game-table { max-width:980px; margin:0 auto 32px; background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
-        .game-table table { width:100%; border-collapse:collapse; }
+        .game-table { width:min(980px, 100%); max-width:980px; margin:0 auto 32px; background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow-x:auto; -webkit-overflow-scrolling:touch; touch-action:pan-x; }
+        .game-table table { width:100%; border-collapse:collapse; min-width:760px; }
         .game-table th { background:rgba(255,255,255,.06); padding:12px 16px; text-align:left; font-size:.85rem; opacity:.7; font-weight:600; border-bottom:1px solid var(--border); }
         .game-table td { padding:12px 16px; border-top:1px solid rgba(255,255,255,.06); font-size:.95rem; }
+        .game-table th, .game-table td { white-space:nowrap; }
         .game-table tr:first-child td { border-top:0; }
         .game-table .game-name { font-weight:700; display:flex; align-items:center; gap:8px; }
         .game-table .winner-cell { color:var(--gold); font-weight:800; }

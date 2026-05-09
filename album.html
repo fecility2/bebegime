@@ -477,6 +477,28 @@
         }
         .album-sort-select option { background: #1a0a1a; }
 
+        .album-clear-btn {
+            flex-shrink: 0;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,75,114,0.3);
+            background: rgba(255,75,114,0.08);
+            color: rgba(255,255,255,0.7);
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .album-clear-btn:hover {
+            background: rgba(255,75,114,0.2);
+            border-color: rgba(255,75,114,0.6);
+            color: #fff;
+        }
+        .album-clear-btn:active { transform: scale(0.9); }
+
         /* ===== Boş Albüm ===== */
         .empty-album {
             text-align: center;
@@ -716,6 +738,7 @@
                 <option value="partner">Sevgilimin</option>
             </select>
         </div>
+        <button class="album-clear-btn" onclick="clearMyAlbum()" title="Kendi fotoğraflarımı sil">🗑️</button>
     </div>
 
     <div class="album-page-wrap">
@@ -741,7 +764,7 @@
             </div>
             <textarea class="modal-input" id="modal-caption" rows="3" placeholder="Bu fotoğraf hakkında bir şeyler yaz..."></textarea>
             <div style="text-align: center;">
-                <button class="modal-btn modal-btn-primary" onclick="savePhotoDetails()">Kaydet</button>
+                <button class="modal-btn modal-btn-primary" id="modal-save-btn" onclick="savePhotoDetails()">Kaydet</button>
                 <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Kapat</button>
             </div>
         </div>
@@ -771,7 +794,9 @@
 
         // =================== GLOBALS ===================
         let photos = [];
+        let partnerPhotos = [];
         let currentPhotoIndex = -1;
+        let currentPhotoId = null;
         const currentUser = localStorage.getItem('active_player') || 'guest';
         let sessionStartTime = Date.now();
         let totalTimeSpent = 0;
@@ -866,7 +891,7 @@
             try {
                 const snap = await getDoc(doc(db, 'couple_album', currentUser));
                 if (snap.exists() && snap.data().photos) {
-                    photos = snap.data().photos.map(p => ({ ...p, owner: currentUser }));
+                    photos = snap.data().photos.map(p => ({ ...p, owner: p.owner || currentUser }));
                 } else {
                     photos = [
                         { id: 'default_1', url: 'r1.jpg', caption: 'İlk anımız 🌹', date: new Date().toISOString(), isMarketPhoto: true, seller: 'Aşk Marketi', title: 'İlk anımız', owner: currentUser },
@@ -879,10 +904,12 @@
                 const partner = currentUser === 'Ayşe' ? 'Mert' : 'Ayşe';
                 const partnerSnap = await getDoc(doc(db, 'couple_album', partner));
                 if (partnerSnap.exists() && partnerSnap.data().photos) {
-                    const partnerPhotos = partnerSnap.data().photos.map(p => ({ ...p, owner: partner, readOnly: true }));
-                    photos = [...photos, ...partnerPhotos];
+                    partnerPhotos = partnerSnap.data().photos.map(p => ({ ...p, owner: partner, readOnly: true }));
+                } else {
+                    partnerPhotos = [];
                 }
                 await loadMarketPhotos();
+                await removeRequestedPhotosIfNeeded();
                 updateAlbumDisplay();
                 updatePhotoCount();
             } catch (error) {
@@ -907,10 +934,28 @@
             }
         }
 
+        // =================== ALBÜMÜ TEMİZLE ===================
+        async function clearMyAlbum() {
+            const myCount = photos.filter(canEditPhoto).length;
+            if (myCount === 0) {
+                showNotification('Silinecek fotoğrafın yok 💕');
+                return;
+            }
+            if (!confirm(`Kendi eklediğin ${myCount} fotoğrafı silmek istediğine emin misin? Bu işlem geri alınamaz.`)) return;
+
+            photos = [];
+            await savePhotos();
+            updateAlbumDisplay();
+            updatePhotoCount();
+            showNotification('🗑️ Fotoğrafların silindi');
+            if (window.haptic) window.haptic([30, 20, 50]);
+        }
+
         async function savePhotos() {
             try {
-                await setDoc(doc(db, 'couple_album', currentUser), { photos, updatedAt: serverTimestamp() });
-                localStorage.setItem('album_photos_backup', JSON.stringify(photos));
+                const albumPhotos = photos.map(photo => ({ ...photo, owner: photo.owner || currentUser }));
+                await setDoc(doc(db, 'couple_album', currentUser), { photos: albumPhotos, updatedAt: serverTimestamp() });
+                localStorage.setItem('album_photos_backup', JSON.stringify(albumPhotos));
             } catch (error) {
                 console.error('Kaydetme hatası:', error);
                 localStorage.setItem('album_photos_backup', JSON.stringify(photos));
@@ -921,6 +966,36 @@
         let currentFilter = '';
         let currentSort = 'newest';
         let allPhotos = []; // partner dahil tüm fotoğraflar
+        const PHOTO_TITLES_TO_REMOVE = ['yeni anı', 'ilk anımız', 'sahildeki anımız', 'romantik akşam'];
+
+        function canEditPhoto(photo) {
+            return photo && !photo.readOnly && (!photo.owner || photo.owner === currentUser);
+        }
+
+        function normalizePhotoText(value) {
+            return (value || '')
+                .toLocaleLowerCase('tr-TR')
+                .replace(/[^\p{L}\p{N}\s]/gu, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function shouldRemoveRequestedPhoto(photo) {
+            if (!canEditPhoto(photo)) return false;
+            const caption = normalizePhotoText(photo.caption);
+            const title = normalizePhotoText(photo.title);
+            const visibleText = caption || title;
+            return PHOTO_TITLES_TO_REMOVE.some(text => visibleText.startsWith(text));
+        }
+
+        async function removeRequestedPhotosIfNeeded() {
+            const before = photos.length;
+            photos = photos.filter(photo => !shouldRemoveRequestedPhoto(photo));
+            if (photos.length !== before) {
+                await savePhotos();
+                showNotification(`${before - photos.length} fotoğraf silindi, diğerleri kaldı`);
+            }
+        }
 
         function getDisplayPhotos() {
             let list = [...allPhotos];
@@ -973,14 +1048,16 @@
                         ${photo.isUploading ? '<div class="uploading-indicator"><div class="spinner"></div>Yükleniyor...</div>' : ''}
                         <img src="${photo.url}" alt="${caption}" class="polaroid-image" loading="lazy">
                         <div class="polaroid-caption" title="${caption}">${caption}</div>
-                        ${(!photo.isMarketPhoto && (!photo.owner || photo.owner === currentUser)) ? `<button class="delete-photo" onclick="deletePhoto(event, ${index}, true)">✕</button>` : ''}
+                        ${canEditPhoto(photo) ? `<button class="delete-photo" onclick="deletePhoto(event, ${index}, true)" title="Fotoğrafı sil">✕</button>` : ''}
                     </div>`;
             }).join('');
         }
 
         function updateAlbumDisplay() {
-            // Kendi fotoğraflarını allPhotos'a ekle (owner tag ile)
-            allPhotos = photos.map(p => ({ ...p, owner: p.owner || currentUser }));
+            allPhotos = [
+                ...photos.map(p => ({ ...p, owner: p.owner || currentUser })),
+                ...partnerPhotos
+            ];
             renderGrid();
         }
 
@@ -1046,10 +1123,15 @@
             const list = fromGrid ? getDisplayPhotos() : photos;
             currentPhotoIndex = index;
             const photo = list[index];
+            currentPhotoId = photo?.id || null;
             const img = document.getElementById('modal-image');
             img.src = photo.url;
             img.style.transform = '';
-            document.getElementById('modal-caption').value = photo.caption || '';
+            const captionInput = document.getElementById('modal-caption');
+            const saveBtn = document.getElementById('modal-save-btn');
+            captionInput.value = photo.caption || '';
+            captionInput.disabled = !canEditPhoto(photo);
+            saveBtn.style.display = canEditPhoto(photo) ? 'inline-block' : 'none';
             // İndirme butonu
             const dlBtn = document.getElementById('modal-download-btn');
             if (dlBtn) {
@@ -1105,12 +1187,18 @@
             document.getElementById('photo-modal').classList.remove('active');
             document.body.style.overflow = '';
             currentPhotoIndex = -1;
+            currentPhotoId = null;
         }
 
         async function savePhotoDetails() {
-            if (currentPhotoIndex < 0) return;
-            photos[currentPhotoIndex].caption = document.getElementById('modal-caption').value.trim() || 'Anılarımız 💕';
-            photos[currentPhotoIndex].updatedAt = new Date().toISOString();
+            if (!currentPhotoId) return;
+            const photoIndex = photos.findIndex(p => p.id === currentPhotoId && canEditPhoto(p));
+            if (photoIndex === -1) {
+                showNotification('Bu fotoğraf düzenlenemez 💕');
+                return;
+            }
+            photos[photoIndex].caption = document.getElementById('modal-caption').value.trim() || 'Anılarımız 💕';
+            photos[photoIndex].updatedAt = new Date().toISOString();
             await savePhotos();
             updateAlbumDisplay();
             closeModal();
@@ -1122,12 +1210,9 @@
             if (!confirm('Bu fotoğrafı silmek istediğinize emin misiniz?')) return;
             const list = fromGrid ? getDisplayPhotos() : photos;
             const photo = list[index];
-            // Sadece kendi fotoğraflarını silebilir
-            const myPhotos = photos.filter(p => p.owner === currentUser || !p.owner);
-            const myIdx = myPhotos.findIndex(p => p.id === photo.id);
-            if (myIdx === -1) { showNotification('Partnerin fotoğrafını silemezsin 💕'); return; }
-            myPhotos.splice(myIdx, 1);
-            photos = [...myPhotos, ...photos.filter(p => p.owner !== currentUser && p.owner)];
+            const photoIndex = photos.findIndex(p => p.id === photo?.id && canEditPhoto(p));
+            if (photoIndex === -1) { showNotification('Partnerin fotoğrafını silemezsin 💕'); return; }
+            photos.splice(photoIndex, 1);
             await savePhotos();
             updateAlbumDisplay();
             updatePhotoCount();
@@ -1161,6 +1246,9 @@
         window.savePhotoDetails = savePhotoDetails;
         window.deletePhoto = deletePhoto;
         window.handlePhotoUpload = handlePhotoUpload;
+        window.clearMyAlbum = clearMyAlbum;
+        window.filterAlbum = filterAlbum;
+        window.sortAlbum = sortAlbum;
     </script>
 <script type="module" src="time-tracker.js"></script>
 <script type="module" src="presence.js"></script>

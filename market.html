@@ -68,7 +68,7 @@
 </head>
 <body>
     <div id="background-canvas"></div>
-    <a href="index.html#hub" class="back-nav">← Ana Sayfaya Dön</a>
+    <a href="games.html" class="back-nav" id="games-back-nav">← Oyunlara Dön</a>
     <div class="header">
         <h1>Aşk Marketi 🛍️</h1>
         <p style="opacity:.8;">Kazandığın Aşk Paralarıyla güçlen, güzelleştir, eğlen.</p>
@@ -185,6 +185,20 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         enableIndexedDbPersistence(db).catch(() => {});
+
+        const marketHistoryState = { page: 'ask-market' };
+        if (window.history.state?.page !== marketHistoryState.page) {
+            window.history.replaceState(marketHistoryState, '', window.location.href);
+            window.history.pushState(marketHistoryState, '', window.location.href);
+        }
+        window.addEventListener('popstate', () => {
+            window.location.replace('games.html');
+        });
+
+        document.getElementById('games-back-nav').addEventListener('click', (event) => {
+            event.preventDefault();
+            window.location.replace('games.html');
+        });
 
         const currentUser = localStorage.getItem('active_player');
         if (!currentUser) window.location.href = 'index.html';
