@@ -1,12 +1,14 @@
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
-const CACHE_NAME = 'askim-pwa-v17';
+const CACHE_NAME = 'askim-pwa-v19';
 const APP_SHELL = [
   './',
   './index.html',
   './style.css',
   './script.js',
   './app-bootstrap.js',
+  './widget-helper.js',
+  './widget.html',
   './onesignal-helper.js',
   './time-tracker.js',
   './presence.js',
@@ -15,14 +17,17 @@ const APP_SHELL = [
   './icon-192.png',
   './icon-512.png',
   './chat.html',
+  './album.html',
   './diary.html',
   './bucket-list.html',
   './lists.html',
   './confessions.html',
+  './confession-archive.html',
   './music.html',
   './games.html',
   './special-days.html',
   './envelopes.html',
+  './envelope-archive.html',
   './profile.html',
   './notification-center.html'
 ];

@@ -405,6 +405,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="widget-helper.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
         import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp }
@@ -458,7 +459,7 @@
             const today = new Date(); today.setHours(0,0,0,0);
 
             // Sabit günler
-            staticDays.forEach(item => {
+            staticDays.forEach((item, index) => {
                 let statusText = '', cssClass = '', isTodayEvent = false;
 
                 if (item.type === 'recurring' || item.type === 'recurring_with_past') {
@@ -488,6 +489,7 @@
                         <div class="day-title">${item.title}</div>
                         <div class="day-date">${item.date}</div>
                         <div class="day-countdown ${cssClass}">${statusText}</div>
+                        <div style="margin-top:12px;">${window.OurStoryWidget.button('Widget yap', "saveSpecialWidget('static-" + index + "')")}</div>
                     </div>`;
             });
 
@@ -528,12 +530,32 @@
                 cardContent += '<div class="day-icon">' + item.icon + '</div>';
                 cardContent += '<div class="day-title">' + item.title + '</div>';
                 cardContent += '<div class="day-date">' + formatDate(item.date) + '</div>';
-                cardContent += '<div class="day-countdown ' + cssClass + '">' + statusText + '</div></div>';
+                cardContent += '<div class="day-countdown ' + cssClass + '">' + statusText + '</div>';
+                cardContent += '<div style="margin-top:12px;">' + window.OurStoryWidget.button('Widget yap', "saveSpecialWidget('" + item.docId + "')") + '</div></div>';
                 container.innerHTML += cardContent;
             });
 
             if (hasConfetti) setTimeout(shootConfetti, 500);
         }
+
+        window.saveSpecialWidget = function(id) {
+            let item = null;
+            let dateLabel = '';
+            if (id.startsWith('static-')) {
+                item = staticDays[Number(id.replace('static-', ''))];
+                dateLabel = item?.date || '';
+            } else {
+                item = customDays.find(day => day.docId === id);
+                dateLabel = item ? formatDate(item.date) : '';
+            }
+            if (!item) return;
+            window.OurStoryWidget.save({
+                type: 'special',
+                title: `${item.icon || '💖'} ${item.title}`,
+                text: dateLabel,
+                meta: 'Hatıralarımızdan seçildi'
+            });
+        };
 
         // ===== FİREBASE DİNLE =====
         onSnapshot(query(colRef, orderBy('ts', 'asc')), function(snap) {

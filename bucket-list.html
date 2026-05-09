@@ -461,6 +461,7 @@
 
     <div class="sync-status" id="sync-status">Buluta bağlanılıyor...</div>
 
+    <script src="widget-helper.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
         import {
@@ -486,6 +487,7 @@
         const bucketRef = collection(db, 'bucket_list');
 
         let currentItemId = null;
+        let bucketItems = [];
         // ... (Yıldızlar kodu aynı kalacak)
         (function () {
             const container = document.getElementById('stars-bg');
@@ -507,18 +509,33 @@
         onSnapshot(q, function (snapshot) {
             var listEl = document.getElementById('bucket-list');
             listEl.innerHTML = '';
+            bucketItems = [];
             document.getElementById('sync-status').innerText = 'Buluta bağlı (Yazılar: Firebase, Resimler: ImgBB) ✨';
             snapshot.forEach(function (doc) {
                 var data = doc.data();
+                bucketItems.push({ id: doc.id, ...data });
                 var item = document.createElement('div');
                 item.className = 'bucket-item ' + (data.isDone ? 'completed' : '') + ' ' + (data.photo ? 'has-photo' : '');
                 item.innerHTML = '<div class="check-circle" onclick="toggleComplete(\'' + doc.id + '\', ' + data.isDone + ')"></div>' +
                     '<div class="item-text">' + data.text + '</div>' +
+                    window.OurStoryWidget.button('Widget yap', 'saveBucketWidget(\'' + doc.id + '\')') +
                     '<div class="photo-btn" onclick="openPhotoModal(\'' + doc.id + '\', \'' + (data.photo || '') + '\')">🖼️</div>' +
                     '<div class="delete-btn" onclick="deleteItem(\'' + doc.id + '\')">🗑️</div>';
                 listEl.appendChild(item);
             });
         });
+
+        window.saveBucketWidget = function(id) {
+            const item = bucketItems.find(entry => entry.id === id);
+            if (!item) return;
+            window.OurStoryWidget.save({
+                type: 'dream',
+                title: item.isDone ? 'Gerçekleşen hayalimiz' : 'Hayallerimiz',
+                text: item.text || '',
+                image: item.photo || '',
+                meta: item.isDone ? 'Tamamlandı' : 'Birlikte yapılacak'
+            });
+        };
 
         document.getElementById('add-btn').onclick = async function () {
             var input = document.getElementById('bucket-input');

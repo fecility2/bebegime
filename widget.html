@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory Widget">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>OurStory Widget</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Outfit:wght@400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { min-height: 100%; }
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            color: #fff;
+            background:
+                radial-gradient(circle at 20% 10%, rgba(255,75,114,0.22), transparent 34%),
+                radial-gradient(circle at 86% 88%, rgba(79,172,254,0.18), transparent 32%),
+                #0a0208;
+            padding: max(18px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
+            display: grid;
+            place-items: center;
+        }
+        .wrap { width: min(100%, 560px); }
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .topbar a, .topbar button {
+            color: rgba(255,255,255,0.82);
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 999px;
+            padding: 9px 13px;
+            text-decoration: none;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .topbar .actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .widget-card {
+            overflow: hidden;
+            border-radius: 28px;
+            min-height: 360px;
+            border: 1px solid rgba(255,255,255,0.14);
+            background: linear-gradient(160deg, rgba(255,255,255,0.13), rgba(255,255,255,0.04));
+            box-shadow: 0 28px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.14);
+            backdrop-filter: blur(18px);
+        }
+        .hero-img {
+            width: 100%;
+            height: min(52vh, 360px);
+            display: block;
+            object-fit: cover;
+            background: rgba(0,0,0,0.24);
+        }
+        .content { padding: 24px; }
+        .kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: #ffd166;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0;
+            margin-bottom: 10px;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 10vw, 3.4rem);
+            line-height: 1.02;
+            margin-bottom: 12px;
+            overflow-wrap: anywhere;
+        }
+        .text {
+            font-family: 'Caveat', cursive;
+            font-size: clamp(1.55rem, 7vw, 2.4rem);
+            line-height: 1.12;
+            color: rgba(255,255,255,0.93);
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+        .meta {
+            margin-top: 18px;
+            color: rgba(255,255,255,0.62);
+            font-size: 0.9rem;
+            line-height: 1.45;
+        }
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: rgba(255,255,255,0.74);
+        }
+        .list {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .list a {
+            display: block;
+            padding: 14px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #fff;
+            text-decoration: none;
+            background: rgba(255,255,255,0.07);
+        }
+        .hint {
+            margin-top: 14px;
+            color: rgba(255,255,255,0.64);
+            font-size: 0.84rem;
+            line-height: 1.45;
+            text-align: center;
+        }
+        .install-help {
+            display: none;
+            margin-top: 12px;
+            padding: 14px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.78);
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+        .install-help.active { display: block; }
+        @media (max-width: 480px) {
+            body { padding-left: 12px; padding-right: 12px; }
+            .widget-card { min-height: 320px; border-radius: 24px; }
+            .content { padding: 20px; }
+            .topbar a, .topbar button { padding: 8px 11px; font-size: 0.88rem; }
+        }
+    </style>
+</head>
+<body>
+    <main class="wrap">
+        <div class="topbar">
+            <a href="index.html#hub">← Uygulama</a>
+            <div class="actions">
+                <button type="button" onclick="copyWidgetLink()">Bağlantı</button>
+                <button type="button" onclick="deleteCurrentWidget()">Sil</button>
+                <button type="button" onclick="showInstallHelp()">Ana ekrana ekle</button>
+            </div>
+        </div>
+        <section id="widget-root"></section>
+        <div class="install-help" id="install-help">
+            <strong>iPhone:</strong> Safari’de paylaş düğmesine bas, sonra “Ana Ekrana Ekle” seç.<br>
+            <strong>Android:</strong> Chrome/Edge menüsünden “Ana ekrana ekle” seç.<br>
+            Bu sayfa seçtiğin içerikle açılır; GitHub Pages’ta da aynı şekilde çalışır.
+        </div>
+        <p class="hint">Not: Bu PWA ana ekran kısayolu gibi çalışır. Gerçek yeniden boyutlanabilir iOS/Android widget için native uygulama paketi gerekir.</p>
+    </main>
+    <script src="widget-helper.js"></script>
+    <script>
+        const root = document.getElementById('widget-root');
+        const params = new URLSearchParams(location.search);
+        const id = params.get('id');
+        let widgets = window.OurStoryWidget.read();
+        let widget = widgets.find(item => item.id === id);
+
+        function esc(value) {
+            return String(value || '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+        }
+
+        function typeLabel(type) {
+            return {
+                photo: 'Albüm fotoğrafı',
+                diary: 'Günlük notu',
+                list: 'Liste',
+                dream: 'Hayal',
+                special: 'Hatıra günü',
+                envelope: 'Zaman kapsülü',
+                confession: 'İtiraf'
+            }[type] || 'OurStory';
+        }
+
+        function renderWidget(item) {
+            root.innerHTML = `
+                <article class="widget-card">
+                    ${item.image ? `<img class="hero-img" src="${esc(item.image)}" alt="">` : ''}
+                    <div class="content">
+                        <div class="kicker">📌 ${esc(typeLabel(item.type))}</div>
+                        <h1>${esc(item.title || 'OurStory')}</h1>
+                        ${item.text ? `<div class="text">${esc(item.text)}</div>` : ''}
+                        ${item.meta ? `<div class="meta">${esc(item.meta)}</div>` : ''}
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderList() {
+            if (!widgets.length) {
+                root.innerHTML = '<div class="widget-card empty"><h1>Henüz widget yok</h1><p>Günlük, albüm, listeler veya zaman kapsülünden “Widget yap” seçeneğini kullan.</p></div>';
+                return;
+            }
+            root.innerHTML = `
+                <div class="widget-card empty">
+                    <h1>Widgetlerim</h1>
+                    <div class="list">
+                        ${widgets.map(item => `<a href="widget.html?id=${encodeURIComponent(item.id)}"><strong>${esc(item.title)}</strong><br><span>${esc(typeLabel(item.type))}</span></a>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        window.showInstallHelp = function() {
+            document.getElementById('install-help').classList.toggle('active');
+        };
+
+        window.copyWidgetLink = async function() {
+            try {
+                await navigator.clipboard.writeText(location.href);
+                alert('Widget bağlantısı kopyalandı.');
+            } catch (error) {
+                prompt('Widget bağlantısı:', location.href);
+            }
+        };
+
+        window.deleteCurrentWidget = function() {
+            if (!widget) {
+                alert('Silinecek widget seçili değil.');
+                return;
+            }
+            if (!confirm('Bu widgeti silmek istiyor musun?')) return;
+            widgets = widgets.filter(item => item.id !== widget.id);
+            localStorage.setItem(window.OurStoryWidget.key, JSON.stringify(widgets));
+            location.href = 'widget.html';
+        };
+
+        if (widget) renderWidget(widget);
+        else renderList();
+    </script>
+</body>
+</html>

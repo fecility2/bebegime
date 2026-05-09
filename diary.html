@@ -993,6 +993,7 @@
         <img src="" class="modal-zoom-img" id="modal-zoom-img">
     </div>
 
+    <script src="widget-helper.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
         import { getFirestore, enableIndexedDbPersistence, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
@@ -1360,6 +1361,7 @@
                 var content = `<div class="note-timestamp">✨ ${data.ts ? formatDate(data.ts) : '...'}${moodBadge}${sharedBadge}</div>`;
                 content += `<div class="note-body">${bodyText}</div>`;
                 content += audioHtml + photoHtml;
+                content += `<div style="margin-top:12px;">${window.OurStoryWidget.button('Widget yap', `saveDiaryWidget('${who}','${data._id}')`)}</div>`;
                 content += `<button class="note-delete" onclick="deleteNote('${who}','${data._id}')">🗑️</button>`;
                 var card = document.createElement('div');
                 card.className = 'note-card ' + who + '-note';
@@ -1367,6 +1369,18 @@
                 list.appendChild(card);
             });
         }
+
+        window.saveDiaryWidget = function(who, id) {
+            const note = (noteCache[who] || []).find(item => item._id === id);
+            if (!note) return;
+            window.OurStoryWidget.save({
+                type: 'diary',
+                title: who === 'ayse' ? 'Ayşe’nin günlük notu' : 'Mert’in günlük notu',
+                text: note.text || '',
+                image: note.photo || '',
+                meta: note.ts ? formatDate(note.ts) : ''
+            });
+        };
 
         function listenNotes(who) {
             var q = query(collection(db, 'diary_' + who), orderBy('ts', 'desc'));

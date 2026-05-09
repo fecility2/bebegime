@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head><meta charset="UTF-8"><title>Coin Ekle</title>
+<style>
+    body { font-family: Outfit, sans-serif; background: #0a0208; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    .card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 32px 40px; text-align: center; max-width: 400px; }
+    h2 { color: #ff4b72; margin-bottom: 16px; }
+    a { color: #4facfe; }
+</style>
+</head>
+<body>
+<div class="card">
+    <h2 id="status">⏳ İşlem yapılıyor...</h2>
+    <p id="detail"></p>
+</div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+        authDomain: "ayseye-surpriz.firebaseapp.com",
+        projectId: "ayseye-surpriz",
+        storageBucket: "ayseye-surpriz.firebasestorage.app",
+        messagingSenderId: "531177459988",
+        appId: "1:531177459988:web:09060a95bea0b06f197201"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const ecoRef = doc(db, 'economy', 'balances');
+
+    try {
+        const snap = await getDoc(ecoRef);
+        const data = snap.exists() ? snap.data() : { 'Ayşe': 0, 'Mert': 0 };
+        const currentMert = Number(data['Mert'] || 0);
+        const newMert = currentMert + 30000;
+
+        await setDoc(ecoRef, { ...data, 'Mert': newMert }, { merge: true });
+
+        document.getElementById('status').textContent = '✅ Tamamlandı!';
+        document.getElementById('detail').innerHTML =
+            `Mert'in eski bakiyesi: <b>${currentMert.toLocaleString()} ❤️</b><br>
+             Yeni bakiyesi: <b>${newMert.toLocaleString()} ❤️</b><br><br>
+             <a href="games.html">← Oyunlara Dön</a>`;
+    } catch (e) {
+        document.getElementById('status').textContent = '❌ Hata oluştu';
+        document.getElementById('detail').textContent = e.message;
+    }
+</script>
+</body>
+</html>

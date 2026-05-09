@@ -215,6 +215,7 @@
         </div>
     </div>
 
+    <script src="widget-helper.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
         import { getFirestore, enableIndexedDbPersistence, collection, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
@@ -270,6 +271,7 @@
                             <strong>Alıcı:</strong> ${env.receiver}
                         </div>
                         ${statusHtml}
+                        <div style="margin-top:10px;">${window.OurStoryWidget.button('Widget yap', `saveEnvelopeWidget('${env.id}')`)}</div>
                     </div>
                 `;
             });
@@ -320,6 +322,19 @@
             audio.pause();
             audio.removeAttribute('src');
             document.body.style.overflow = 'auto';
+        };
+
+        window.saveEnvelopeWidget = function(id) {
+            const env = envelopes.find(item => item.id === id);
+            if (!env) return;
+            const isReady = Date.now() >= env.unlock_date;
+            window.OurStoryWidget.save({
+                type: 'envelope',
+                title: env.title || (isReady ? 'Açılmış zaman kapsülü' : 'Mühürlü zaman kapsülü'),
+                text: isReady ? (env.message || '') : 'Bu yazı henüz mühürlü. Açılma zamanı gelince uygulamada okuyabilirsin.',
+                image: isReady ? (env.photo || '') : '',
+                meta: isReady ? `Gönderen: ${env.sender || ''}` : `Açılmasına: ${getTimeLeft(env.unlock_date - Date.now())}`
+            });
         };
 
         window.removeEnv = async (id) => {

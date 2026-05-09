@@ -62,6 +62,33 @@
             background:#ff4b72;
             box-shadow:0 0 12px rgba(255,75,114,.8);
         }
+        .hub-widget-shortcut {
+            position:absolute;
+            top:54px;
+            right:-2px;
+            width:40px;
+            height:32px;
+            border:none;
+            border-radius:999px;
+            background:rgba(255,255,255,0.10);
+            color:#fff;
+            cursor:pointer;
+            font-size:.96rem;
+            font-weight:800;
+            z-index:5;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:0;
+            box-shadow:0 8px 20px rgba(0,0,0,.20);
+            backdrop-filter:blur(12px);
+            -webkit-backdrop-filter:blur(12px);
+        }
+        .hub-widget-shortcut:hover,
+        .hub-widget-shortcut:active {
+            background:rgba(255,75,114,0.20);
+            transform:translateY(-1px);
+        }
         .hub-countdown-band {
             margin:0 58px 16px 0;
             border:1px solid rgba(255,255,255,.14);
@@ -78,6 +105,14 @@
         .hub-countdown-icon { font-size:1.7rem; }
         .hub-countdown-title { font-weight:800; }
         .hub-countdown-meta { opacity:.76; font-size:.86rem; margin-top:2px; }
+        @media (max-width:480px) {
+            .hub-widget-shortcut {
+                right:0;
+                height:30px;
+                width:38px;
+                font-size:.9rem;
+            }
+        }
     </style>
     <link rel="stylesheet" href="style.css?v=4">
     <script src="app-bootstrap.js?v=1" defer></script>
@@ -228,6 +263,7 @@
     <div class="feature-hub-overlay" id="feature-hub">
         <div class="hub-container" style="position: relative;">
             <button class="hub-notification-btn" id="hub-notification-btn" onclick="window.location.href='notification-center.html'" title="Bildirim Merkezi" aria-label="Bildirim Merkezi">🔔</button>
+            <button class="hub-widget-shortcut" id="hub-widget-shortcut" onclick="window.location.href='widget.html'" title="Widgetlerim" aria-label="Widgetlerim">📌</button>
             <div class="hub-countdown-band" id="hub-countdown-band" onclick="window.location.href='special-days.html'">
                 <div class="hub-countdown-icon" id="hub-countdown-icon">📅</div>
                 <div>

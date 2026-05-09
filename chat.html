@@ -294,6 +294,45 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
+        .message-text {
+            padding-top: 4px;
+            overflow-wrap: anywhere;
+            white-space: normal;
+        }
+        .message-text.collapsed {
+            max-height: 9.2em;
+            overflow: hidden;
+            position: relative;
+        }
+        .message-text.collapsed::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 3.2em;
+            background: linear-gradient(180deg, transparent, rgba(20,10,18,0.94));
+            pointer-events: none;
+        }
+        .show-more-btn {
+            margin-top: 6px;
+            border: 0;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            border-radius: 999px;
+            padding: 6px 10px;
+            font: inherit;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .scheduled-note {
+            margin-top: 7px;
+            color: #ffd166;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
         .msg-info {
             font-size: 0.65rem;
             opacity: 0.6;
@@ -1284,6 +1323,30 @@
             align-items: center; justify-content: center; overflow: hidden;
         }
         #img-modal img { max-width: 95%; max-height: 90vh; border-radius: 10px; animation: zoomIn 0.3s; }
+        .img-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(15,15,20,0.72);
+            color: #fff;
+            font-size: 1.6rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+        .img-nav-btn.prev { left: max(14px, env(safe-area-inset-left, 14px)); }
+        .img-nav-btn.next { right: max(14px, env(safe-area-inset-right, 14px)); }
+        .img-nav-btn:disabled { opacity: 0.25; pointer-events: none; }
+        @media (max-width: 520px) {
+            .img-nav-btn { width: 38px; height: 38px; font-size: 1.35rem; }
+            #img-modal img { max-width: 100%; max-height: 86vh; }
+        }
         
         @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes zoomIn { from { transform: scale(0.8); } to { transform: scale(1); } }
@@ -1677,6 +1740,39 @@
         }
         .voice-time {
             font-size: 0.68rem; opacity: 0.6; font-variant-numeric: tabular-nums;
+        }
+        .voice-speed-btn {
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 999px;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .voice-speed-btn:hover { background: rgba(255,255,255,0.14); }
+
+        .chat-upload-progress {
+            display: none;
+            width: 120px;
+            height: 6px;
+            margin-top: 8px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.12);
+        }
+        .chat-upload-progress span {
+            display: block;
+            width: 0%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #ff4b72, #ffd166);
+            transition: width 0.18s ease;
         }
 
         /* Emoji klavyesi */
@@ -2143,17 +2239,19 @@
         }
         .msg-ayse .bubble {
             background:
-                linear-gradient(135deg, rgba(255,75,114,0.24), rgba(255,140,170,0.11)),
+                linear-gradient(135deg, rgba(255,75,114,0.38), rgba(255,140,170,0.2)),
                 var(--ayse-bubble);
-            border-color: rgba(255,117,151,0.34);
+            border-color: rgba(255,117,151,0.5);
             border-bottom-left-radius: 7px;
+            color: rgba(255,255,255,0.96);
         }
         .msg-mert .bubble {
             background:
-                linear-gradient(135deg, rgba(79,172,254,0.25), rgba(0,242,254,0.11)),
+                linear-gradient(135deg, rgba(79,172,254,0.4), rgba(0,242,254,0.2)),
                 var(--mert-bubble);
-            border-color: rgba(105,192,255,0.34);
+            border-color: rgba(105,192,255,0.5);
             border-bottom-right-radius: 7px;
+            color: rgba(255,255,255,0.96);
         }
         .bubble-reply {
             max-width: min(270px, 68vw);
@@ -2305,6 +2403,7 @@
             <div style="position: relative;">
                 <img id="temp-photo" class="preview-img" style="display: none;">
                 <div id="voice-label" style="display: none; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 10px; font-size: 0.8rem;">🎤 Ses kaydedildi</div>
+                <div class="chat-upload-progress" id="chat-upload-progress"><span id="chat-upload-fill"></span></div>
                 <div class="cancel-preview" onclick="cancelMedia()" title="Eki kaldır" aria-label="Eki kaldır" role="button">✕</div>
             </div>
         </div>
@@ -2358,6 +2457,7 @@
                 <option value="heart">Kalp gönder</option>
                 <option value="coupon">Kupon gönder</option>
                 <option value="note">Mini not gönder</option>
+                <option value="scheduled">⏰ Zamanlanmış mesaj</option>
             </select>
             <div id="gift-fields"></div>
             <textarea id="gift-note" rows="2" maxlength="160" placeholder="Minik not (opsiyonel)"></textarea>
@@ -2369,8 +2469,10 @@
         </div>
     </div>
 
-    <div id="img-modal" onclick="this.style.display='none'">
+    <div id="img-modal" onclick="closeImgModal()">
+        <button class="img-nav-btn prev" type="button" onclick="event.stopPropagation(); navigateChatPhoto(-1)" aria-label="Önceki fotoğraf">‹</button>
         <img src="" id="modal-img">
+        <button class="img-nav-btn next" type="button" onclick="event.stopPropagation(); navigateChatPhoto(1)" aria-label="Sonraki fotoğraf">›</button>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -2475,7 +2577,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, updateDoc, doc, onSnapshot, query, orderBy, serverTimestamp, increment, setDoc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, updateDoc, doc, onSnapshot, query, orderBy, serverTimestamp, increment, setDoc, getDoc, runTransaction, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -2529,6 +2631,8 @@
         let replyTarget = null;
         let typingTimer = null;
         let selectedMessageEffect = 'none';
+        let currentChatPhotoIndex = -1;
+        let processingScheduledMessages = false;
         const CHAT_WP_KEY = 'chat_wallpaper_pref';
         const CUSTOM_WP_KEY = 'chat_custom_wallpaper_url';
 
@@ -2824,6 +2928,14 @@
             }
         });
 
+        document.addEventListener('keydown', (event) => {
+            const modal = document.getElementById('img-modal');
+            if (!modal || modal.style.display !== 'flex') return;
+            if (event.key === 'Escape') closeImgModal();
+            if (event.key === 'ArrowLeft') navigateChatPhoto(-1);
+            if (event.key === 'ArrowRight') navigateChatPhoto(1);
+        });
+
         window.addEventListener('beforeunload', () => setTypingState(false));
 
         window.showToast = (txt) => {
@@ -2832,30 +2944,75 @@
             t.className = 'toast show';
             setTimeout(() => t.className = 'toast', 3000);
         };
+
+        function setChatUploadProgress(percent) {
+            const wrap = document.getElementById('chat-upload-progress');
+            const fill = document.getElementById('chat-upload-fill');
+            if (!wrap || !fill) return;
+            const value = Math.max(0, Math.min(100, Math.round(percent || 0)));
+            wrap.style.display = value > 0 && value < 100 ? 'block' : (value >= 100 ? 'block' : 'none');
+            fill.style.width = value + '%';
+        }
+
+        function uploadImageToImgBB(base64) {
+            return new Promise((resolve, reject) => {
+                const fd = new FormData();
+                fd.append('image', base64);
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', `https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`);
+                xhr.upload.onprogress = (event) => {
+                    if (event.lengthComputable) setChatUploadProgress(20 + (event.loaded / event.total) * 75);
+                };
+                xhr.onload = () => {
+                    try {
+                        const json = JSON.parse(xhr.responseText || '{}');
+                        if (xhr.status >= 200 && xhr.status < 300 && json.success) resolve(json.data.url);
+                        else reject(new Error(json.error?.message || 'Yükleme başarısız'));
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                xhr.onerror = () => reject(new Error('Yükleme bağlantısı kurulamadı'));
+                xhr.send(fd);
+            });
+        }
+
+        function restoreComposerAfterRecording() {
+            document.getElementById('voice-waves').style.display = 'none';
+            ta.style.display = '';
+            requestAnimationFrame(() => ta.focus());
+        }
+
         // --- Media Handlers ---
         window.handlePhoto = async () => {
             const file = document.getElementById('chat-file').files[0];
             if (!file) return;
             showToast('Fotoğraf hazırlanıyor... 📸');
+            document.getElementById('previews').style.display = 'flex';
+            setChatUploadProgress(8);
             try {
                 const base64 = await new Promise((resolve, reject) => {
                     const reader = new FileReader();
+                    reader.onprogress = (event) => {
+                        if (event.lengthComputable) setChatUploadProgress((event.loaded / event.total) * 18);
+                    };
                     reader.onload = () => resolve(reader.result.split(',')[1]);
                     reader.onerror = error => reject(error);
                     reader.readAsDataURL(file);
                 });
-                const fd = new FormData();
-                fd.append('image', base64);
-                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
-                const json = await res.json();
-                if (json.success) {
-                    media.photo = json.data.url;
-                    document.getElementById('temp-photo').src = json.data.url;
-                    document.getElementById('temp-photo').style.display = 'block';
-                    document.getElementById('previews').style.display = 'flex';
-                    updateSendButton();
-                }
-            } catch (e) { showToast('Yükleme hatası 😔'); }
+                const imageUrl = await uploadImageToImgBB(base64);
+                setChatUploadProgress(100);
+                media.photo = imageUrl;
+                document.getElementById('temp-photo').src = imageUrl;
+                document.getElementById('temp-photo').style.display = 'block';
+                document.getElementById('previews').style.display = 'flex';
+                updateSendButton();
+                setTimeout(() => setChatUploadProgress(0), 700);
+            } catch (e) {
+                setChatUploadProgress(0);
+                if (!media.photo && !media.voice) document.getElementById('previews').style.display = 'none';
+                showToast('Yükleme hatası 😔');
+            }
         };
 
         let mediaRecorder;
@@ -2869,8 +3026,7 @@
                 // Kaydı durdur
                 mediaRecorder.stop();
                 btn.classList.remove('recording');
-                waves.style.display = 'none';
-                ta.style.display = 'block';
+                restoreComposerAfterRecording();
                 return;
             }
             try {
@@ -2897,7 +3053,11 @@
                 waves.style.display = 'flex';
                 ta.style.display = 'none';
                 showToast('Kaydediliyor... 🔴');
-            } catch (e) { showToast('Mikrofon hatası ⚠️'); }
+            } catch (e) {
+                btn.classList.remove('recording');
+                restoreComposerAfterRecording();
+                showToast('Mikrofon hatası ⚠️');
+            }
         };
 
         window.cancelMedia = () => {
@@ -2906,6 +3066,8 @@
             document.getElementById('temp-photo').style.display = 'none';
             document.getElementById('voice-label').style.display = 'none';
             document.getElementById('previews').style.display = 'none';
+            setChatUploadProgress(0);
+            restoreComposerAfterRecording();
             updateSendButton();
         };
 
@@ -2978,12 +3140,19 @@
                 resetMessageEffect();
                 setTypingState(false);
                 updateSendButton();
+                // Klavye açık kalsın — mobilde focus geri ver
+                setTimeout(() => ta.focus(), 50);
                 showToast('Mesaj gönderildi! 💌');
             } catch (e) {
                 console.error('[SendMessage] Hata:', e);
                 showToast('Mesaj gönderilemedi: ' + (e.message || 'Bilinmeyen hata') + ' 😔');
             }
-            finally { btn.disabled = false; btn.style.opacity = ''; updateSendButton(); }
+            finally {
+                btn.disabled = false;
+                btn.style.opacity = '';
+                updateSendButton();
+                setTimeout(() => ta.focus(), 50);
+            }
         };
 
         // Helper function to get date label for sticky header
@@ -3003,6 +3172,52 @@
             }
         }
 
+        function toDateValue(value) {
+            if (!value) return null;
+            if (typeof value.toDate === 'function') return value.toDate();
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? null : date;
+        }
+
+        function formatScheduleTime(value) {
+            const date = toDateValue(value);
+            if (!date) return '';
+            return date.toLocaleString('tr-TR', {
+                day: 'numeric',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function shouldHideScheduledMessage(msg, isMe) {
+            if (!msg?.isScheduled) return false;
+            const due = toDateValue(msg.scheduledAt);
+            return !!due && due > new Date() && !isMe;
+        }
+
+        function buildMessageText(text, id, effect) {
+            const safeText = escapeHTML(text).replace(/\n/g, '<br>');
+            const isLong = text.length > 420 || (text.match(/\n/g) || []).length > 6;
+            const textId = `msg-text-${id}`;
+            const body = `<div id="${textId}" class="message-text ${isLong ? 'collapsed' : ''}">${safeText}</div>`;
+            const more = isLong ? `<button class="show-more-btn" type="button" onclick="event.stopPropagation(); toggleLongMessage('${textId}', this)">Daha fazla göster</button>` : '';
+            if (effect === 'secret') {
+                return `<div class="secret-cover" onclick="event.stopPropagation(); revealSecretMessage(this, 'Gizli mesajı kapat')">🔒 Gizli mesajı aç</div><div class="tap-reveal-content">${body}${more}</div>`;
+            }
+            if (effect === 'tap_reveal') {
+                return `<div class="secret-cover" onclick="event.stopPropagation(); revealSecretMessage(this, 'Tekrar gizle')">👆 Dokununca açılır</div><div class="tap-reveal-content">${body}${more}</div>`;
+            }
+            return body + more;
+        }
+
+        window.toggleLongMessage = function(textId, button) {
+            const el = document.getElementById(textId);
+            if (!el) return;
+            const collapsed = el.classList.toggle('collapsed');
+            button.textContent = collapsed ? 'Daha fazla göster' : 'Daha az göster';
+        };
+
         // --- Messaging Logic ---
         function renderMessages() {
             console.log('[Chat] renderMessages çağrıldı, mesaj sayısı:', messageCache.length);
@@ -3020,6 +3235,7 @@
                 if (!msg.timestamp) return;
 
                 const isMe = msg.sender === currentUser;
+                if (shouldHideScheduledMessage(msg, isMe)) return;
 
                 const msgDateD = msg.timestamp.toDate();
 
@@ -3061,14 +3277,10 @@
                 }
                 if (msg.photo) content += `<img src="${msg.photo}" class="msg-photo" onclick="event.stopPropagation(); zoomImg('${msg.photo}')">`;
                 if (msg.text) {
-                    const safeText = escapeHTML(msg.text).replace(/\n/g, '<br>');
-                    if (msg.messageEffect === 'secret') {
-                        content += `<div class="secret-cover" onclick="event.stopPropagation(); revealSecretMessage(this, 'Gizli mesajı kapat')">🔒 Gizli mesajı aç</div><div class="tap-reveal-content" style="padding-top:4px;">${safeText}</div>`;
-                    } else if (msg.messageEffect === 'tap_reveal') {
-                        content += `<div class="secret-cover" onclick="event.stopPropagation(); revealSecretMessage(this, 'Tekrar gizle')">👆 Dokununca açılır</div><div class="tap-reveal-content" style="padding-top:4px;">${safeText}</div>`;
-                    } else {
-                        content += `<div style="padding-top:4px;">${safeText}</div>`;
-                    }
+                    content += buildMessageText(msg.text, id, msg.messageEffect);
+                }
+                if (msg.isScheduled) {
+                    content += `<div class="scheduled-note">⏰ ${escapeHTML(formatScheduleTime(msg.scheduledAt))} için planlandı</div>`;
                 }
                 if (msg.gift) {
                     const gift = msg.gift;
@@ -3334,6 +3546,28 @@
                 console.error('[ReadReceipt] Okundu işaretlenemedi:', e);
             }
         }
+
+        async function processScheduledMessages() {
+            if (processingScheduledMessages) return;
+            processingScheduledMessages = true;
+            try {
+                const now = new Date();
+                const dueMessages = messageCache.filter(({ msg }) => {
+                    if (!msg?.isScheduled) return false;
+                    const due = toDateValue(msg.scheduledAt);
+                    return due && due <= now;
+                });
+                await Promise.all(dueMessages.map(({ id }) => updateDoc(doc(db, 'chat_messages', id), {
+                    isScheduled: false,
+                    sentFromSchedule: true,
+                    timestamp: serverTimestamp()
+                })));
+            } catch (error) {
+                console.error('[Schedule] Zamanlı mesajlar işlenemedi:', error);
+            } finally {
+                processingScheduledMessages = false;
+            }
+        }
         
         // Mesajları dinle
         const messagesQuery = query(collection(db, 'chat_messages'), orderBy('timestamp', 'asc'));
@@ -3342,6 +3576,7 @@
         onSnapshot(messagesQuery, (snap) => {
             console.log('[Chat] Mesajlar yüklendi:', snap.docs.length, 'adet');
             messageCache = snap.docs.map((d) => ({ id: d.id, msg: d.data() }));
+            processScheduledMessages();
             renderMessages();
             dateDividers = [];
             setTimeout(updateStickyHeader, 100);
@@ -3349,6 +3584,7 @@
             console.error('[Chat] Mesaj dinleme hatası:', error);
             showToast('Mesajlar yüklenemedi 😔');
         });
+        setInterval(processScheduledMessages, 30000);
 
         onSnapshot(doc(db, 'chat_typing', partnerName), (snap) => {
             const indicator = document.getElementById('typing-indicator');
@@ -3404,6 +3640,28 @@
             setGiftBusy(false);
         };
 
+        function getTomorrowNineValue() {
+            const date = new Date();
+            date.setDate(date.getDate() + 1);
+            date.setHours(9, 0, 0, 0);
+            const pad = n => String(n).padStart(2, '0');
+            return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        }
+
+        window.openScheduleFromComposer = function() {
+            openGiftModal();
+            const typeSelect = document.getElementById('gift-type');
+            typeSelect.value = 'scheduled';
+            renderGiftFields();
+            const timeInput = document.getElementById('scheduled-time');
+            const textInput = document.getElementById('scheduled-text');
+            if (timeInput) timeInput.value = getTomorrowNineValue();
+            if (textInput) {
+                textInput.value = ta.value.trim();
+                setTimeout(() => textInput.focus(), 80);
+            }
+        };
+
         function setGiftStatus(message, isError = false) {
             const status = document.getElementById('gift-status');
             if (!status) return;
@@ -3424,9 +3682,11 @@
         window.renderGiftFields = function() {
             const type = document.getElementById('gift-type').value;
             const box = document.getElementById('gift-fields');
+            const noteArea = document.getElementById('gift-note');
             setGiftStatus('');
             if (type === 'heart') {
                 box.innerHTML = '<input id="gift-heart-amount" type="number" min="1" step="1" inputmode="numeric" placeholder="Kaç kalp gönderilsin?">';
+                noteArea.style.display = '';
                 return;
             }
             if (type === 'coupon') {
@@ -3436,9 +3696,30 @@
                     .map(([key, count]) => `<option value="${key}">${COUPON_TITLES[key] || key} (${count})</option>`)
                     .join('');
                 box.innerHTML = options ? `<select id="gift-coupon-key">${options}</select>` : '<div style="opacity:.7;margin-top:10px;">Gönderecek kupon yok.</div>';
+                noteArea.style.display = '';
+                return;
+            }
+            if (type === 'scheduled') {
+                // Minimum: şu andan 5 dakika sonrası
+                const minDate = new Date(Date.now() + 5 * 60 * 1000);
+                const pad = n => String(n).padStart(2, '0');
+                const minStr = `${minDate.getFullYear()}-${pad(minDate.getMonth()+1)}-${pad(minDate.getDate())}T${pad(minDate.getHours())}:${pad(minDate.getMinutes())}`;
+                box.innerHTML = `
+                    <div style="font-size:0.82rem;opacity:0.6;margin-bottom:8px;">Mesaj ne zaman gönderilsin?</div>
+                    <input id="scheduled-time" type="datetime-local" min="${minStr}"
+                        style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.16);border-radius:12px;color:#fff;padding:10px;font:inherit;font-size:0.9rem;">
+                    <textarea id="scheduled-text" rows="3" maxlength="500" placeholder="Zamanlanmış mesajını yaz..."
+                        style="width:100%;margin-top:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.16);border-radius:12px;color:#fff;padding:10px;font:inherit;font-size:0.9rem;resize:none;"></textarea>
+                `;
+                setTimeout(() => {
+                    const timeInput = document.getElementById('scheduled-time');
+                    if (timeInput && !timeInput.value) timeInput.value = getTomorrowNineValue();
+                }, 0);
+                noteArea.style.display = 'none';
                 return;
             }
             box.innerHTML = '<div style="opacity:.7;margin-top:10px;">Sadece mini not gönderilecek.</div>';
+            noteArea.style.display = '';
         };
 
         window.sendGift = async function() {
@@ -3481,6 +3762,38 @@
                     });
                     gift.key = key;
                     gift.title = COUPON_TITLES[key] || key;
+                } else if (type === 'scheduled') {
+                    const scheduledText = document.getElementById('scheduled-text')?.value.trim();
+                    const scheduledValue = document.getElementById('scheduled-time')?.value;
+                    const scheduledDate = scheduledValue ? new Date(scheduledValue) : null;
+                    if (!scheduledText) throw new Error('Zamanlanacak mesaj boş olamaz.');
+                    if (!scheduledDate || Number.isNaN(scheduledDate.getTime())) throw new Error('Geçerli bir tarih seç.');
+                    if (scheduledDate.getTime() < Date.now() + 4 * 60 * 1000) throw new Error('Saat en az 5 dakika sonrası olmalı.');
+                    setGiftStatus('Mesaj planlanıyor...');
+                    await addDoc(collection(db, 'chat_messages'), {
+                        sender: currentUser,
+                        text: scheduledText,
+                        isScheduled: true,
+                        scheduledAt: Timestamp.fromDate(scheduledDate),
+                        reactions: {},
+                        readBy: { [currentUser]: true },
+                        timestamp: serverTimestamp()
+                    });
+                    await addDoc(collection(db, 'activity_logs'), {
+                        type: 'scheduled_message',
+                        user: currentUser,
+                        meta: { scheduledAt: scheduledDate.toISOString() },
+                        createdAt: serverTimestamp()
+                    });
+                    closeGiftModal();
+                    if (ta.value.trim() === scheduledText) {
+                        ta.value = '';
+                        ta.style.height = 'auto';
+                        updateSendButton();
+                    }
+                    showToast('Mesaj zamanlandı ⏰');
+                    setTimeout(() => ta.focus(), 80);
+                    return;
                 } else if (!note) {
                     throw new Error('Mini not boş olamaz.');
                 }
@@ -3524,10 +3837,34 @@
             setTimeout(() => { host.innerHTML = ''; }, 3600);
         }
 
+        function updateChatPhotoNav() {
+            const modal = document.getElementById('img-modal');
+            const buttons = modal?.querySelectorAll('.img-nav-btn') || [];
+            buttons.forEach(btn => {
+                btn.style.display = sharedPhotos.length > 1 ? 'flex' : 'none';
+                btn.disabled = sharedPhotos.length < 2;
+            });
+        }
+
         window.zoomImg = function(url) {
-            var m = document.getElementById('img-modal');
+            const m = document.getElementById('img-modal');
+            currentChatPhotoIndex = sharedPhotos.indexOf(url);
+            if (currentChatPhotoIndex < 0) currentChatPhotoIndex = 0;
             document.getElementById('modal-img').src = url;
+            updateChatPhotoNav();
             m.style.display = 'flex';
+        };
+
+        window.closeImgModal = function() {
+            document.getElementById('img-modal').style.display = 'none';
+            currentChatPhotoIndex = -1;
+        };
+
+        window.navigateChatPhoto = function(direction) {
+            if (!sharedPhotos.length) return;
+            currentChatPhotoIndex = (currentChatPhotoIndex + direction + sharedPhotos.length) % sharedPhotos.length;
+            document.getElementById('modal-img').src = sharedPhotos[currentChatPhotoIndex];
+            updateChatPhotoNav();
         };
 
         window.openChatSearch = function() {
@@ -3568,7 +3905,7 @@
                     ? msg.timestamp.toDate().toLocaleString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
                     : '';
                 return `<div class="chat-search-result" onclick="goToMessage('${id}')">
-                    <div class="chat-search-meta">${escapeHTML(msg.sender)} Â· ${escapeHTML(when)}</div>
+                    <div class="chat-search-meta">${escapeHTML(msg.sender)} · ${escapeHTML(when)}</div>
                     <div>${escapeHTML(getMessagePreview(msg)).slice(0, 120)}</div>
                 </div>`;
             }).join('');
@@ -3753,6 +4090,7 @@
                     </div>
                     <span class="voice-time" id="${pid}-time">0:00</span>
                 </div>
+                <button class="voice-speed-btn" onclick="cycleVoiceSpeed('${pid}')" id="${pid}-speed" title="Hız">1x</button>
             </div>`;
         }
 
@@ -3769,6 +4107,7 @@
             if (!_vpAudios[pid]) {
                 const audio = new Audio(src);
                 _vpAudios[pid] = audio;
+                audio.playbackRate = _vpSpeeds[pid] || 1;
                 audio.addEventListener('timeupdate', () => {
                     const fill = document.getElementById(`${pid}-fill`);
                     const time = document.getElementById(`${pid}-time`);
@@ -3811,6 +4150,21 @@
             const rect = e.currentTarget.getBoundingClientRect();
             const pct = (e.clientX - rect.left) / rect.width;
             audio.currentTime = pct * audio.duration;
+        };
+
+        const _vpSpeeds = {};
+        const SPEED_STEPS = [1, 1.5, 2];
+        window.cycleVoiceSpeed = function(pid) {
+            const audio = _vpAudios[pid];
+            const btn = document.getElementById(`${pid}-speed`);
+            if (!btn) return;
+            const cur = _vpSpeeds[pid] || 1;
+            const next = SPEED_STEPS[(SPEED_STEPS.indexOf(cur) + 1) % SPEED_STEPS.length];
+            _vpSpeeds[pid] = next;
+            if (audio) audio.playbackRate = next;
+            btn.textContent = next + 'x';
+            btn.style.color = next > 1 ? 'var(--ayse-color)' : 'rgba(255,255,255,0.6)';
+            if (window.haptic) window.haptic(15);
         };
 
         // ===== Mesaj Düzenleme =====

@@ -345,6 +345,7 @@
 
     </div>
 
+    <script src="widget-helper.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
         import {
@@ -427,10 +428,24 @@
                                  '<span class="check-label">Mert</span>' +
                                  '<span class="check-icon">' + mertIcon + '</span>' +
                                '</div>' +
+                               window.OurStoryWidget.button('Widget yap', 'saveListWidget(\'' + item.id + '\')') +
                                '<button class="delete-btn" onclick="removeItem(\'' + item.id + '\')" title="Sil">🗑️</button>';
                 container.appendChild(el);
             });
         }
+
+        window.saveListWidget = function(id) {
+            const item = allItems.find(entry => entry.id === id);
+            if (!item) return;
+            const categoryNames = { kitap: 'Kitap listesi', film: 'Film listesi', yemek: 'Yemek listesi', yer: 'Gidilecek yerler', hediye: 'Hediye fikirleri' };
+            const ownerName = item.owner === 'ayse' ? 'Ayşe' : 'Mert';
+            window.OurStoryWidget.save({
+                type: 'list',
+                title: categoryNames[item.category] || 'Listemiz',
+                text: item.text || '',
+                meta: `${ownerName} listesi · Ayşe ${item.ayseChecked ? 'işaretledi' : 'bekliyor'} · Mert ${item.mertChecked ? 'işaretledi' : 'bekliyor'}`
+            });
+        };
 
         document.getElementById('add-btn').onclick = async function() {
             var input = document.getElementById('item-input');
@@ -486,4 +501,3 @@
 <script type="module" src="presence.js"></script>
 </body>
 </html>
-

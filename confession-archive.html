@@ -192,6 +192,7 @@
         </div>
     </div>
 
+    <script src="widget-helper.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
         import { getFirestore, enableIndexedDbPersistence, collection, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
@@ -208,6 +209,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        let confessions = [];
         enableIndexedDbPersistence(db).catch(err => console.log('Offline DB:', err.code));
 
         const q = query(collection(db, "confessions"), orderBy("timestamp", "desc"));
@@ -215,6 +217,7 @@
         onSnapshot(q, (snapshot) => {
             const grid = document.getElementById('archive-grid');
             grid.innerHTML = '';
+            confessions = [];
 
             if (snapshot.empty) {
                 grid.innerHTML = '<p style="grid-column: 1/-1; opacity: 0.5;">Henüz yazılmış bir mektup yok sevgilim. ❤️</p>';
@@ -223,6 +226,7 @@
 
             snapshot.forEach((doc) => {
                 const data = doc.data();
+                confessions.push({ id: doc.id, ...data });
                 const d = data.timestamp ? new Date(data.timestamp.seconds * 1000) : null;
                 const formattedDate = d ? d.toLocaleDateString('tr-TR') + ' - ' + d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '...';
                 
@@ -236,7 +240,7 @@
                         Durum: ${data.status}
                     </div>
                 `;
-                card.onclick = () => openModal(data);
+                card.onclick = () => openModal({ _widgetId: doc.id, ...data });
                 grid.appendChild(card);
             });
         });
@@ -263,8 +267,20 @@
                 <div style="text-align: center; margin-top: 30px; font-family: 'Caveat', cursive; font-size: 1.5rem; color: #ff4b72;">
                     Hep aşacağız, seni çok seviyorum. ❤️
                 </div>
+                <div style="text-align:center;margin-top:20px;">${window.OurStoryWidget.button('Widget yap', `saveConfessionWidget('${data._widgetId || ''}')`)}</div>
             `;
             document.getElementById('letter-modal').classList.add('show');
+        };
+
+        window.saveConfessionWidget = function(id) {
+            const item = confessions.find(entry => entry.id === id);
+            if (!item) return;
+            window.OurStoryWidget.save({
+                type: 'confession',
+                title: 'İtirafımız',
+                text: `Kızgınlık: ${item.anger || ''}\n\nSevgi: ${item.love || ''}`,
+                meta: item.status ? `Durum: ${item.status}` : 'İtiraf köşesi'
+            });
         };
 
         window.closeModal = () => {
