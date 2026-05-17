@@ -1,0 +1,732 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Aşk Profili ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=3">
+    <style>
+        body { font-family: 'Outfit', sans-serif; color: #fff; margin: 0; padding: 20px; padding-bottom: 120px; min-height: 100vh; background: #0a0208; }
+        #background-canvas { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, #1a0520 0%, #0a0208 100%); }
+        .back-nav { position: fixed; top: 20px; left: 20px; background: rgba(255,255,255,.06); padding: 10px 18px; border-radius: 25px; color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,.16); z-index: 100; backdrop-filter: blur(5px); transition: all 0.3s; }
+        .back-nav:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.3); }
+        .header { text-align: center; margin-top: 58px; margin-bottom: 30px; }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: 2.7rem; color: var(--primary); margin: 0; text-shadow: 0 0 15px rgba(255, 75, 114, 0.5); }
+        
+        .profile-container { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; max-width: 1000px; margin: 0 auto; }
+        @media (max-width: 768px) { .profile-container { grid-template-columns: 1fr; } }
+        
+        .panel { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 20px; padding: 24px; backdrop-filter: blur(10px); position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #ff4b72, #ff8c00); }
+        .panel-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: #fff; }
+        
+        /* User Card */
+        .user-card { text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .avatar-wrap { position: relative; margin-bottom: 15px; cursor: pointer; transition: 0.3s; }
+        .avatar-wrap:hover { transform: scale(1.03); }
+        .avatar-wrap::after { content: '📷'; position: absolute; top: 0; right: 0; background: rgba(0,0,0,0.6); border-radius: 50%; padding: 6px; font-size: 1.2rem; }
+        .avatar { width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #1a0520, #ff4b72); margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 4rem; box-shadow: 0 0 25px rgba(255, 75, 114, 0.4); border: 3px solid rgba(255,255,255,0.2); }
+        .level-badge { position: absolute; bottom: 0; right: 0; background: #ff8c00; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; border: 2px solid #0a0208; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        
+        .username { font-size: 2rem; font-weight: 700; margin-bottom: 5px; font-family: 'Playfair Display', serif; }
+        .balance-badge { display: inline-block; background: rgba(255, 215, 0, 0.15); border: 1px solid var(--gold, #ffd700); color: var(--gold, #ffd700); padding: 8px 20px; border-radius: 20px; font-size: 1.1rem; font-weight: 600; margin-bottom: 25px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+        
+        /* Daily Reward */
+        .daily-reward-box { background: rgba(0,0,0,0.3); border: 1px dashed rgba(255, 75, 114, 0.5); border-radius: 15px; padding: 15px; width: 100%; text-align: center; margin-bottom: 15px; }
+        .daily-reward-btn { width: 100%; background: linear-gradient(45deg, #ff8c00, #ff4b72); border: none; border-radius: 10px; padding: 12px; font-size: 1.1rem; font-weight: 700; color: #fff; cursor: pointer; transition: all 0.3s; box-shadow: 0 5px 15px rgba(255, 75, 114, 0.3); }
+        .daily-reward-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255, 75, 114, 0.5); }
+        .daily-reward-btn:disabled { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); cursor: not-allowed; box-shadow: none; border: 1px solid rgba(255,255,255,0.1); }
+        .daily-status { font-size: 0.85rem; opacity: 0.7; margin-top: 8px; }
+        .profile-stat-btn { margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.12); }
+        .profile-stat-btn.time { background: linear-gradient(45deg, #4facfe, #1a0520); border-color: rgba(79, 172, 254, 0.4); box-shadow: 0 5px 15px rgba(79, 172, 254, 0.2); }
+        .profile-stat-btn.mood { background: linear-gradient(45deg, #b44fff, #ff4b72); border-color: rgba(180, 79, 255, 0.4); box-shadow: 0 5px 15px rgba(180, 79, 255, 0.22); margin-bottom: 20px; }
+        
+        /* Achievements */
+        .achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 15px; }
+        .achi-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0.5; filter: grayscale(1); transform: scale(0.98); }
+        .achi-card.unlocked { opacity: 1; filter: grayscale(0); border-color: rgba(255, 75, 114, 0.4); background: rgba(255, 75, 114, 0.08); transform: scale(1); box-shadow: 0 5px 15px rgba(255, 75, 114, 0.1); }
+        .achi-card:hover.unlocked { transform: translateY(-5px) scale(1.02); box-shadow: 0 10px 20px rgba(255, 75, 114, 0.2); }
+        .achi-icon { font-size: 2.2rem; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
+        .achi-info { flex: 1; }
+        .achi-info h4 { margin: 0 0 4px 0; font-size: 1rem; color: #fff; }
+        .achi-info p { margin: 0; font-size: 0.8rem; opacity: 0.7; line-height: 1.3; }
+        .achi-date { display: none; font-size: 0.7rem; color: var(--primary); margin-top: 4px; font-weight: 600; }
+        .achi-card.unlocked .achi-date { display: block; }
+        
+        /* Inventory List */
+        .inventory-list { display: flex; flex-direction: column; gap: 12px; width: 100%; max-height: 300px; overflow-y: auto; padding-right: 5px; }
+        .inventory-list::-webkit-scrollbar { width: 5px; }
+        .inventory-list::-webkit-scrollbar-thumb { background: rgba(255, 75, 114, 0.5); border-radius: 10px; }
+        .inv-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; transition: background 0.3s; }
+        .inv-item:hover { background: rgba(255,255,255,0.06); }
+        .inv-item-name { font-weight: 600; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; }
+        .inv-item-icon { font-size: 1.3rem; }
+        .inv-item-actions { display: flex; align-items: center; gap: 10px; }
+        .inv-item-count { background: rgba(255, 75, 114, 0.2); color: #ffb6c1; padding: 4px 10px; border-radius: 15px; font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(255, 75, 114, 0.3); }
+        .profile-badge-cosmetic { margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); font-size: .9rem; font-weight: 700; }
+        .inventory-tabs { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:12px; }
+        .inventory-tab { border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.07); color:#fff; border-radius:999px; padding:7px 10px; cursor:pointer; font-size:.82rem; }
+        .inventory-tab.active { border-color:var(--primary); background:rgba(255,75,114,.18); }
+        .mini-action { border:1px solid rgba(255,255,255,.16); border-radius:10px; background:rgba(255,255,255,.08); color:#fff; padding:6px 8px; cursor:pointer; font-size:.78rem; }
+        .mini-action.primary { border-color:rgba(255,75,114,.45); background:rgba(255,75,114,.18); }
+        .mini-action:disabled { opacity:.55; cursor:default; }
+        .showcase-panel { width:100%; background:rgba(0,0,0,.24); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:12px; margin-bottom:15px; text-align:left; }
+        .showcase-title { font-weight:800; margin-bottom:8px; color:var(--primary); text-align:center; }
+        .showcase-grid { display:grid; gap:8px; }
+        .showcase-item { display:flex; align-items:center; gap:10px; min-height:42px; background:rgba(255,255,255,.045); border-radius:10px; padding:8px; font-size:.9rem; }
+        .showcase-item span:nth-child(2) { flex:1; min-width:0; }
+        .showcase-change { width:30px; height:30px; border-radius:9px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.08); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:.9rem; flex:0 0 auto; }
+        .showcase-change:hover { border-color:rgba(255,75,114,.42); background:rgba(255,75,114,.16); }
+        .showcase-photo { width:44px; height:44px; border-radius:9px; object-fit:cover; background:rgba(255,255,255,.08); }
+        .inventory-photo { width:46px; height:46px; border-radius:10px; object-fit:cover; background:rgba(255,255,255,.08); flex:0 0 auto; }
+        .inv-item-name small { display:block; opacity:.62; font-weight:500; margin-top:3px; }
+        
+        #status-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(255, 75, 114, 0.95); color: #fff; padding: 12px 24px; border-radius: 30px; font-weight: 600; opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); }
+        #status-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        
+        .empty-state { text-align: center; opacity: 0.5; font-style: italic; font-size: 0.9rem; padding: 20px; }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    </style>
+    <script src="app-bootstrap.js?v=1" defer></script>
+</head>
+<body>
+    <div id="background-canvas"></div>
+    <a href="#" class="back-nav" id="back-nav">← Geri Dön</a>
+    
+    <div class="header animate-pop">
+        <h1>Aşk Profili ✨</h1>
+    </div>
+    
+    <div class="profile-container">
+        <!-- Sol Panel: User Info & Inventory -->
+        <div class="panel user-card animate-pop" style="animation-delay: 0.1s;">
+            <div class="avatar-wrap" onclick="document.getElementById('avatar-upload').click()">
+                <div class="avatar" id="user-avatar" style="background-size: cover; background-position: center;">👤</div>
+                <div class="level-badge" id="level-badge">1</div>
+            </div>
+            <input type="file" id="avatar-upload" hidden accept="image/*">
+            <div class="username" id="user-name">...</div>
+            <div class="profile-badge-cosmetic" id="profile-cosmetic-badge" style="display:none;"></div>
+            <div class="balance-badge"><span id="user-balance">0</span> ❤️</div>
+            
+            <div class="daily-reward-box">
+                <button class="daily-reward-btn" id="daily-btn" disabled>Yükleniyor...</button>
+                <div class="daily-status" id="daily-status-text">Her gün giriş yap, ödülünü kap!</div>
+            </div>
+            
+            <button class="daily-reward-btn profile-stat-btn time" id="time-stats-btn" onclick="window.location.href='time-stats.html'">⏳ Geçirilen Süre İstatistikleri</button>
+            <button class="daily-reward-btn profile-stat-btn mood" id="mood-stats-btn" onclick="window.location.href='mood-stats.html'">✨ Ruh Hali Grafiği</button>
+            
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 0 0 20px; width: 100%;">
+
+            <div class="showcase-panel">
+                <div class="showcase-title">Profil Vitrini</div>
+                <div class="showcase-grid" id="profile-showcase"></div>
+            </div>
+            
+            <div class="panel-title" style="width: 100%; justify-content: center; font-size: 1.2rem; margin-bottom: 15px;">🛍️ Kuponlar ve Eşyalar</div>
+            <div class="inventory-tabs">
+                <button class="inventory-tab active" data-inv-tab="all">Tümü</button>
+                <button class="inventory-tab" data-inv-tab="power">Oyun Güçleri</button>
+                <button class="inventory-tab" data-inv-tab="coupon">Kuponlar</button>
+                <button class="inventory-tab" data-inv-tab="cosmetic">Kozmetikler</button>
+                <button class="inventory-tab" data-inv-tab="photo">Fotoğraflar</button>
+            </div>
+            <div class="inventory-list" id="inventory-list">
+                <div class="empty-state">Yükleniyor...</div>
+            </div>
+        </div>
+        
+        <!-- Sağ Panel: Achievements (Sadece kendi profilinde göster) -->
+        <div class="panel animate-pop" id="achievements-panel" style="animation-delay: 0.2s;">
+            <div class="panel-title">🏆 Başarımlar</div>
+            <div class="achievements-grid" id="achi-grid">
+                <!-- Javascript will populate -->
+            </div>
+        </div>
+    </div>
+    
+    <div id="status-toast"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import {
+            getFirestore,
+            enableIndexedDbPersistence,
+            doc,
+            getDoc,
+            setDoc,
+            onSnapshot,
+            runTransaction,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+            authDomain: "ayseye-surpriz.firebaseapp.com",
+            projectId: "ayseye-surpriz",
+            storageBucket: "ayseye-surpriz.firebasestorage.app",
+            messagingSenderId: "531177459988",
+            appId: "1:531177459988:web:09060a95bea0b06f197201"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        enableIndexedDbPersistence(db).catch(() => {});
+
+        const currentUser = localStorage.getItem('active_player');
+        if (!currentUser) window.location.href = 'index.html';
+
+        // URL parametrelerini kontrol et
+        const urlParams = new URLSearchParams(window.location.search);
+        const viewMode = urlParams.get('view'); // 'partner' veya null
+        const fromPage = urlParams.get('from'); // 'chat' veya 'chat-profile'
+
+        // Partner belirleme
+        const partner = currentUser === 'Ayşe' ? 'Mert' : 'Ayşe';
+        const displayUser = viewMode === 'partner' ? partner : currentUser;
+
+        // Geri dönüş butonunu ayarla
+        document.getElementById('back-nav').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (fromPage === 'chat') {
+                window.location.href = 'chat.html';
+            } else if (fromPage === 'chat-profile') {
+                window.location.href = 'chat-profile.html';
+            } else {
+                window.location.href = 'index.html#hub';
+            }
+        });
+
+        // Header'ı güncelle
+        if (viewMode === 'partner') {
+            document.querySelector('.header h1').textContent = partner + 'nin Profili 💕';
+            document.getElementById('user-name').textContent = partner;
+            // Avatar'ı partner'e göre ayarla
+            if (partner === "Ayşe") {
+                document.getElementById('user-avatar').textContent = "👸🏻";
+            } else {
+                document.getElementById('user-avatar').textContent = "🤴🏻";
+            }
+            // Avatar upload'u gizle (partner profilinde değiştirilemez)
+            document.querySelector('.avatar-wrap').style.pointerEvents = 'none';
+            document.querySelector('.avatar-wrap').style.opacity = '0.8';
+            // Başarımlar panelini gizle (partner'inkileri gösterme)
+            document.getElementById('achievements-panel').style.display = 'none';
+            // Günlük ödül butonunu gizle
+            document.querySelector('.daily-reward-box').style.display = 'none';
+            // İstatistik butonunu gizle
+            document.getElementById('time-stats-btn').style.display = 'none';
+            document.getElementById('mood-stats-btn').style.display = 'none';
+            // Envanter başlığını değiştir
+            document.querySelector('.panel-title').textContent = '🎁 Kuponlarım ve Eşyalarım';
+        } else {
+            document.getElementById('user-name').textContent = currentUser;
+        }
+
+        const ecoRef = doc(db, 'economy', 'balances');
+        // Partner görünümünde KENDİ envanterini göster (ortaklanmasın diye)
+        const inventoryRef = doc(db, 'user_inventory', currentUser);
+        // Partner görünümünde KENDİ stats'larını göster (ortaklanmasın diye)
+        const userStatsRef = doc(db, 'user_stats', currentUser);
+        // Partner'in sadece görünüm bilgileri (resim vs)
+        const partnerStatsRef = doc(db, 'user_stats', partner);
+
+        const statusToast = document.getElementById('status-toast');
+        let toastTimeout;
+        function showToast(msg) {
+            statusToast.textContent = msg;
+            statusToast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                statusToast.classList.remove('show');
+            }, 3000);
+        }
+
+        // --- KUPON & ITEM ISIMLERI ---
+        const ITEM_NAMES = {
+            "coupon_hug": { title: "Sınırsız Sarılma", icon: "🫂" },
+            "coupon_snack": { title: "Atıştırmalık Kölesi", icon: "🍿" },
+            "coupon_choice": { title: "Seçim Hakkı", icon: "🎮" },
+            "coupon_hair": { title: "Saçlarımla Oyna", icon: "💆‍♀️" },
+            "coupon_call": { title: "Gece Boyu Telefon", icon: "📞" },
+            "coupon_treat": { title: "Tatlı/Kahve İkramı", icon: "🧋" },
+            "coupon_right": { title: "Haklı Sayılma Jokeri", icon: "👑" },
+            "badge_star": { title: "Yıldız Rozet", icon: "⭐" },
+            "badge_crown": { title: "Kalp Tacı", icon: "👑" },
+            "badge_flame": { title: "Alevli Kalp Rozeti", icon: "🔥" },
+            "theme_rose": { title: "Gül Teması", icon: "🌹" },
+            "theme_gold": { title: "Altın Gece Teması", icon: "🌙" },
+            "theme_blue": { title: "Ay Işığı Teması", icon: "💎" },
+            "memory_retry": { title: "Hafıza İkinci Şans", icon: "🃏" },
+            "mine_shield": { title: "Kalp Kalkanı", icon: "🛡️" },
+            "dice_insurance": { title: "Zar Sigortası", icon: "🎲" },
+            "jackpot_boost": { title: "Jackpot Boost", icon: "🎰" },
+            "scratch_extra": { title: "Ekstra Kazıma", icon: "🎟️" },
+            "quiz_hint": { title: "Quiz İpucu", icon: "💡" },
+            "quiz_skip": { title: "Soru Değiştirici", icon: "🔁" },
+            "quiz_double": { title: "Çifte Puan Kalbi", icon: "💘" },
+            "word_hint": { title: "Harf Fısıltısı", icon: "🔤" },
+            "word_second": { title: "İkinci Harf", icon: "✌️" },
+            "word_reveal": { title: "Kelime Kurtarıcı", icon: "🧩" },
+            "reward_boost": { title: "Ödül Parlatıcı", icon: "✨" },
+            "entry_ticket": { title: "Bedava Giriş Bileti", icon: "🎫" },
+            "rhythm_slow": { title: "Sakin Kalp", icon: "💓" }
+        };
+
+        // --- BASARIMLAR ---
+        const ACHIEVEMENTS = [
+            { id: "first_blood", title: "İlk Ziyaret", icon: "🌱", desc: "Aşk Dünyasına ilk adımı attın." },
+            { id: "rich_bitch", title: "Zenginliğin Böylesi", icon: "💰", desc: "10.000 ❤️ barajını geçtin." },
+            { id: "shopping_spree", title: "Para Harcamayı Severim", icon: "🛍️", desc: "Marketten ilk eşyanı aldın." },
+            { id: "jackpot_master", title: "Şans Meleği", icon: "🎰", desc: "Jackpot Boost aldın, büyük oynuyorsun." },
+            { id: "coupon_hoarder", title: "Kupon Canavarı", icon: "🎟️", desc: "İlk kuponunu aldın." },
+            { id: "loyal_lover", title: "Sadık Aşık", icon: "📅", desc: "3 farklı günde günlük ödül topladın." },
+            { id: "profile_pic", title: "Yakışıklı/Güzel", icon: "📸", desc: "Kendi muhteşem profil fotoğrafını güncelledin." },
+            { id: "wealth_50k", title: "Banker Bilo", icon: "🏦", desc: "50.000 ❤️ eşiğini geçtin, paraya para demiyorsun!" },
+            { id: "true_addict", title: "Bağımlı", icon: "🔥", desc: "Toplam 10 kez giriş yaparak kalbini belli ettin." },
+            { id: "shopaholic", title: "Alışveriş Kolik", icon: "🛒", desc: "Toplam 5 farklı eşya veya kozmetik satın aldın." },
+            { id: "time_spark", title: "Vakit Ayıran Kalp", icon: "⏳", desc: "Aşk dünyasında toplam 30 dakika geçirdin." },
+            { id: "time_keeper", title: "Zaman Bekçisi", icon: "🕰️", desc: "Toplam 5 saati geride bıraktın." },
+            { id: "week_regular", title: "Haftalık Müdavim", icon: "📆", desc: "7 farklı günde burada iz bıraktın." },
+            { id: "mood_opener", title: "İçini Açan", icon: "✨", desc: "İlk ruh hali güncellemeni yaptın." },
+            { id: "mood_diary", title: "Mood Günlüğü", icon: "📊", desc: "7 kez ruh halini kaydettin." },
+            { id: "memory_star", title: "Anı Koleksiyoncusu", icon: "⭐", desc: "Sohbette özel mesajları yıldızlamaya başladın." },
+            { id: "love_god", title: "Aşk Tanrısı", icon: "👼", desc: "Geliştirmeler ve başarımlarla Seviye 10'a ulaştın!" }
+        ];
+
+        let userBalance = 0;
+        let inventoryData = {};
+        let statsData = {};
+        let inventoryTab = 'all';
+
+        document.querySelectorAll('[data-inv-tab]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-inv-tab]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                inventoryTab = btn.dataset.invTab;
+                renderInventory();
+            });
+        });
+
+        // INITIALIZE DB DOCS IF NOT EXIST
+        async function initDocs() {
+            const snap = await getDoc(userStatsRef);
+            if (!snap.exists()) {
+                await setDoc(userStatsRef, {
+                    lastLoginDate: null,
+                    achievements: { "first_blood": new Date().toISOString() },
+                    loginCount: 1
+                });
+            }
+        }
+
+        // LISTEN TO BALANCE
+        onSnapshot(ecoRef, (snap) => {
+            if (!snap.exists()) return;
+            const data = snap.data();
+            userBalance = data[currentUser] || 0;
+            document.getElementById('user-balance').textContent = userBalance;
+            checkAchievements(); // Balance might trigger an achi
+        });
+
+        // LISTEN TO INVENTORY
+        onSnapshot(inventoryRef, (snap) => {
+            if (!snap.exists()) {
+                document.getElementById('inventory-list').innerHTML = '<div class="empty-state">Henüz hiç eşyan yok. <br>Marketten bir şeyler alabilirsin!</div>';
+                return;
+            }
+            inventoryData = snap.data();
+            renderInventory();
+            renderShowcase();
+            
+            // Check Theme
+            const activeTheme = inventoryData?.activeCosmetics?.gameTheme;
+            if (activeTheme === 'theme_rose') {
+                document.getElementById('background-canvas').style.background = "radial-gradient(circle at center, #2b0715 0%, #12040a 100%)";
+            } else if (activeTheme === 'theme_gold') {
+                document.getElementById('background-canvas').style.background = "radial-gradient(circle at center, #2a1b05 0%, #0c0702 100%)";
+            } else if (activeTheme === 'theme_blue') {
+                document.getElementById('background-canvas').style.background = "radial-gradient(circle at center, #061b2c 0%, #02070d 100%)";
+            }
+            renderProfileBadge();
+            
+            checkAchievements(); // Inventory might trigger an achi
+        });
+
+        // LISTEN TO STATS (Kendi stats'larım)
+        onSnapshot(userStatsRef, (snap) => {
+            if (!snap.exists()) return;
+            statsData = snap.data();
+            renderAchievements();
+            checkDailyStatus();
+
+            // Calc Level based on login count + unlocked achi (sadece kendi profilinde göster)
+            if (viewMode !== 'partner') {
+                const unlockedCount = Object.keys(statsData.achievements || {}).length;
+                const logins = statsData.loginCount || 1;
+                const level = Math.floor((unlockedCount * 2 + logins * 0.5) / 3) + 1;
+                document.getElementById('level-badge').textContent = level > 99 ? 99 : level;
+            }
+        });
+
+        // Partner görünümünde partner'in profil resmini çek
+        if (viewMode === 'partner') {
+            onSnapshot(partnerStatsRef, (snap) => {
+                if (snap.exists() && snap.data().profilePic) {
+                    document.getElementById('user-avatar').style.backgroundImage = `url(${snap.data().profilePic})`;
+                    document.getElementById('user-avatar').textContent = "";
+                }
+            });
+            // Partner görünümünde level badge'i gizle (ortaklanmasın)
+            document.getElementById('level-badge').style.display = 'none';
+        } else {
+            // Kendi profilimde benim profil resmim
+            onSnapshot(userStatsRef, (snap) => {
+                if (snap.exists() && snap.data().profilePic) {
+                    document.getElementById('user-avatar').style.backgroundImage = `url(${snap.data().profilePic})`;
+                    document.getElementById('user-avatar').textContent = "";
+                }
+            });
+        }
+
+        const IMGBB_KEY = "7916dd11376f59a547ed252799f1328a";
+
+        // Handle Avatar Upload
+        document.getElementById('avatar-upload').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            showToast('Fotoğraf yükleniyor... Lütfen bekle ⏳');
+            try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                });
+                const fd = new FormData();
+                fd.append('image', base64);
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
+                const json = await res.json();
+                if (json.success) {
+                    const url = json.data.url;
+                    await setDoc(userStatsRef, { profilePic: url }, { merge: true });
+                    showToast('Profil fotoğrafın harika oldu! 📸');
+                    
+                    const unlocked = statsData.achievements || {};
+                    if (!unlocked["profile_pic"]) {
+                        await setDoc(userStatsRef, { achievements: { ...unlocked, "profile_pic": new Date().toISOString() } }, { merge: true });
+                    }
+                }
+            } catch (err) {
+                showToast('Yükleme hatası 😔');
+            }
+        });
+
+        function renderInventory() {
+            const listEl = document.getElementById('inventory-list');
+            listEl.innerHTML = '';
+            
+            const cons = inventoryData.consumables || {};
+            const cos = inventoryData.cosmetics || {};
+            let hasItems = false;
+            
+            for (const [key, count] of Object.entries(cons)) {
+                if (count > 0) {
+                    const isCoupon = key.indexOf('coupon_') === 0;
+                    if (inventoryTab === 'coupon' && !isCoupon) continue;
+                    if (inventoryTab === 'power' && isCoupon) continue;
+                    if (inventoryTab === 'cosmetic' || inventoryTab === 'photo') continue;
+                    hasItems = true;
+                    const meta = ITEM_NAMES[key] || { title: key, icon: "📦" };
+                    const isFavoriteCoupon = inventoryData.activeCosmetics?.favoriteCoupon === key;
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'inv-item';
+                    itemEl.innerHTML = `
+                        <div class="inv-item-name">
+                            <span class="inv-item-icon">${meta.icon}</span>
+                            <span>${meta.title}</span>
+                        </div>
+                        <div class="inv-item-actions">
+                            ${isCoupon ? `<button class="mini-action ${isFavoriteCoupon ? 'primary' : ''}" ${isFavoriteCoupon ? 'disabled' : ''} onclick="setFavoriteCoupon('${key}')">${isFavoriteCoupon ? 'Vitrinde' : 'Vitrine koy'}</button>` : ''}
+                            <div class="inv-item-count">${count} Adet</div>
+                        </div>
+                    `;
+                    listEl.appendChild(itemEl);
+                }
+            }
+
+            for (const [key, owned] of Object.entries(cos)) {
+                if (owned) {
+                    if (inventoryTab !== 'all' && inventoryTab !== 'cosmetic') continue;
+                    hasItems = true;
+                    const meta = ITEM_NAMES[key] || { title: key, icon: "🎨" };
+                    const isBadge = key.indexOf('badge_') === 0;
+                    const isTheme = key.indexOf('theme_') === 0;
+                    const isActiveBadge = inventoryData.activeCosmetics?.profileBadge === key;
+                    const isActiveTheme = inventoryData.activeCosmetics?.gameTheme === key;
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'inv-item';
+                    itemEl.innerHTML = `
+                        <div class="inv-item-name">
+                            <span class="inv-item-icon">${meta.icon}</span>
+                            <span>${meta.title}</span>
+                        </div>
+                        <div class="inv-item-actions">
+                            ${isBadge ? `<button class="mini-action ${isActiveBadge ? 'primary' : ''}" ${isActiveBadge ? 'disabled' : ''} onclick="setActiveCosmetic('${key}', 'profileBadge')">${isActiveBadge ? 'Vitrinde' : 'Vitrine koy'}</button>` : ''}
+                            ${isTheme ? `<button class="mini-action ${isActiveTheme ? 'primary' : ''}" ${isActiveTheme ? 'disabled' : ''} onclick="setActiveCosmetic('${key}', 'gameTheme')">${isActiveTheme ? 'Aktif' : 'Temayı kullan'}</button>` : ''}
+                            <div class="inv-item-count">${isActiveTheme || isActiveBadge ? 'Aktif' : 'Kozmetik'}</div>
+                        </div>
+                    `;
+                    listEl.appendChild(itemEl);
+                }
+            }
+
+            const photos = inventoryData.purchasedPhotos || {};
+            for (const [photoId, record] of Object.entries(photos)) {
+                if (inventoryTab !== 'all' && inventoryTab !== 'photo') continue;
+                const photo = normalizePurchasedPhoto(photoId, record);
+                if (!photo?.url) continue;
+                hasItems = true;
+                const isFavoritePhoto = inventoryData.activeCosmetics?.favoritePhoto?.id === photoId;
+                const itemEl = document.createElement('div');
+                itemEl.className = 'inv-item';
+                itemEl.innerHTML = `
+                    <div class="inv-item-name">
+                        <img class="inventory-photo" src="${photo.url}" alt="">
+                        <span>${photo.title}<small>${photo.seller ? `Satıcı: ${photo.seller}` : 'Market fotoğrafı'}</small></span>
+                    </div>
+                    <div class="inv-item-actions">
+                        <button class="mini-action ${isFavoritePhoto ? 'primary' : ''}" ${isFavoritePhoto ? 'disabled' : ''} onclick="setFavoritePhotoFromInventory('${photoId}')">${isFavoritePhoto ? 'Vitrinde' : 'Vitrine koy'}</button>
+                    </div>
+                `;
+                listEl.appendChild(itemEl);
+            }
+            
+            if (!hasItems) {
+                listEl.innerHTML = '<div class="empty-state">Henüz hiç eşyan yok. <br>Marketten bir şeyler alabilirsin!</div>';
+            }
+        }
+
+        function renderProfileBadge() {
+            const badgeEl = document.getElementById('profile-cosmetic-badge');
+            const activeBadge = inventoryData?.activeCosmetics?.profileBadge;
+            const meta = ITEM_NAMES[activeBadge];
+            if (!badgeEl || !meta) {
+                if (badgeEl) badgeEl.style.display = 'none';
+                return;
+            }
+            badgeEl.innerHTML = `<span>${meta.icon}</span><span>${meta.title}</span>`;
+            badgeEl.style.display = 'inline-flex';
+        }
+
+        function renderShowcase() {
+            const box = document.getElementById('profile-showcase');
+            if (!box) return;
+            const active = inventoryData.activeCosmetics || {};
+            const badgeMeta = ITEM_NAMES[active.profileBadge] || { title: 'Rozet seçilmedi', icon: '🏷️' };
+            const couponMeta = ITEM_NAMES[active.favoriteCoupon] || { title: 'Favori kupon seçilmedi', icon: '🎟️' };
+            const photo = active.favoritePhoto;
+            const photoUrl = photo?.url || photo?.photoUrl;
+            box.innerHTML = `
+                <div class="showcase-item"><span>${badgeMeta.icon}</span><span>${badgeMeta.title}</span><button class="showcase-change" onclick="openInventoryTab('cosmetic')" title="Rozeti değiştir" aria-label="Rozeti değiştir">✎</button></div>
+                <div class="showcase-item"><span>${couponMeta.icon}</span><span>${couponMeta.title}</span><button class="showcase-change" onclick="openInventoryTab('coupon')" title="Kuponu değiştir" aria-label="Kuponu değiştir">✎</button></div>
+                <div class="showcase-item">${photoUrl ? `<img class="showcase-photo" src="${photoUrl}" alt="">` : '<span>🖼️</span>'}<span>${photo?.title || 'Favori fotoğraf seçilmedi'}</span><button class="showcase-change" onclick="openInventoryTab('photo')" title="Fotoğrafı değiştir" aria-label="Fotoğrafı değiştir">✎</button></div>
+            `;
+        }
+
+        window.openInventoryTab = function(tabName) {
+            const btn = document.querySelector(`[data-inv-tab="${tabName}"]`);
+            if (!btn) return;
+            btn.click();
+            document.getElementById('inventory-list')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        };
+
+        function normalizePurchasedPhoto(photoId, record) {
+            if (!record || record === true) return null;
+            return {
+                id: record.id || photoId,
+                url: record.url || record.photoUrl,
+                title: record.title || 'Market Fotoğrafı',
+                seller: record.seller || ''
+            };
+        }
+
+        window.setFavoriteCoupon = async function(key) {
+            await setDoc(inventoryRef, {
+                activeCosmetics: { ...(inventoryData.activeCosmetics || {}), favoriteCoupon: key },
+                updatedAt: serverTimestamp()
+            }, { merge: true });
+            showToast('Kupon vitrine eklendi 🎟️');
+        };
+
+        window.setActiveCosmetic = async function(key, slot) {
+            await setDoc(inventoryRef, {
+                activeCosmetics: { ...(inventoryData.activeCosmetics || {}), [slot]: key },
+                updatedAt: serverTimestamp()
+            }, { merge: true });
+            showToast(slot === 'profileBadge' ? 'Rozet vitrine eklendi 🏷️' : 'Tema aktif edildi 🎨');
+        };
+
+        window.setFavoritePhotoFromInventory = async function(photoId) {
+            const photo = normalizePurchasedPhoto(photoId, inventoryData.purchasedPhotos?.[photoId]);
+            if (!photo?.url) {
+                showToast('Bu fotoğrafın vitrin bilgisi eksik. Markette tekrar satın alma kaydı yenilenmeli.');
+                return;
+            }
+            await setDoc(inventoryRef, {
+                activeCosmetics: {
+                    ...(inventoryData.activeCosmetics || {}),
+                    favoritePhoto: { id: photoId, url: photo.url, title: photo.title, seller: photo.seller }
+                },
+                updatedAt: serverTimestamp()
+            }, { merge: true });
+            showToast('Fotoğraf vitrine eklendi 🖼️');
+        };
+
+        function renderAchievements() {
+            const gridEl = document.getElementById('achi-grid');
+            gridEl.innerHTML = '';
+            
+            const unlocked = statsData.achievements || {};
+            
+            ACHIEVEMENTS.forEach(achi => {
+                const isUnlocked = !!unlocked[achi.id];
+                const dateStr = isUnlocked && typeof unlocked[achi.id] === 'string' ? new Date(unlocked[achi.id]).toLocaleDateString('tr-TR') : '';
+                
+                const card = document.createElement('div');
+                card.className = `achi-card ${isUnlocked ? 'unlocked' : ''}`;
+                card.innerHTML = `
+                    <div class="achi-icon">${achi.icon}</div>
+                    <div class="achi-info">
+                        <h4>${achi.title}</h4>
+                        <p>${achi.desc}</p>
+                        ${isUnlocked ? `<div class="achi-date">🎉 Kazanıldı: ${dateStr}</div>` : ''}
+                    </div>
+                `;
+                gridEl.appendChild(card);
+            });
+        }
+
+        async function checkAchievements() {
+            if (!statsData || Object.keys(statsData).length === 0) return;
+            const unlocked = statsData.achievements || {};
+            let newlyUnlocked = false;
+            const updates = { achievements: { ...unlocked } };
+            
+            const unlock = (id) => {
+                if (!updates.achievements[id]) {
+                    updates.achievements[id] = new Date().toISOString();
+                    newlyUnlocked = true;
+                    setTimeout(() => showToast(`🏆 Yeni Başarım Kazandın: ${ACHIEVEMENTS.find(a=>a.id===id).title}!`), 1000);
+                }
+            }
+
+            if (userBalance >= 10000) unlock("rich_bitch");
+            if (userBalance >= 50000) unlock("wealth_50k");
+            
+            const cons = inventoryData.consumables || {};
+            const cos = inventoryData.cosmetics || {};
+            const totalItems = Object.keys(cons).length + Object.keys(cos).length;
+            
+            if (totalItems > 0) unlock("shopping_spree");
+            if (totalItems >= 5) unlock("shopaholic");
+            if (cons["jackpot_boost"] > 0) unlock("jackpot_master");
+            if (cons["coupon_hug"] > 0 || cons["coupon_snack"] > 0 || cons["coupon_right"] > 0 || cons["coupon_choice"] > 0 || cons["coupon_hair"] > 0 || cons["coupon_call"] > 0 || cons["coupon_treat"] > 0) unlock("coupon_hoarder");
+            if ((statsData.loginCount || 1) >= 3) unlock("loyal_lover");
+            if ((statsData.loginCount || 1) >= 10) unlock("true_addict");
+
+            const timeSpent = statsData.timeSpent || {};
+            const totalMinutes = Object.values(timeSpent).reduce((sum, value) => sum + (Number(value) || 0), 0);
+            if (totalMinutes >= 30) unlock("time_spark");
+            if (totalMinutes >= 300) unlock("time_keeper");
+            if (Object.keys(timeSpent).length >= 7) unlock("week_regular");
+            if ((statsData.moodCheckins || 0) >= 1) unlock("mood_opener");
+            if ((statsData.moodCheckins || 0) >= 7) unlock("mood_diary");
+            if ((statsData.starredMessages || 0) >= 1) unlock("memory_star");
+            
+            const unlockedCount = Object.keys(updates.achievements).length;
+            const logins = statsData.loginCount || 1;
+            const level = Math.floor((unlockedCount * 2 + logins * 0.5) / 3) + 1;
+            if (level >= 10) unlock("love_god");
+            
+            if (newlyUnlocked) {
+                await setDoc(userStatsRef, updates, { merge: true });
+            }
+        }
+
+        function getTodayString() {
+            const d = new Date();
+            return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+        }
+
+        function checkDailyStatus() {
+            const btn = document.getElementById('daily-btn');
+            const statusText = document.getElementById('daily-status-text');
+            const today = getTodayString();
+            
+            if (statsData.lastLoginDate === today) {
+                btn.disabled = true;
+                btn.textContent = "Bugünün Ödülünü Aldın 🎁";
+                statusText.textContent = "Yarın tekrar gel, daha çok ❤️ kazan!";
+            } else {
+                btn.disabled = false;
+                btn.textContent = "Günlük Ödülü Topla! (150 ❤️)";
+                statusText.textContent = "Tıklamaya hazır!";
+                btn.onclick = claimDaily;
+            }
+        }
+
+        async function claimDaily() {
+            const btn = document.getElementById('daily-btn');
+            btn.disabled = true;
+            btn.textContent = "İşleniyor...";
+            
+            try {
+                const today = getTodayString();
+                
+                await runTransaction(db, async (tx) => {
+                    const ecoSnap = await tx.get(ecoRef);
+                    if (!ecoSnap.exists()) throw new Error("Eco doc yok");
+                    
+                    const ecoDat = ecoSnap.data();
+                    const currentBal = ecoDat[currentUser] || 0;
+                    const reward = 150;
+                    
+                    tx.update(ecoRef, { [currentUser]: currentBal + reward });
+                    
+                    const currentLogins = statsData.loginCount || 0;
+                    tx.set(userStatsRef, {
+                        lastLoginDate: today,
+                        loginCount: currentLogins + 1
+                    }, { merge: true });
+                });
+                
+                showToast("🎁 Günlük 150 ❤️ ödülünü aldın!");
+                setTimeout(checkAchievements, 500); // Check for login achievement
+            } catch(e) {
+                console.error(e);
+                showToast("Bir hata oluştu!");
+                checkDailyStatus(); // reset button
+            }
+        }
+
+        initDocs();
+
+    </script>
+<script type="module" src="time-tracker.js"></script>
+<script type="module" src="presence.js"></script>
+</body>
+</html>

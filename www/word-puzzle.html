@@ -1,0 +1,197 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Aşk Kelimeleri </title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg:#0a0208; --primary:#ff4b72; --blue:#4facfe; --gold:#ffd166; --border:rgba(255,255,255,.1); }
+        * { box-sizing:border-box; }
+        body { margin:0; min-height:100vh; font-family:'Outfit',sans-serif; color:#fff; background:radial-gradient(circle at 20% 0, rgba(79,172,254,.16), transparent 34%), radial-gradient(circle at 85% 12%, rgba(255,75,114,.16), transparent 30%), #0a0208; padding:20px; display:flex; align-items:center; justify-content:center; }
+        .back { position:fixed; top:20px; left:20px; color:#fff; text-decoration:none; background:rgba(255,255,255,.07); border:1px solid var(--border); border-radius:24px; padding:10px 16px; }
+        .wallet { position:fixed; top:20px; right:20px; color:var(--gold); background:rgba(255,209,102,.12); border:1px solid rgba(255,209,102,.4); border-radius:24px; padding:10px 16px; font-weight:700; }
+        .game { width:min(620px,100%); background:rgba(255,255,255,.055); border:1px solid var(--border); border-radius:22px; padding:24px; box-shadow:0 20px 55px rgba(0,0,0,.38); text-align:center; }
+        h1 { font-family:'Playfair Display',serif; color:var(--primary); font-size:2.35rem; margin:0 0 8px; }
+        .scramble { display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin:22px 0; }
+        .letter { min-width:42px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.35rem; font-weight:700; background:rgba(79,172,254,.16); border:1px solid rgba(79,172,254,.36); }
+        input { width:100%; border:1px solid var(--border); border-radius:16px; background:rgba(0,0,0,.32); color:#fff; padding:14px; font:inherit; text-align:center; font-size:1.1rem; outline:none; }
+        .actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px; }
+        .btn { border:0; border-radius:999px; padding:12px 18px; font-weight:700; color:#fff; background:linear-gradient(45deg,#ff4b72,#ff8c00); cursor:pointer; }
+        .btn.alt { background:rgba(255,255,255,.09); border:1px solid var(--border); }
+        .meta,.status { color:rgba(255,255,255,.72); }
+        .status { min-height:24px; margin-top:12px; }
+        @media (max-width:640px){ body{align-items:flex-start;padding-top:86px}.wallet{top:auto;bottom:18px;right:18px}.game{padding:18px}.letter{min-width:36px;height:42px} }
+    </style>
+    <script src="app-bootstrap.js?v=1" defer></script>
+</head>
+<body>
+    <a class="back" href="games.html">Oyunlara Dön</a>
+    <div class="wallet" id="wallet">0 </div>
+    <main class="game">
+        <h1>Aşk Kelimeleri </h1>
+        <div class="meta">Giriş: 60  | 4 kelimeyi çöz, 260  kazan</div>
+        <section id="panel">
+            <p>Harfler karıştı, aşk kelimesini bul. Harf Fısıltısı ilk harfi gösterir.</p>
+            <button class="btn" onclick="startGame()">60  Oyna</button>
+        </section>
+        <div class="status" id="status"></div>
+    </main>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, setDoc, addDoc, collection, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        const firebaseConfig = { apiKey:"AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU", authDomain:"ayseye-surpriz.firebaseapp.com", projectId:"ayseye-surpriz", storageBucket:"ayseye-surpriz.firebasestorage.app", messagingSenderId:"531177459988", appId:"1:531177459988:web:09060a95bea0b06f197201" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const currentUser = localStorage.getItem('active_player');
+        if (!currentUser) location.href = 'index.html';
+        const ecoRef = doc(db, 'economy', 'balances');
+        const invRef = doc(db, 'user_inventory', currentUser);
+        const progressRef = doc(db, 'game_progress', currentUser);
+        const WORDS_PER_GAME = 4;
+        const WORD_PREFIXES = [
+            'DERIN','SONSUZ','GIZLI','SICAK','TATLI','SESSIZ','PARLAK','YUMUSAK','BUYULU','SABIRLI','NAZIK','GUCLU','ICLI','SAKIN','SAF','UZAK','YAKIN','OZEL','GUVENLI','KIRILMAZ','GULEN','SADIK','HASSAS','KALICI','RENKLI','SAKLI','INCE','SEVECEN','HUZURLU','KIYMETLI','CANIM','BIRICIK','GECE','SABAH','KALPTEN','MASUM','TUTKULU','YILDIZLI','ILK','SON','UNUTULMAZ','YUREKTEN','KIVILCIMLI','SIRLI','NAZENIN','DURGUN','COSKULU','USUL','SICACIK','KOKULU','ISILTILI','SARSILMAZ','KADIFE','SAKINCALI','KALABALIK','YALNIZ','SANAOZEL','BANAOZEL','GONULDEN','YARIMKALAN','TAMAMLANAN'
+        ];
+        const WORD_ROOTS = [
+            'SEVGI','SARILMA','GULUS','OZLEM','KALBIM','BULUSMA','ROMANTIK','HATIRA','SEFKAT','MUTLULUK','SADAKAT','GUVEN','ASKIM','YOLCULUK','HEDIYE','MEKTUP','MASAL','BAHAR','UMUT','NESE','SIR','OPUCUK','SARKI','RITUEL','YAKAMOZ','GUNAYDIN','IYIGECELER','KIVILCIM','HAYAL','RUYA','BAKIS','DOKUNUS','SICAKLIK','ANILAR','BAGLILIK','YAKINLIK','KADER','YUVAM','YUREK','HUZUR','VUSLAT','ILGI','MERHAMET','SABIR','TUTKU','NAZ','GUL','YILDIZ','AYISIGI','GUNES','KOKU','SES','NEFES','ELIM','OMUZ','KAHVE','TATLI','SINEMA','SAHIL','YAGMUR','GOKYUZU','FISILTI','VEDA','BARISMA','KAVUSMA','SIRDASLIK','KIYMET','SEVDA','GONUL','CAN','KALPATISI','NABIZ','UYKU','RANDEVU','SABAHSEKERI','GECEYARISI','HATIRLATMA','GAMZE','KIRGINLIK','ONARIM','YEMIN','SADIKLIK','KORUMA','YAKINLIKSOZU','ESLIK','PAYLASIM','SUSKUNLUK','CESARET','KABULLENIS','INANIS','ICCEKIS','KOKUN','SESIN'
+        ];
+        const WORD_SUFFIXES = ['','IM','IMSIN','LI','DOLU'];
+        const WORD_BANK = (() => {
+            const seenWords = new Set();
+            const bank = [];
+            WORD_PREFIXES.forEach((prefix) => {
+                WORD_ROOTS.forEach((root) => {
+                    WORD_SUFFIXES.forEach((suffix) => {
+                        const word = `${prefix}${root}${suffix}`;
+                        if (word.length < 9 || seenWords.has(word)) return;
+                        seenWords.add(word);
+                        bank.push({ id: `${prefix}_${root}_${suffix || 'SADE'}`, word });
+                    });
+                });
+            });
+            return bank;
+        })();
+        let balance=0, hintStock=0, secondStock=0, revealStock=0, ticketStock=0, boostStock=0, words=[], round=0, score=0, hinted=false, secondHinted=false, solved=false;
+        onSnapshot(ecoRef, s => { balance = s.data()?.[currentUser] || 0; document.getElementById('wallet').textContent = `${balance} ❤️`; });
+        onSnapshot(invRef, s => {
+            const cons = s.data()?.consumables || {};
+            hintStock = cons.word_hint || 0;
+            secondStock = cons.word_second || 0;
+            revealStock = cons.word_reveal || 0;
+            ticketStock = cons.entry_ticket || 0;
+            boostStock = cons.reward_boost || 0;
+        });
+        function shuffle(a){ return [...a].sort(()=>Math.random()-.5); }
+        function scramble(w){ let s=shuffle([...w]); return s.join('') === w ? shuffle([...w]).join('') : s.join(''); }
+        async function changeBalance(delta){ await setDoc(ecoRef, { [currentUser]: increment(delta) }, { merge:true }); }
+        async function consumeItem(key){
+            let ok=false;
+            await runTransaction(db, async tx => {
+                const snap=await tx.get(invRef); const data=snap.exists()?snap.data():{}; const cur=data.consumables?.[key]||0;
+                if(cur<=0) return;
+                tx.set(invRef,{ consumables:{ ...(data.consumables||{}), [key]:cur-1 }, updatedAt:serverTimestamp() },{ merge:true });
+                ok=true;
+            });
+            return ok;
+        }
+        async function consumeHint(){ return consumeItem('word_hint'); }
+        window.startGame = async function(){
+            const canUseTicket = ticketStock > 0;
+            if(balance < 60 && !canUseTicket){ status('Yetersiz bakiye'); return; }
+            try {
+                let picked = [];
+                await runTransaction(db, async tx => {
+                    const progressSnap = await tx.get(progressRef);
+                    const progress = progressSnap.exists() ? progressSnap.data() : {};
+                    const seen = new Set(progress.wordPuzzleSeen || []);
+                    const available = WORD_BANK.filter(item => !seen.has(item.id));
+                    if (available.length === 0) throw new Error('WORDS_DONE');
+                    picked = shuffle(available).slice(0, Math.min(WORDS_PER_GAME, available.length));
+                    tx.set(progressRef, {
+                        wordPuzzleSeen: [...seen, ...picked.map(item => item.id)],
+                        wordPuzzleTotal: WORD_BANK.length,
+                        updatedAt: serverTimestamp()
+                    }, { merge:true });
+                });
+                const usedTicket = canUseTicket && await consumeItem('entry_ticket');
+                if (!usedTicket && balance < 60) throw new Error('Yetersiz bakiye');
+                if (!usedTicket) await changeBalance(-60);
+                words=picked; round=0; score=0; render();
+                if (usedTicket) status('Bedava Giriş Bileti kullanıldı.');
+            } catch(e) {
+                if (e.message === 'WORDS_DONE') {
+                    document.getElementById('panel').innerHTML = '<h2>Başka kelime kalmadı</h2><p>Bu kullanıcı için çıkabilecek tüm kelimeler oynandı.</p>';
+                    status('Bu oyun havuzu senin için tamamlandı.');
+                } else {
+                    console.error(e);
+                    status(e.message || 'Oyun başlatılamadı.');
+                }
+            }
+        };
+        function render(){
+            hinted=false;
+            secondHinted=false;
+            solved=false;
+            const word=words[round].word;
+            document.getElementById('panel').innerHTML = `
+                <div class="meta">Kelime ${round + 1}/${WORDS_PER_GAME} | Doğru: ${score}</div>
+                <div class="scramble">${[...scramble(word)].map(l=>`<div class="letter">${l}</div>`).join('')}</div>
+                <input id="guess" autocomplete="off" placeholder="Cevabını yaz">
+                <div class="actions">
+                    <button class="btn" onclick="submitGuess()">Kontrol Et</button>
+                    <button class="btn alt" onclick="useHint()">🔤 Harf Fısıltısı (${hintStock})</button>
+                    <button class="btn alt" onclick="useSecondHint()">✌️ İkinci Harf (${secondStock})</button>
+                    <button class="btn alt" onclick="revealWord()">🧩 Kelime Kurtar (${revealStock})</button>
+                </div>
+            `;
+            document.getElementById('guess').focus();
+            document.getElementById('guess').onkeydown = e => { if(e.key === 'Enter') submitGuess(); };
+        }
+        window.useHint = async function(){
+            if(hinted) return;
+            if (!(await consumeHint())) { status('Harf Fısıltısı stokta yok. Marketten alabilirsin.'); return; }
+            hinted=true;
+            status(`İlk harf: ${words[round].word[0]}`);
+        };
+        window.useSecondHint = async function(){
+            if(secondHinted) return;
+            if (!(await consumeItem('word_second'))) { status('İkinci Harf stokta yok.'); return; }
+            secondHinted=true;
+            status(`İkinci harf: ${words[round].word[1]}`);
+        };
+        window.revealWord = async function(){
+            if(solved) return;
+            if (!(await consumeItem('word_reveal'))) { status('Kelime Kurtarıcı stokta yok.'); return; }
+            solved=true;
+            score++;
+            status(`Kelime kurtarıldı: ${words[round].word}`);
+            setTimeout(()=>{ round++; round >= words.length ? finish() : render(); }, 900);
+        };
+        window.submitGuess = function(){
+            if(solved) return;
+            const guess = document.getElementById('guess').value.trim().toLocaleUpperCase('tr-TR');
+            if(guess === words[round].word.toLocaleUpperCase('tr-TR')) { score++; status('Doğru!'); }
+            else status(`Cevap: ${words[round].word}`);
+            setTimeout(()=>{ round++; round >= words.length ? finish() : render(); }, 900);
+        };
+        async function finish(){
+            const ratio = score / words.length;
+            let reward = ratio === 1 ? 260 : ratio >= 0.75 ? 140 : ratio >= 0.5 ? 60 : 0;
+            const boosted = reward > 0 && boostStock > 0 && await consumeItem('reward_boost');
+            if (boosted) reward = Math.round(reward * 1.5);
+            if(reward) await changeBalance(reward);
+            await addDoc(collection(db,'activity_logs'), { type:'word_puzzle', user:currentUser, score, reward, boosted, timestamp:serverTimestamp() });
+            document.getElementById('panel').innerHTML = `<h2>${score}/${words.length} doğru</h2><p>${reward ? `${reward} ❤️ kazandın!${boosted ? ' Ödül Parlatıcı çalıştı.' : ''}` : 'Bu tur olmadı ama dahaki tur daha iyi olur.'}</p><button class="btn" onclick="startGame()">Tekrar Oyna</button>`;
+        }
+        function status(t){ document.getElementById('status').textContent=t; setTimeout(()=>document.getElementById('status').textContent='',2400); }
+    </script>
+<script type="module" src="time-tracker.js"></script>
+<script type="module" src="presence.js"></script>
+</body>
+</html>

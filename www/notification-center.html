@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Bildirim Merkezi</title>
+  <link rel="stylesheet" href="style.css?v=3">
+  <style>
+    body { font-family: Outfit, sans-serif; margin: 0; padding: 20px; padding-bottom:80px; background: #0a0208; color: #fff; }
+    #bg { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, #1a0520 0%, #0a0208 100%); }
+    .back { position: fixed; top: 20px; left: 20px; text-decoration: none; color: #fff; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); padding: 10px 14px; border-radius: 22px; backdrop-filter:blur(10px); z-index:10; }
+    .wrap { max-width: 900px; margin: 72px auto 0; }
+    .hero { border:1px solid rgba(255,255,255,.12); border-radius:22px; padding:22px; background:linear-gradient(135deg, rgba(255,75,114,.16), rgba(255,255,255,.045)); margin-bottom:16px; }
+    h1 { margin: 0 0 6px; color: var(--primary); font-size:2.1rem; }
+    .subtitle { opacity:.76; margin:0; }
+    .filters { display:flex; gap:8px; flex-wrap:wrap; margin:16px 0; }
+    .filter-btn { border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.07); color:#fff; padding:9px 12px; cursor:pointer; font-weight:700; }
+    .filter-btn.active { border-color:rgba(255,75,114,.52); background:rgba(255,75,114,.18); }
+    .log { background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius: 16px; padding: 14px; margin-bottom: 10px; display:grid; grid-template-columns:44px 1fr; gap:12px; align-items:center; }
+    .log-icon { width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; background:rgba(255,75,114,.14); font-size:1.25rem; }
+    .log-title { font-weight:800; }
+    .meta { opacity:.68; font-size:.85rem; margin-top:4px; }
+    .empty { text-align:center; padding:34px; border:1px dashed rgba(255,255,255,.18); border-radius:18px; opacity:.76; }
+  </style>
+    <script src="app-bootstrap.js?v=1" defer></script>
+</head>
+<body>
+  <div id="bg"></div>
+  <a href="index.html#hub" class="back">← Hub'a Dön</a>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Bildirim Merkezi</h1>
+      <p class="subtitle">Mesajlar, hediyeler, market hareketleri ve küçük anılar tek yerde.</p>
+    </div>
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">Tümü</button>
+      <button class="filter-btn" data-filter="message">Mesaj</button>
+      <button class="filter-btn" data-filter="gift">Hediye</button>
+      <button class="filter-btn" data-filter="market">Market</button>
+      <button class="filter-btn" data-filter="photo">Fotoğraf</button>
+      <button class="filter-btn" data-filter="mood">Ruh hali</button>
+    </div>
+    <div id="list"></div>
+  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+    const firebaseConfig = { apiKey:"AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU", authDomain:"ayseye-surpriz.firebaseapp.com", projectId:"ayseye-surpriz", storageBucket:"ayseye-surpriz.firebasestorage.app", messagingSenderId:"531177459988", appId:"1:531177459988:web:09060a95bea0b06f197201" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const list = document.getElementById('list');
+    let rows = [];
+    let activeFilter = 'all';
+    document.querySelectorAll('[data-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-filter]').forEach(x => x.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        render();
+      });
+    });
+    function iconFor(type) {
+      const t = type || '';
+      if (t.includes('message')) return '💬';
+      if (t.includes('gift')) return '🎁';
+      if (t.includes('market') || t.includes('purchase')) return '🛍️';
+      if (t.includes('photo')) return '🖼️';
+      if (t.includes('mood')) return '✨';
+      if (t.includes('theme')) return '🎨';
+      return '🔔';
+    }
+    function matchesFilter(x) {
+      if (activeFilter === 'all') return true;
+      return (x.type || '').includes(activeFilter);
+    }
+    function render() {
+      const filtered = rows.filter(matchesFilter);
+      list.innerHTML = '';
+      if (!filtered.length) {
+        list.innerHTML = '<div class="empty">Bu filtrede henüz bildirim yok.</div>';
+        return;
+      }
+      filtered.forEach(x => {
+        const dt = x.createdAt?.toDate ? x.createdAt.toDate().toLocaleString('tr-TR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '...';
+        const row = document.createElement('div');
+        row.className = 'log';
+        row.innerHTML = `<div class="log-icon">${iconFor(x.type)}</div><div><div class="log-title">${x.title || x.type || 'Etkinlik'}</div><div class="meta">${x.user || '-'} · ${dt}</div></div>`;
+        list.appendChild(row);
+      });
+    }
+    const q = query(collection(db, 'activity_logs'), orderBy('createdAt', 'desc'), limit(150));
+    onSnapshot(q, (snap) => {
+      rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      render();
+    });
+  </script>
+<script type="module" src="time-tracker.js"></script>
+<script type="module" src="presence.js"></script>
+</body>
+</html>

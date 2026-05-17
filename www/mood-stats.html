@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Ruh Hali Grafiği ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #0b0208;
+            --primary: #ff4b72;
+            --mert: #4facfe;
+            --border: rgba(255,255,255,0.08);
+            --surface: rgba(255,255,255,0.05);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background:
+                radial-gradient(circle at 20% -8%, rgba(255,75,114,0.18), transparent 34%),
+                radial-gradient(circle at 92% 12%, rgba(79,172,254,0.15), transparent 30%),
+                linear-gradient(180deg, #120711, #0b0208 48%, #080609);
+            color: #fff;
+            padding: 16px;
+            max-width: 680px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding-bottom: 90px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 22px;
+            margin-top: max(72px, calc(env(safe-area-inset-top) + 56px));
+        }
+        .back-nav {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,.06);
+            padding: 9px 15px;
+            border-radius: 25px;
+            color: #fff;
+            text-decoration: none;
+            border: 1px solid rgba(255,255,255,.16);
+            backdrop-filter: blur(8px);
+            font-size: 0.82rem;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.55rem;
+            color: var(--primary);
+            text-align: center;
+            text-shadow: 0 0 15px rgba(255,75,114,0.4);
+        }
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.62);
+            font-size: 0.78rem;
+            margin-top: 4px;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .summary-card,
+        .chart-container,
+        .mood-log {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 26px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.06);
+        }
+        .summary-card {
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff4b72, #ff8c00);
+        }
+        #mert-card::before { background: linear-gradient(90deg, #4facfe, #00f2fe); }
+        .avatar {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .name {
+            font-weight: 700;
+            opacity: 0.88;
+            margin-bottom: 6px;
+        }
+        .current {
+            font-size: 2rem;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .count {
+            color: rgba(255,255,255,0.62);
+            font-size: 0.78rem;
+        }
+        .chart-container {
+            margin-bottom: 18px;
+        }
+        .chart-header {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .chart-wrap {
+            position: relative;
+            height: 220px;
+        }
+        canvas {
+            position: absolute;
+            inset: 0;
+            width: 100% !important;
+            height: 100% !important;
+        }
+        .mood-log {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .log-title {
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .day-row {
+            display: grid;
+            grid-template-columns: 92px 1fr 1fr;
+            gap: 8px;
+            align-items: center;
+            font-size: 0.84rem;
+            color: rgba(255,255,255,0.72);
+        }
+        .pill {
+            min-height: 34px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.055);
+            border: 1px solid rgba(255,255,255,0.07);
+        }
+        .empty {
+            text-align: center;
+            color: rgba(255,255,255,0.58);
+            padding: 24px 10px;
+        }
+    </style>
+    <script src="app-bootstrap.js?v=1" defer></script>
+</head>
+<body>
+    <a href="profile.html" class="back-nav">← Profile Dön</a>
+    <div class="header">
+        <div>
+            <h1>Ruh Hali Grafiği ✨</h1>
+            <div class="subtitle">Son 7 günde modunuz nasıl değişti?</div>
+        </div>
+    </div>
+
+    <section class="summary-cards">
+        <div class="summary-card">
+            <span class="avatar">👸🏻</span>
+            <div class="name">Ayşe</div>
+            <div class="current" id="ayse-current">❓</div>
+            <div class="count" id="ayse-count">0 değişim</div>
+        </div>
+        <div class="summary-card" id="mert-card">
+            <span class="avatar">🤴🏻</span>
+            <div class="name">Mert</div>
+            <div class="current" id="mert-current">❓</div>
+            <div class="count" id="mert-count">0 değişim</div>
+        </div>
+    </section>
+
+    <section class="chart-container">
+        <div class="chart-header">
+            <span>📅 Haftalık Mood Değişimleri</span>
+            <span>📈</span>
+        </div>
+        <div class="chart-wrap">
+            <canvas id="moodChart"></canvas>
+        </div>
+    </section>
+
+    <section class="mood-log" id="mood-log">
+        <div class="log-title">Gün Gün Son Mood</div>
+        <div class="empty">Mood kayıtları yükleniyor...</div>
+    </section>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, collection, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+            authDomain: "ayseye-surpriz.firebaseapp.com",
+            projectId: "ayseye-surpriz",
+            storageBucket: "ayseye-surpriz.firebasestorage.app",
+            messagingSenderId: "531177459988",
+            appId: "1:531177459988:web:09060a95bea0b06f197201"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const activePlayer = localStorage.getItem('active_player');
+        if (!activePlayer) window.location.href = 'index.html';
+
+        let currentMood = {};
+        let history = [];
+        let chartInstance = null;
+
+        onSnapshot(doc(db, 'p_moods', 'current'), (snap) => {
+            currentMood = snap.exists() ? snap.data() : {};
+            document.getElementById('ayse-current').textContent = currentMood['Ayşe'] || '❓';
+            document.getElementById('mert-current').textContent = currentMood['Mert'] || '❓';
+        });
+
+        onSnapshot(query(collection(db, 'mood_history'), orderBy('timestamp', 'desc')), (snap) => {
+            history = snap.docs.map((d) => d.data()).filter((item) => item.date);
+            updateView();
+        });
+
+        function isoDays() {
+            const days = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                days.push({
+                    iso: d.toISOString().split('T')[0],
+                    label: d.toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric' })
+                });
+            }
+            return days;
+        }
+
+        function updateView() {
+            const days = isoDays();
+            const daySet = new Set(days.map((d) => d.iso));
+            const recent = history.filter((item) => daySet.has(item.date));
+            const ayseTotal = recent.filter((item) => item.user === 'Ayşe').length;
+            const mertTotal = recent.filter((item) => item.user === 'Mert').length;
+
+            document.getElementById('ayse-count').textContent = `${ayseTotal} değişim`;
+            document.getElementById('mert-count').textContent = `${mertTotal} değişim`;
+
+            const ayseData = days.map((day) => recent.filter((item) => item.user === 'Ayşe' && item.date === day.iso).length);
+            const mertData = days.map((day) => recent.filter((item) => item.user === 'Mert' && item.date === day.iso).length);
+            renderChart(days.map((d) => d.label), ayseData, mertData);
+            renderDailyLog(days, recent);
+        }
+
+        function latestFor(recent, user, iso) {
+            return recent.find((item) => item.user === user && item.date === iso)?.emoji || '—';
+        }
+
+        function renderDailyLog(days, recent) {
+            const log = document.getElementById('mood-log');
+            const rows = days.map((day) => `
+                <div class="day-row">
+                    <strong>${day.label}</strong>
+                    <div class="pill">👸🏻 ${latestFor(recent, 'Ayşe', day.iso)}</div>
+                    <div class="pill">🤴🏻 ${latestFor(recent, 'Mert', day.iso)}</div>
+                </div>
+            `).join('');
+            log.innerHTML = `<div class="log-title">Gün Gün Son Mood</div>${rows}`;
+        }
+
+        function renderChart(labels, ayseData, mertData) {
+            const ctx = document.getElementById('moodChart').getContext('2d');
+            if (chartInstance) {
+                chartInstance.data.labels = labels;
+                chartInstance.data.datasets[0].data = ayseData;
+                chartInstance.data.datasets[1].data = mertData;
+                chartInstance.update();
+                return;
+            }
+
+            Chart.defaults.color = 'rgba(255,255,255,0.7)';
+            Chart.defaults.font.family = "'Outfit', sans-serif";
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: '👸🏻 Ayşe',
+                            data: ayseData,
+                            backgroundColor: 'rgba(255,75,114,0.78)',
+                            borderColor: '#ff4b72',
+                            borderWidth: 1,
+                            borderRadius: 7
+                        },
+                        {
+                            label: '🤴🏻 Mert',
+                            data: mertData,
+                            backgroundColor: 'rgba(79,172,254,0.78)',
+                            borderColor: '#4facfe',
+                            borderWidth: 1,
+                            borderRadius: 7
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } },
+                        tooltip: { backgroundColor: 'rgba(10,2,8,0.92)', padding: 12, cornerRadius: 10 }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: 'rgba(255,255,255,0.055)' }, title: { display: true, text: 'Mood değiştirme sayısı' } }
+                    }
+                }
+            });
+        }
+    </script>
+<script type="module" src="time-tracker.js"></script>
+<script type="module" src="presence.js"></script>
+</body>
+</html>
