@@ -138,6 +138,16 @@
             line-height: 1.5;
         }
         .install-help.active { display: block; }
+        .install-help ol {
+            margin: 8px 0 0 18px;
+            padding: 0;
+        }
+        .install-help li { margin: 5px 0; }
+        .install-status {
+            margin-top: 10px;
+            color: rgba(255,255,255,0.62);
+            font-size: 0.82rem;
+        }
         @media (max-width: 480px) {
             body { padding-left: 12px; padding-right: 12px; }
             .widget-card { min-height: 320px; border-radius: 24px; }
@@ -169,8 +179,15 @@
         const root = document.getElementById('widget-root');
         const params = new URLSearchParams(location.search);
         const id = params.get('id');
+        const addMode = params.get('add') === '1';
         let widgets = window.OurStoryWidget.read();
         let widget = widgets.find(item => item.id === id);
+        let deferredInstallPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', function(event) {
+            event.preventDefault();
+            deferredInstallPrompt = event;
+        });
 
         function esc(value) {
             return String(value || '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
@@ -217,8 +234,42 @@
             `;
         }
 
-        window.showInstallHelp = function() {
-            document.getElementById('install-help').classList.toggle('active');
+        function getPlatformInstallText() {
+            const ua = navigator.userAgent || '';
+            const isIOS = /iphone|ipad|ipod/i.test(ua);
+            const isAndroid = /android/i.test(ua);
+            if (isIOS) {
+                return '<p>iPhone icin Safari ile ac:</p><ol><li>Paylas dugmesine bas.</li><li>Ana Ekrana Ekle sec.</li><li>Ekleye bas.</li></ol>';
+            }
+            if (isAndroid) {
+                return '<p>Android icin Chrome/Edge ile ac:</p><ol><li>Uc nokta menusune bas.</li><li>Ana ekrana ekle veya Uygulamayi yukle sec.</li><li>Onayla.</li></ol>';
+            }
+            return '<p>Telefonda tarayici menusunden Ana ekrana ekle secenegini kullan.</p>';
+        }
+
+        async function tryInstallPrompt() {
+            if (!deferredInstallPrompt) return false;
+            try {
+                deferredInstallPrompt.prompt();
+                await deferredInstallPrompt.userChoice;
+                deferredInstallPrompt = null;
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        window.showInstallHelp = async function(forceOpen = false) {
+            const help = document.getElementById('install-help');
+            help.innerHTML = '<strong>Web uygulamasi telefonun gercek native widget alanina otomatik ekleyemez.</strong>' +
+                getPlatformInstallText() +
+                '<div class="install-status" id="install-status"></div>';
+            if (forceOpen) help.classList.add('active');
+            else help.classList.toggle('active');
+            const prompted = await tryInstallPrompt();
+            document.getElementById('install-status').textContent = prompted
+                ? 'Kurulum penceresi acildi. Onaylarsan ana ekrana uygulama/kisayol olarak eklenir.'
+                : 'Tarayici izin vermiyorsa menuden manuel eklemek gerekir.';
         };
 
         window.copyWidgetLink = async function() {
@@ -243,6 +294,7 @@
 
         if (widget) renderWidget(widget);
         else renderList();
+        if (addMode) setTimeout(() => window.showInstallHelp(true), 450);
     </script>
 </body>
 </html>

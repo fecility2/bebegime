@@ -299,7 +299,7 @@
         const widgetId = pendingWidget.id;
         pendingWidget = null;
         showToast('Widget hazırlandı.');
-        location.href = 'widget.html?id=' + encodeURIComponent(widgetId);
+        location.href = 'widget.html?id=' + encodeURIComponent(widgetId) + '&add=1';
     }
 
     function save(data) {

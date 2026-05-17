@@ -1,0 +1,462 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0208">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OurStory">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Sürpriz Zarflar 💌</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    
+    <!-- OneSignal Push Notification SDK -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script src="onesignal-helper.js"></script>
+    
+    <link rel="stylesheet" href="style.css?v=3">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #background-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a0520 0%, #0a0208 100%);
+        }
+
+        .back-nav {
+            position: fixed;
+            top: 20px; left: 20px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: #fff;
+            text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.1);
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        .header {
+            margin-top: 60px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(255, 75, 114, 0.5);
+            margin-bottom: 15px;
+        }
+
+        .header p {
+            opacity: 0.8;
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .compose-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            border: 1px solid var(--primary);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(255, 75, 114, 0.15);
+        }
+
+        .compose-container h3 {
+            margin-top: 0;
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 15px;
+            border-radius: 15px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            resize: none;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        input[type="datetime-local"] {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 12px 15px;
+            border-radius: 15px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            color-scheme: dark;
+        }
+        input[type="text"] {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 12px 15px;
+            border-radius: 15px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        .capsule-tools {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin: 0 0 16px;
+        }
+
+        .capsule-tool {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 44px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.16);
+            border-radius: 14px;
+            color: #fff;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .capsule-tool:hover,
+        .capsule-tool.recording {
+            background: rgba(255,75,114,0.16);
+            border-color: rgba(255,75,114,0.45);
+        }
+
+        .capsule-preview {
+            display: none;
+            position: relative;
+            margin-bottom: 14px;
+            padding: 12px;
+            border-radius: 16px;
+            background: rgba(0,0,0,0.26);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .capsule-preview.active { display: block; }
+        .capsule-preview img { width: 100%; max-height: 220px; object-fit: cover; display: block; border-radius: 12px; }
+        .capsule-preview audio { width: 100%; height: 38px; }
+        .preview-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255,75,114,0.92);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .btn-seal {
+            background: linear-gradient(45deg, #ff4b72, #ff8c00);
+            border: none;
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255,75,114,0.3);
+        }
+
+        .btn-seal:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255,75,114,0.5);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2.5rem; }
+            .capsule-tools { grid-template-columns: 1fr; }
+        }
+    </style>
+    <script src="app-bootstrap.js?v=1" defer></script>
+</head>
+<body>
+
+    <div id="background-canvas"></div>
+    <a href="index.html#hub" class="back-nav">← Ana Sayfaya Dön</a>
+
+    <div class="header">
+        <h1>Sürpriz Zarflar 💌</h1>
+        <p>Geleceğe bıraktığımız sırlar, itiraflar ve aşk sözcükleri...</p>
+    </div>
+
+    <div class="compose-container" style="text-align: center;">
+        <a href="envelope-archive.html" class="btn-seal" style="max-width: 250px; display: inline-block; text-decoration: none; margin-bottom: 30px; font-size: 1rem; padding: 12px 20px; background: linear-gradient(45deg, #1ed760, #1db954);">Zaman Kapsülü ⏳</a>
+        <h3 style="text-align: left;">Yeni Bir Zarf Hazırla 🔒</h3>
+        <p style="opacity: 0.8; font-size: 0.95rem; margin-bottom: 15px; text-align: left;">
+            Yazdığın mektup mühürlenecek ve seçtiğin tarihe kadar asla açılamayacak.
+        </p>
+        <input type="text" id="env-title" placeholder="Zarf başlığı (opsiyonel)">
+        <textarea id="env-message" placeholder="Gelecekteki ona söylemek istediklerin..."></textarea>
+        <div class="capsule-tools">
+            <label for="env-photo" class="capsule-tool">📸 Resim Ekle</label>
+            <input type="file" id="env-photo" hidden accept="image/*" onchange="uploadEnvelopePhoto()">
+            <label for="env-audio-file" class="capsule-tool">🎧 Ses Dosyası</label>
+            <input type="file" id="env-audio-file" hidden accept="audio/*" onchange="pickEnvelopeAudio()">
+            <button type="button" class="capsule-tool" id="record-audio-btn" onclick="toggleEnvelopeRecording()">🎤 Ses Kaydet</button>
+            <button type="button" class="capsule-tool" onclick="removeEnvelopeAudio()">🗑️ Sesi Kaldır</button>
+        </div>
+        <div class="capsule-preview" id="photo-preview">
+            <button class="preview-remove" onclick="removeEnvelopePhoto()" type="button">×</button>
+            <img id="photo-preview-img" alt="Eklenen resim">
+        </div>
+        <div class="capsule-preview" id="audio-preview">
+            <audio id="audio-preview-player" controls></audio>
+        </div>
+        <label style="display: block; margin-bottom: 8px; opacity: 0.9; font-size: 0.9rem; text-align: left;">Ne zaman açılsın?</label>
+        <input type="datetime-local" id="env-time">
+        <button class="btn-seal" id="btn-seal" onclick="sendEnvelope()">Mühürle ve Geleceğe Gönder ✨</button>
+        <div id="send-status" style="margin-top: 10px; color: #1ed760; display: none; font-weight: bold; text-align: center;">Zarf Mühürlendi! 💌</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, enableIndexedDbPersistence, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
+            authDomain: "ayseye-surpriz.firebaseapp.com",
+            projectId: "ayseye-surpriz",
+            storageBucket: "ayseye-surpriz.firebasestorage.app",
+            messagingSenderId: "531177459988",
+            appId: "1:531177459988:web:09060a95bea0b06f197201"
+        };
+
+        var app = initializeApp(firebaseConfig);
+        var db = getFirestore(app);
+        enableIndexedDbPersistence(db).catch(function(err) {
+            console.log('Firebase Offline Persistence Error:', err.code);
+        });
+        var envRef = collection(db, 'locked_envelopes');
+        const IMGBB_API_KEY = "7916dd11376f59a547ed252799f1328a";
+        const CLOUD_NAME = "dcxab3wb2";
+        const UPLOAD_PRESET = "mekade";
+
+        var currentUser = localStorage.getItem('active_player');
+        if (!currentUser) {
+            window.location.href = 'index.html';
+        }
+        
+        var receiverUser = (currentUser === 'Ayşe' ? 'Mert' : 'Ayşe');
+        var envelopePhotoUrl = "";
+        var envelopeAudioBlob = null;
+        var envelopeAudioUrl = "";
+        var envelopeRecorder = null;
+        var envelopeAudioChunks = [];
+        var envelopeStream = null;
+
+        function setStatus(text, color = '#1ed760') {
+            var st = document.getElementById('send-status');
+            st.innerText = text;
+            st.style.color = color;
+            st.style.display = 'block';
+        }
+
+        window.uploadEnvelopePhoto = async function() {
+            var file = document.getElementById('env-photo').files[0];
+            if (!file) return;
+            setStatus('Resim buluta yükleniyor... ⏳');
+            var btn = document.getElementById('btn-seal');
+            btn.disabled = true;
+            var formData = new FormData();
+            formData.append('image', file);
+            try {
+                var res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+                var json = await res.json();
+                if (!json.success) throw new Error('IMGBB_ERROR');
+                envelopePhotoUrl = json.data.url;
+                document.getElementById('photo-preview-img').src = envelopePhotoUrl;
+                document.getElementById('photo-preview').classList.add('active');
+                setStatus('Resim hazır ✨');
+                setTimeout(function() { document.getElementById('send-status').style.display = 'none'; }, 1800);
+            } catch (e) {
+                console.error(e);
+                setStatus('Resim yüklenemedi, tekrar dene.', '#ff8c00');
+            } finally {
+                btn.disabled = false;
+            }
+        };
+
+        window.removeEnvelopePhoto = function() {
+            envelopePhotoUrl = "";
+            document.getElementById('env-photo').value = "";
+            document.getElementById('photo-preview').classList.remove('active');
+        };
+
+        window.pickEnvelopeAudio = function() {
+            var file = document.getElementById('env-audio-file').files[0];
+            if (!file) return;
+            envelopeAudioBlob = file;
+            envelopeAudioUrl = URL.createObjectURL(file);
+            document.getElementById('audio-preview-player').src = envelopeAudioUrl;
+            document.getElementById('audio-preview').classList.add('active');
+            setStatus('Ses hazır, mühürlenirken buluta yüklenecek 🎧');
+            setTimeout(function() { document.getElementById('send-status').style.display = 'none'; }, 2200);
+        };
+
+        window.toggleEnvelopeRecording = async function() {
+            var btn = document.getElementById('record-audio-btn');
+            if (envelopeRecorder && envelopeRecorder.state === 'recording') {
+                envelopeRecorder.stop();
+                btn.classList.remove('recording');
+                btn.innerText = '🎤 Ses Kaydet';
+                return;
+            }
+
+            try {
+                envelopeStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                var mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+                envelopeRecorder = new MediaRecorder(envelopeStream, { mimeType });
+                envelopeAudioChunks = [];
+                envelopeRecorder.ondataavailable = function(e) {
+                    if (e.data.size > 0) envelopeAudioChunks.push(e.data);
+                };
+                envelopeRecorder.onstop = function() {
+                    envelopeAudioBlob = new Blob(envelopeAudioChunks, { type: mimeType });
+                    envelopeAudioUrl = URL.createObjectURL(envelopeAudioBlob);
+                    document.getElementById('audio-preview-player').src = envelopeAudioUrl;
+                    document.getElementById('audio-preview').classList.add('active');
+                    if (envelopeStream) envelopeStream.getTracks().forEach(track => track.stop());
+                    setStatus('Ses kaydedildi, mühürlenirken buluta yüklenecek 🎤');
+                    setTimeout(function() { document.getElementById('send-status').style.display = 'none'; }, 2200);
+                };
+                envelopeRecorder.start();
+                btn.classList.add('recording');
+                btn.innerText = '🔴 Kaydı Durdur';
+                setStatus('Ses kaydediliyor...');
+            } catch (e) {
+                console.error(e);
+                setStatus('Mikrofon erişimi alınamadı.', '#ff8c00');
+            }
+        };
+
+        window.removeEnvelopeAudio = function() {
+            envelopeAudioBlob = null;
+            envelopeAudioUrl = "";
+            document.getElementById('env-audio-file').value = "";
+            document.getElementById('audio-preview-player').removeAttribute('src');
+            document.getElementById('audio-preview').classList.remove('active');
+        };
+
+        async function uploadEnvelopeAudio() {
+            if (!envelopeAudioBlob) return "";
+            var formData = new FormData();
+            formData.append('file', envelopeAudioBlob);
+            formData.append('upload_preset', UPLOAD_PRESET);
+            formData.append('resource_type', 'auto');
+            var res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, { method: 'POST', body: formData });
+            var data = await res.json();
+            if (!data.secure_url) {
+                console.error('Cloudinary Hatası:', data);
+                throw new Error('CLOUDINARY_ERROR');
+            }
+            return data.secure_url;
+        }
+
+        window.sendEnvelope = async function() {
+            var titleObj = document.getElementById('env-title');
+            var msgObj = document.getElementById('env-message');
+            var timeObj = document.getElementById('env-time');
+            var btn = document.getElementById('btn-seal');
+            
+            var msg = msgObj.value.trim();
+            var timeVal = timeObj.value;
+
+            if ((!msg && !envelopePhotoUrl && !envelopeAudioBlob) || !timeVal) {
+                alert("Lütfen bir mesaj, resim veya ses ekle ve açılacağı zamanı seç sevgilim!");
+                return;
+            }
+
+            var unlockDate = new Date(timeVal).getTime();
+            if (unlockDate <= new Date().getTime()) {
+                alert("Mühür tarihi gelecekten bir an olmalı!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Mühürleniyor... ⏳";
+            try {
+                setStatus(envelopeAudioBlob ? 'Ses buluta yükleniyor... ⏳' : 'Zarf mühürleniyor... ⏳');
+                var audioUrl = await uploadEnvelopeAudio();
+
+                await addDoc(envRef, {
+                    sender: currentUser,
+                    receiver: receiverUser,
+                    title: titleObj.value.trim(),
+                    message: msg,
+                    photo: envelopePhotoUrl,
+                    audio: audioUrl,
+                    unlock_date: unlockDate,
+                    created_at: serverTimestamp()
+                });
+
+                if (window.sendLoveNotification) {
+                    window.sendLoveNotification("Geleceğe Bir Zarf Mühürlendi! 💌", currentUser + " sana ileride açman için sihirli bir zarf gönderdi...");
+                }
+
+                titleObj.value = "";
+                msgObj.value = "";
+                timeObj.value = "";
+                removeEnvelopePhoto();
+                removeEnvelopeAudio();
+                setStatus('Zarf Mühürlendi! 💌');
+                setTimeout(function() { document.getElementById('send-status').style.display = 'none'; }, 3000);
+            } catch (e) {
+                console.error(e);
+                setStatus('Mühürleme sırasında ek yüklenemedi, tekrar dene.', '#ff8c00');
+            } finally {
+                btn.innerText = "Mühürle ve Geleceğe Gönder ✨";
+                btn.disabled = false;
+            }
+        };
+
+    </script>
+<script type="module" src="time-tracker.js"></script>
+<script type="module" src="presence.js"></script>
+</body>
+</html>

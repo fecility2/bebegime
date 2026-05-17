@@ -131,6 +131,59 @@
             border-color: rgba(255, 75, 114, 0.2);
         }
 
+        .day-photo-actions {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            display: flex;
+            gap: 7px;
+            z-index: 5;
+        }
+
+        .day-photo-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.16);
+            background: rgba(10,2,8,0.58);
+            color: #fff;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+        }
+
+        .day-photo-btn:hover {
+            background: rgba(255,75,114,0.22);
+            border-color: rgba(255,75,114,0.45);
+            transform: translateY(-1px);
+        }
+
+        .day-photo-btn.has-photo {
+            position: relative;
+            border-color: rgba(255,75,114,0.45);
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+        }
+
+        .day-photo-btn.has-photo::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.34);
+        }
+
+        .day-photo-btn span {
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 1px 6px rgba(0,0,0,0.7);
+        }
+
         .day-icon { font-size: 4rem; margin-bottom: 15px; }
         .day-title { font-size: 1.6rem; margin-bottom: 10px; font-family: 'Playfair Display', serif; }
         .day-date { font-family: 'Caveat', cursive; font-size: 1.6rem; color: rgba(255,255,255,0.6); margin-bottom: 15px; }
@@ -320,6 +373,68 @@
 
         .btn-cancel:hover { background: rgba(255,255,255,0.12); }
 
+        .photo-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(8px);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            cursor: zoom-out;
+        }
+
+        .photo-modal.show { display: flex; }
+
+        .photo-modal img {
+            max-width: 95%;
+            max-height: 88vh;
+            object-fit: contain;
+            border-radius: 14px;
+            border: 2px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 50px rgba(0,0,0,0.55);
+            animation: modalIn 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .photo-modal-close {
+            position: absolute;
+            top: 26px;
+            right: 28px;
+            color: #fff;
+            font-size: 34px;
+            cursor: pointer;
+            opacity: 0.72;
+            transition: 0.2s;
+        }
+
+        .photo-modal-close:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+
+        .special-toast {
+            position: fixed;
+            left: 50%;
+            bottom: 28px;
+            transform: translate(-50%, 120px);
+            background: linear-gradient(135deg, var(--primary), #c62a6e);
+            color: #fff;
+            border-radius: 16px;
+            padding: 12px 18px;
+            z-index: 3500;
+            box-shadow: 0 12px 28px rgba(255,75,114,0.35);
+            font-weight: 600;
+            transition: transform 0.3s ease;
+            max-width: min(90vw, 360px);
+            text-align: center;
+        }
+
+        .special-toast.show {
+            transform: translate(-50%, 0);
+        }
+
         /* Yükleniyor */
         .loading-text {
             text-align: center;
@@ -335,6 +450,7 @@
             .day-icon   { font-size: 3rem; }
             .modal-box  { padding: 30px 22px; }
             .delete-btn { opacity: 1; }
+            .day-photo-btn { width: 34px; height: 34px; }
         }
     </style>
     <script src="app-bootstrap.js?v=1" defer></script>
@@ -354,6 +470,8 @@
     <div class="days-container" id="days-container">
         <div class="loading-text">Günler yükleniyor... 💫</div>
     </div>
+
+    <input type="file" id="special-photo-input" accept="image/*" hidden>
 
     <!-- Ekle Modalı -->
     <div class="modal-overlay" id="add-modal" onclick="handleOverlayClick(event)">
@@ -404,12 +522,20 @@
         </div>
     </div>
 
+    <div class="photo-modal" id="special-photo-modal" onclick="closeSpecialPhotoModal()">
+        <span class="photo-modal-close">×</span>
+        <img src="" alt="Özel gün fotoğrafı" id="special-photo-modal-img">
+    </div>
+    <div class="special-toast" id="special-toast"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="widget-helper.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp }
+        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc }
             from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        const IMGBB_API_KEY = "7916dd11376f59a547ed252799f1328a";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB1EbNEABIODcVts24HpES1UebXQ4wTifU",
@@ -433,7 +559,50 @@
         ];
 
         let customDays = [];
+        let staticPhotos = {};
+        let pendingPhotoTarget = null;
         let hasConfetti = false;
+
+        function escAttr(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function escJs(value) {
+            return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n');
+        }
+
+        function showSpecialToast(message) {
+            const toast = document.getElementById('special-toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(showSpecialToast.timer);
+            showSpecialToast.timer = setTimeout(() => toast.classList.remove('show'), 2600);
+        }
+
+        function renderPhotoActions(id, source, photoUrl) {
+            const safeUrl = escAttr(photoUrl || '');
+            const openBtn = photoUrl
+                ? '<button type="button" class="day-photo-btn has-photo" style="background-image:url(&quot;' + safeUrl + '&quot;)" onclick="openSpecialPhotoModal(\'' + escJs(photoUrl) + '\')" title="Fotoğrafı büyüt"><span>🖼️</span></button>'
+                : '<button type="button" class="day-photo-btn" onclick="pickSpecialPhoto(\'' + escJs(id) + '\', \'' + source + '\')" title="Fotoğraf ekle"><span>📷</span></button>';
+            const changeBtn = photoUrl
+                ? '<button type="button" class="day-photo-btn" onclick="pickSpecialPhoto(\'' + escJs(id) + '\', \'' + source + '\')" title="Fotoğrafı değiştir"><span>📷</span></button>'
+                : '';
+            return '<div class="day-photo-actions">' + openBtn + changeBtn + '</div>';
+        }
+
+        async function uploadImageToImgBB(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+            const json = await res.json();
+            if (!json.success) throw new Error(json.error?.message || 'ImageBB yüklemesi başarısız');
+            return json.data.display_url || json.data.url;
+        }
 
         // ===== HESAPLAMALAR =====
         function calcDiff(targetDate) {
@@ -485,6 +654,7 @@
 
                 container.innerHTML += `
                     <div class="day-card ${isTodayEvent ? 'is-today' : ''}">
+                        ${renderPhotoActions(item.id, 'static', staticPhotos[item.id])}
                         <div class="day-icon">${item.icon}</div>
                         <div class="day-title">${item.title}</div>
                         <div class="day-date">${item.date}</div>
@@ -526,6 +696,7 @@
                 }
 
                 var cardContent = '<div class="day-card custom-card ' + (isTodayEvent ? 'is-today' : '') + '">';
+                cardContent += renderPhotoActions(item.docId, 'custom', item.photo);
                 cardContent += '<button class="delete-btn" onclick="deleteDay(\'' + item.docId + '\')" title="Sil">✕</button>';
                 cardContent += '<div class="day-icon">' + item.icon + '</div>';
                 cardContent += '<div class="day-title">' + item.title + '</div>';
@@ -553,6 +724,7 @@
                 type: 'special',
                 title: `${item.icon || '💖'} ${item.title}`,
                 text: dateLabel,
+                image: id.startsWith('static-') ? (staticPhotos[item.id] || '') : (item.photo || ''),
                 meta: 'Hatıralarımızdan seçildi'
             });
         };
@@ -561,8 +733,18 @@
         onSnapshot(query(colRef, orderBy('ts', 'asc')), function(snap) {
             customDays = snap.docs.map(function(d) {
                 var data = d.data();
-                return { docId: d.id, title: data.title, date: data.date, mode: data.mode, icon: data.icon, ts: data.ts };
+                return { docId: d.id, title: data.title, date: data.date, mode: data.mode, icon: data.icon, photo: data.photo || '', ts: data.ts };
             });
+            renderAll();
+        });
+
+        onSnapshot(collection(db, 'special_day_photos'), function(snap) {
+            const nextPhotos = {};
+            snap.docs.forEach(function(d) {
+                const data = d.data();
+                if (data.photo) nextPhotos[d.id] = data.photo;
+            });
+            staticPhotos = nextPhotos;
             renderAll();
         });
 
@@ -602,6 +784,57 @@
             if (!confirm('Bu günü silmek istiyor musun? 🥺')) return;
             try { await deleteDoc(doc(db, 'special_days', docId)); }
             catch(e) { console.error(e); }
+        };
+
+        window.pickSpecialPhoto = function(id, source) {
+            pendingPhotoTarget = { id, source };
+            const input = document.getElementById('special-photo-input');
+            input.value = '';
+            input.click();
+        };
+
+        document.getElementById('special-photo-input').addEventListener('change', async function(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file || !pendingPhotoTarget) return;
+            if (!file.type.startsWith('image/')) {
+                showSpecialToast('Lütfen bir fotoğraf seç');
+                return;
+            }
+            showSpecialToast('Fotoğraf ImageBB’ye yükleniyor...');
+            try {
+                const photoUrl = await uploadImageToImgBB(file);
+                if (pendingPhotoTarget.source === 'static') {
+                    await setDoc(doc(db, 'special_day_photos', pendingPhotoTarget.id), {
+                        photo: photoUrl,
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                } else {
+                    await updateDoc(doc(db, 'special_days', pendingPhotoTarget.id), {
+                        photo: photoUrl,
+                        updatedAt: serverTimestamp()
+                    });
+                }
+                showSpecialToast('Fotoğraf kaydedildi ✨');
+            } catch (error) {
+                console.error(error);
+                showSpecialToast('Fotoğraf yüklenemedi 😔');
+            } finally {
+                pendingPhotoTarget = null;
+                event.target.value = '';
+            }
+        });
+
+        window.openSpecialPhotoModal = function(url) {
+            const modal = document.getElementById('special-photo-modal');
+            document.getElementById('special-photo-modal-img').src = url;
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeSpecialPhotoModal = function() {
+            document.getElementById('special-photo-modal').classList.remove('show');
+            document.getElementById('special-photo-modal-img').src = '';
+            document.body.style.overflow = 'auto';
         };
 
         // ===== CONFETTI =====
