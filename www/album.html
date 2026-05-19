@@ -16,6 +16,9 @@
             --primary: #ff4b72;
             --accent-pink: #ff6b9d;
             --accent-purple: #c44569;
+            --accent-gold: #ffd166;
+            --ink: #fff8fb;
+            --muted: rgba(255,255,255,0.64);
             --bg-primary: #0a0208;
             --bg-secondary: #1a0a1a;
             --glass: rgba(255, 255, 255, 0.08);
@@ -35,9 +38,10 @@
         body {
             font-family: 'Outfit', sans-serif;
             background:
-                radial-gradient(ellipse at 20% 0%, rgba(255,75,114,0.18) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 100%, rgba(180,79,255,0.12) 0%, transparent 50%),
-                linear-gradient(160deg, #0d0208 0%, #1a0a1a 45%, #0f0510 100%);
+                radial-gradient(ellipse at 18% 4%, rgba(255,75,114,0.16) 0%, transparent 38%),
+                radial-gradient(ellipse at 82% 18%, rgba(255,209,102,0.11) 0%, transparent 32%),
+                radial-gradient(ellipse at 50% 105%, rgba(72,201,176,0.11) 0%, transparent 42%),
+                linear-gradient(155deg, #10040c 0%, #1a0b16 48%, #07070d 100%);
             min-height: 100vh;
             color: #fff;
             padding: 20px;
@@ -65,10 +69,12 @@
 
         /* Header */
         .header {
-            text-align: center;
-            padding: 20px 0 36px;
+            text-align: left;
+            padding: 34px 0 26px;
             position: relative;
             z-index: 1;
+            max-width: 1120px;
+            margin: 0 auto;
         }
 
         .back-btn {
@@ -95,11 +101,17 @@
         }
 
         .header-icon {
-            font-size: 3.5rem;
-            margin-bottom: 12px;
-            filter: drop-shadow(0 4px 12px rgba(255,75,114,0.4));
-            display: block;
-            animation: floatIcon 3s ease-in-out infinite;
+            width: 58px;
+            height: 58px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 16px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.22);
         }
 
         @keyframes floatIcon {
@@ -108,21 +120,18 @@
         }
 
         .header h1 {
-            font-family: 'Caveat', cursive;
-            font-size: 2.8rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, #ffd6e0, var(--accent-pink), var(--accent-purple));
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: clamp(2rem, 7vw, 4.2rem);
+            font-weight: 700;
+            color: var(--ink);
             margin-bottom: 8px;
-            letter-spacing: 1px;
+            letter-spacing: 0;
         }
 
         .header p {
-            color: rgba(255, 255, 255, 0.55);
-            font-size: 0.95rem;
-            font-style: italic;
+            color: var(--muted);
+            font-size: 1rem;
+            max-width: 560px;
+            line-height: 1.5;
         }
 
         /* Stats Container */
@@ -133,6 +142,9 @@
             margin-bottom: 24px;
             position: relative;
             z-index: 1;
+            max-width: 1120px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         @media (max-width: 640px) {
@@ -144,7 +156,7 @@
             background: rgba(255,255,255,0.045);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 20px;
+            border-radius: 8px;
             padding: 18px 20px;
             text-align: center;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 8px 24px rgba(0,0,0,0.25);
@@ -184,33 +196,43 @@
 
         /* Fotoğraf Ekleme */
         .add-photo-section {
-            background: rgba(255,75,114,0.06);
+            background: linear-gradient(135deg, rgba(255,75,114,0.12), rgba(255,209,102,0.08));
             backdrop-filter: blur(16px);
-            border: 2px dashed rgba(255,75,114,0.35);
-            border-radius: 22px;
-            padding: 28px 20px;
-            text-align: center;
-            margin-bottom: 36px;
+            border: 1px dashed rgba(255,255,255,0.28);
+            border-radius: 8px;
+            padding: 22px;
+            text-align: left;
+            margin: 0 auto 22px;
             cursor: pointer;
-            transition: all 0.35s cubic-bezier(0.175,0.885,0.32,1.275);
+            transition: all 0.25s ease;
             position: relative;
             z-index: 1;
             box-shadow: 0 4px 20px rgba(255,75,114,0.08);
+            max-width: 1120px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         .add-photo-section:hover {
             background: rgba(255,75,114,0.13);
             border-color: var(--primary);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
             box-shadow: 0 12px 32px rgba(255,75,114,0.18);
         }
 
         .add-photo-section:active { transform: scale(0.98); }
 
         .add-photo-section .icon {
-            font-size: 2.6rem;
-            margin-bottom: 10px;
-            display: block;
+            width: 52px;
+            height: 52px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            flex: 0 0 auto;
         }
 
         .add-photo-section p {
@@ -228,12 +250,49 @@
 
         #photo-input { display: none; }
 
+        .upload-queue-status {
+            width: min(1120px, 100%);
+            margin: -8px auto 22px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.055);
+            color: var(--muted);
+            font-size: 0.84rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .upload-queue-status.active { display: flex; }
+
+        .upload-queue-bar {
+            flex: 1;
+            height: 7px;
+            min-width: 80px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.12);
+        }
+
+        .upload-queue-fill {
+            width: 0%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--accent-pink), var(--accent-gold));
+            transition: width 0.22s ease;
+        }
+
         /* ===== ALBÜM SAYFASI ===== */
         .album-page-wrap {
             position: relative;
             z-index: 1;
-            width: 100%;
+            width: min(1120px, 100%);
             max-width: 100%;
+            margin: 0 auto;
         }
 
         /* Albüm başlık bandı */
@@ -262,8 +321,8 @@
         /* Albüm Grid — masaüstü dağınık, mobil 2 sütun */
         .album-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-            gap: 28px 22px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
             padding: 10px 4px 20px;
             width: 100%;
             max-width: 100%;
@@ -279,21 +338,23 @@
 
         /* ===== POLAROİD KART ===== */
         .polaroid-card {
-            background: #1c1c1e;
-            border-radius: 3px;
-            padding: 10px 10px 52px 10px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 8px 8px 48px;
             box-shadow:
-                0 2px 4px rgba(0,0,0,0.4),
-                0 8px 20px rgba(0,0,0,0.55),
-                0 20px 40px rgba(0,0,0,0.3),
+                0 10px 28px rgba(0,0,0,0.28),
                 inset 0 1px 0 rgba(255,255,255,0.06);
             cursor: pointer;
-            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, opacity 0.22s ease;
             position: relative;
-            transform: rotate(var(--rotation, 0deg));
+            transform: translateY(0);
             transform-origin: center bottom;
             will-change: transform;
             min-width: 0;
+            overflow: hidden;
+            touch-action: manipulation;
+            user-select: none;
         }
 
         /* Farklı rotasyonlar */
@@ -303,13 +364,43 @@
         .polaroid-card:nth-child(4n+4) { --rotation: 3.5deg; }
 
         .polaroid-card:hover {
-            transform: rotate(0deg) scale(1.06) translateY(-8px);
+            transform: translateY(-4px);
             box-shadow:
-                0 4px 8px rgba(0,0,0,0.4),
-                0 16px 40px rgba(0,0,0,0.6),
-                0 32px 60px rgba(0,0,0,0.35),
+                0 16px 36px rgba(0,0,0,0.35),
                 0 0 0 1px rgba(255,75,114,0.2);
             z-index: 20;
+        }
+
+        .polaroid-card.is-draggable { cursor: grab; }
+        .album-grid.is-sorting .polaroid-card {
+            transition: transform 0.16s ease, opacity 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+        }
+        .polaroid-card.is-dragging {
+            opacity: 0.42;
+            transform: scale(0.94);
+            border-color: rgba(255,209,102,0.75);
+            cursor: grabbing;
+        }
+        .polaroid-card.drag-over {
+            border-color: rgba(255,75,114,0.85);
+            box-shadow: 0 0 0 2px rgba(255,75,114,0.22), 0 16px 36px rgba(0,0,0,0.35);
+        }
+
+        .drag-handle {
+            position: absolute;
+            left: 12px;
+            bottom: 11px;
+            width: 26px;
+            height: 26px;
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.28);
+            color: rgba(255,255,255,0.72);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            z-index: 8;
         }
 
         @media (max-width: 520px) {
@@ -337,7 +428,7 @@
 
         /* Bant efekti */
         .polaroid-card::before {
-            content: '';
+            content: none;
             position: absolute;
             top: -12px;
             left: 50%;
@@ -362,17 +453,18 @@
 
         .polaroid-image {
             width: 100%;
-            height: 150px;
+            aspect-ratio: 1 / 1;
+            height: auto;
             object-fit: cover;
-            border-radius: 1px;
+            border-radius: 6px;
             background: #111;
             display: block;
         }
 
         @media (max-width: 520px) {
             .polaroid-image {
-                height: 118px;
-                border-radius: 10px;
+                height: auto;
+                border-radius: 6px;
             }
         }
 
@@ -380,13 +472,13 @@
         .polaroid-caption {
             position: absolute;
             bottom: 10px;
-            left: 10px;
+            left: 44px;
             right: 10px;
-            font-family: 'Caveat', cursive;
-            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.82rem;
             font-weight: 500;
             color: rgba(255,255,255,0.75);
-            text-align: center;
+            text-align: left;
             line-height: 1.3;
             white-space: nowrap;
             overflow: hidden;
@@ -428,11 +520,11 @@
         /* Sil butonu */
         .delete-photo {
             position: absolute;
-            top: -10px;
-            right: -10px;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
+            top: 12px;
+            right: 12px;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
             background: var(--primary);
             color: #fff;
             border: 2px solid #1c1c1e;
@@ -442,12 +534,19 @@
             align-items: center;
             justify-content: center;
             opacity: 0;
+            pointer-events: none;
+            transform: scale(0.86);
             transition: all 0.25s;
             z-index: 30;
             box-shadow: 0 2px 8px rgba(255,75,114,0.5);
         }
 
-        .polaroid-card:hover .delete-photo { opacity: 1; }
+        .polaroid-card:hover .delete-photo,
+        .polaroid-card.show-actions .delete-photo {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
 
         /* Yükleniyor */
         .uploading-indicator {
@@ -507,7 +606,13 @@
             z-index: 1;
             align-items: center;
             width: 100%;
-            max-width: 100%;
+            max-width: 1120px;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 8px;
+            padding: 10px;
+            background: rgba(255,255,255,0.04);
         }
 
         .album-sort-wrap { flex-shrink: 0; }
@@ -538,7 +643,7 @@
         .album-sort-select {
             background: rgba(255,255,255,0.06);
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 18px;
+            border-radius: 8px;
             color: #fff;
             font-family: inherit;
             font-size: 0.82rem;
@@ -553,7 +658,7 @@
             flex-shrink: 0;
             width: 38px;
             height: 38px;
-            border-radius: 50%;
+            border-radius: 8px;
             border: 1px solid rgba(255,75,114,0.3);
             background: rgba(255,75,114,0.08);
             color: rgba(255,255,255,0.7);
@@ -651,14 +756,30 @@
 
             .add-photo-section {
                 border-radius: 16px;
-                padding: 20px 14px;
+                padding: 16px 14px;
                 margin-bottom: 18px;
+                gap: 12px;
+            }
+
+            .add-photo-section .icon {
+                width: 44px;
+                height: 44px;
+                font-size: 1.45rem;
+            }
+
+            .upload-queue-status {
+                flex-wrap: wrap;
+            }
+
+            .upload-queue-bar {
+                flex-basis: 100%;
             }
 
             .album-toolbar {
                 display: grid;
                 grid-template-columns: minmax(0, 1fr) auto;
                 gap: 8px;
+                padding: 8px;
             }
 
             .album-search-wrap {
@@ -678,11 +799,17 @@
             }
 
             .delete-photo {
-                opacity: 1;
+                opacity: 0;
                 top: 6px;
                 right: 6px;
                 width: 26px;
                 height: 26px;
+            }
+
+            .polaroid-card.show-actions .delete-photo {
+                opacity: 1;
+                pointer-events: auto;
+                transform: scale(1);
             }
         }
 
@@ -947,10 +1074,19 @@
 
     <div class="add-photo-section" onclick="document.getElementById('photo-input').click()">
         <div class="icon">📷</div>
-        <p>Yeni Fotoğraf Ekle</p>
-        <small>Birden fazla fotoğraf seçebilirsin</small>
+        <div>
+            <p>Yeni Fotoğraf Ekle</p>
+            <small>Çoklu seçimde fotoğraflar sırayla kuyruğa alınır</small>
+        </div>
     </div>
     <input type="file" id="photo-input" accept="image/*" multiple onchange="handlePhotoUpload(event)">
+
+    <div class="upload-queue-status" id="upload-queue-status">
+        <span id="upload-queue-text">Kuyruk hazırlanıyor...</span>
+        <div class="upload-queue-bar">
+            <div class="upload-queue-fill" id="upload-queue-fill"></div>
+        </div>
+    </div>
 
     <!-- Arama & Sıralama Araç Çubuğu -->
     <div class="album-toolbar">
@@ -960,6 +1096,7 @@
         </div>
         <div class="album-sort-wrap">
             <select id="album-sort" class="album-sort-select" onchange="sortAlbum(this.value)">
+                <option value="custom">Özel sıra</option>
                 <option value="newest">En Yeni</option>
                 <option value="oldest">En Eski</option>
                 <option value="mine">Benimkiler</option>
@@ -1030,6 +1167,10 @@
         let currentPhotoIndex = -1;
         let currentPhotoId = null;
         let currentModalFromGrid = true;
+        let uploadQueue = [];
+        let uploadQueueRunning = false;
+        let dragState = null;
+        let suppressNextPhotoOpen = false;
 
         function normalizeUserName(value) {
             const raw = String(value || '').trim();
@@ -1042,8 +1183,19 @@
             return raw || 'guest';
         }
 
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         const currentUser = normalizeUserName(localStorage.getItem('active_player'));
         const albumBackupKey = `album_photos_backup_${currentUser}`;
+        const albumOrderKey = `album_display_order_${currentUser}`;
+        let customAlbumOrder = [];
 
         function getPartnerName(user = currentUser) {
             const normalized = normalizeUserName(user);
@@ -1159,6 +1311,7 @@
                 owner: normalizeUserName(photo.owner || fallbackOwner),
                 readOnly,
                 isMarketPhoto: !!photo.isMarketPhoto,
+                ...(Number.isFinite(Number(photo.order)) ? { order: Number(photo.order) } : {}),
                 ...(photo.seller ? { seller: photo.seller } : {}),
                 ...(photo.title ? { title: photo.title } : {}),
                 ...(photo.imgbbUrl || photo.url ? { imgbbUrl: photo.imgbbUrl || photo.url } : {}),
@@ -1181,9 +1334,47 @@
             }
         }
 
+        function loadAlbumOrder(remoteOrder = null) {
+            if (Array.isArray(remoteOrder)) {
+                customAlbumOrder = remoteOrder.map(String).filter(Boolean);
+                localStorage.setItem(albumOrderKey, JSON.stringify(customAlbumOrder));
+                return;
+            }
+            try {
+                const parsed = JSON.parse(localStorage.getItem(albumOrderKey) || '[]');
+                customAlbumOrder = Array.isArray(parsed) ? parsed.map(String).filter(Boolean) : [];
+            } catch (error) {
+                customAlbumOrder = [];
+            }
+        }
+
+        function saveAlbumOrder() {
+            const ids = new Set(allPhotos.map(photo => photo.id));
+            customAlbumOrder = customAlbumOrder.filter(id => ids.has(id));
+            localStorage.setItem(albumOrderKey, JSON.stringify(customAlbumOrder));
+        }
+
+        function getOrderRank(photo) {
+            const index = customAlbumOrder.indexOf(photo.id);
+            return index === -1 ? 999999 + Number(photo.order ?? 0) : index;
+        }
+
+        function ensurePhotoOrder() {
+            photos.forEach((photo, index) => {
+                if (!Number.isFinite(Number(photo.order))) {
+                    photo.order = index;
+                }
+            });
+            photos.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
+            photos.forEach((photo, index) => {
+                photo.order = index;
+            });
+        }
+
         function getSavablePhotos() {
+            ensurePhotoOrder();
             return photos
-                .map(p => normalizePhotoRecord(p, currentUser))
+                .map((p, index) => normalizePhotoRecord({ ...p, order: index }, currentUser))
                 .filter(p => p && p.url && !p.url.startsWith('data:') && !p.isUploading);
         }
 
@@ -1191,14 +1382,19 @@
             try {
                 const snap = await getDoc(doc(db, 'couple_album', currentUser));
                 if (snap.exists() && snap.data().photos) {
+                    loadAlbumOrder(snap.data().displayOrder);
                     photos = snap.data().photos
                         .map(p => normalizePhotoRecord(p, currentUser))
                         .filter(Boolean);
+                    ensurePhotoOrder();
                     if (!photos.length) {
                         photos = getBackupPhotos();
+                        ensurePhotoOrder();
                     }
                 } else {
+                    loadAlbumOrder();
                     photos = getBackupPhotos();
+                    ensurePhotoOrder();
                 }
                 // Partner fotoğraflarını da yükle (ortak albüm)
                 const partner = getPartnerName();
@@ -1216,6 +1412,7 @@
                 updatePhotoCount();
             } catch (error) {
                 console.error('Fotoğraflar yüklenemedi:', error);
+                loadAlbumOrder();
                 photos = getBackupPhotos();
                 partnerPhotos = [];
                 updateAlbumDisplay();
@@ -1270,7 +1467,7 @@
             try {
                 // Firestore'a sadece ImageBB/kalıcı URL'li ve undefined alan içermeyen kayıtlar gider.
                 const albumPhotos = getSavablePhotos();
-                await setDoc(doc(db, 'couple_album', currentUser), { photos: albumPhotos, updatedAt: serverTimestamp() });
+                await setDoc(doc(db, 'couple_album', currentUser), { photos: albumPhotos, displayOrder: customAlbumOrder, updatedAt: serverTimestamp() });
                 try {
                     await setDoc(doc(db, 'user_stats', currentUser), { photoCount: albumPhotos.length }, { merge: true });
                 } catch (statsError) {
@@ -1290,7 +1487,7 @@
 
         // =================== DISPLAY ===================
         let currentFilter = '';
-        let currentSort = 'newest';
+        let currentSort = 'custom';
         let allPhotos = []; // partner dahil tüm fotoğraflar
         const PHOTO_TITLES_TO_REMOVE = ['ilk anımız', 'sahildeki anımız', 'romantik akşam'];
 
@@ -1330,7 +1527,8 @@
                 list = list.filter(p => (p.caption || '').toLowerCase().includes(currentFilter.toLowerCase()));
             }
             // Sıralama
-            if (currentSort === 'newest') list.sort((a, b) => new Date(b.date) - new Date(a.date));
+            if (currentSort === 'custom') list.sort((a, b) => getOrderRank(a) - getOrderRank(b));
+            else if (currentSort === 'newest') list.sort((a, b) => new Date(b.date) - new Date(a.date));
             else if (currentSort === 'oldest') list.sort((a, b) => new Date(a.date) - new Date(b.date));
             else if (currentSort === 'mine') list = list.filter(p => normalizeUserName(p.owner) === currentUser || !p.owner);
             else if (currentSort === 'partner') {
@@ -1362,21 +1560,25 @@
             grid.style.display = 'grid';
             empty.style.display = 'none';
             grid.innerHTML = list.map((photo, index) => {
-                const caption = photo.isMarketPhoto
+                const captionRaw = photo.isMarketPhoto
                     ? `${photo.caption} - ${photo.seller || 'Aşk Marketi'} 💝`
                     : photo.caption;
+                const caption = escapeHtml(captionRaw);
+                const isDraggable = !currentFilter && currentSort === 'custom';
                 const ownerBadge = photo.owner && photo.owner !== currentUser
                     ? `<div class="polaroid-owner">${photo.owner === 'Ayşe' ? '🎀' : '💙'}</div>` : '';
                 return `
-                    <div class="polaroid-card" onclick="openPhotoModal(${index}, true)">
+                    <div class="polaroid-card ${isDraggable ? 'is-draggable' : ''}" data-photo-id="${escapeHtml(photo.id)}" data-index="${index}" draggable="false" onclick="openPhotoModal(${index}, true)">
                         ${ownerBadge}
                         <div class="polaroid-date">${formatDate(photo.date)}</div>
                         ${photo.isUploading ? `<div class="uploading-indicator"><div class="spinner"></div>Yükleniyor: %${Math.round(photo.uploadProgress || 0)}</div><div class="upload-progress"><div class="upload-progress-fill" style="width:${Math.max(0, Math.min(100, photo.uploadProgress || 0))}%"></div></div>` : ''}
                         <img src="${photo.url}" alt="${caption}" class="polaroid-image" loading="lazy">
+                        ${isDraggable ? '<div class="drag-handle" title="Sırayı değiştir">☰</div>' : ''}
                         <div class="polaroid-caption" title="${caption}">${caption}</div>
                         ${canEditPhoto(photo) ? `<button class="delete-photo" onclick="deletePhoto(event, ${index}, true)" title="Fotoğrafı sil">✕</button>` : ''}
                     </div>`;
             }).join('');
+            setupAlbumDrag();
         }
 
         function updateAlbumDisplay() {
@@ -1384,6 +1586,14 @@
                 ...photos.map(p => ({ ...p, owner: normalizeUserName(p.owner || currentUser) })),
                 ...partnerPhotos
             ];
+            const knownIds = new Set(customAlbumOrder);
+            allPhotos.forEach(photo => {
+                if (!knownIds.has(photo.id)) {
+                    customAlbumOrder.push(photo.id);
+                    knownIds.add(photo.id);
+                }
+            });
+            saveAlbumOrder();
             renderGrid();
         }
 
@@ -1427,60 +1637,268 @@
         }
 
         // =================== UPLOAD ===================
-        async function handlePhotoUpload(event) {
-            const files = Array.from(event.target.files);
-            for (const file of files) {
-                if (!file.type.startsWith('image/')) continue;
-                const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onload = async (e) => {
-                    const newPhoto = { id: photoId, url: e.target.result, caption: 'Anılarımız 💕', date: new Date().toISOString(), owner: currentUser, isMarketPhoto: false, isUploading: true, uploadProgress: 0 };
-                    photos.unshift(newPhoto);
-                    updateAlbumDisplay();
-                    showNotification('Fotoğraf yükleniyor... ☁️');
-                    try {
-                        const data = await uploadAlbumPhoto(file, photoId, (progress) => {
-                            const idx = photos.findIndex(p => p.id === photoId);
-                            if (idx !== -1) {
-                                photos[idx].uploadProgress = progress;
-                                updateAlbumDisplay();
-                            }
-                        });
-                        if (data.success) {
-                            const idx = photos.findIndex(p => p.id === photoId);
-                            if (idx !== -1) {
-                                const uploadedUrl = data.data.display_url || data.data.url;
-                                photos[idx].url = uploadedUrl;
-                                photos[idx].isUploading = false;
-                                photos[idx].uploadProgress = 100;
-                                photos[idx].imgbbUrl = uploadedUrl;
-                                if (data.data.delete_url) photos[idx].imgbbDeleteUrl = data.data.delete_url;
-                                const savedRemotely = await savePhotos();
-                                updateAlbumDisplay();
-                                updatePhotoCount();
-                                showNotification(savedRemotely ? '✅ Fotoğraf buluta kaydedildi!' : '✅ Fotoğraf ImageBB’de, albüm yedeği alındı');
-                            }
-                        } else {
-                            throw new Error(data.error?.message || 'Yükleme başarısız');
-                        }
-                    } catch (error) {
-                        console.error('ImgBB hatası:', error);
-                        const idx = photos.findIndex(p => p.id === photoId);
-                        if (idx !== -1) {
-                            photos.splice(idx, 1);
-                        }
-                        updateAlbumDisplay();
-                        updatePhotoCount();
-                        showNotification('❌ ImageBB yüklemesi başarısız oldu');
-                    }
-                };
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = () => reject(new Error('Fotoğraf okunamadı'));
                 reader.readAsDataURL(file);
+            });
+        }
+
+        function updateUploadQueueStatus(done = 0, total = uploadQueue.length, currentName = '') {
+            const status = document.getElementById('upload-queue-status');
+            const text = document.getElementById('upload-queue-text');
+            const fill = document.getElementById('upload-queue-fill');
+            if (!status || !text || !fill) return;
+            if (!uploadQueueRunning && total === 0) {
+                status.classList.remove('active');
+                fill.style.width = '0%';
+                return;
+            }
+            status.classList.add('active');
+            const percent = total ? Math.round((done / total) * 100) : 0;
+            fill.style.width = `${percent}%`;
+            text.textContent = currentName
+                ? `${done + 1}/${total} yükleniyor: ${currentName}`
+                : `${done}/${total} fotoğraf tamamlandı`;
+        }
+
+        async function processUploadQueue() {
+            if (uploadQueueRunning) return;
+            uploadQueueRunning = true;
+            const initialTotal = uploadQueue.length;
+            let completed = 0;
+            showNotification(`${initialTotal} fotoğraf sıraya alındı`);
+
+            while (uploadQueue.length) {
+                const item = uploadQueue.shift();
+                updateUploadQueueStatus(completed, initialTotal, item.file.name || 'fotoğraf');
+                try {
+                    const data = await uploadAlbumPhoto(item.file, item.photoId, (progress) => {
+                        const idx = photos.findIndex(p => p.id === item.photoId);
+                        if (idx !== -1) {
+                            photos[idx].uploadProgress = progress;
+                            updateAlbumDisplay();
+                        }
+                    });
+                    const idx = photos.findIndex(p => p.id === item.photoId);
+                    if (idx !== -1 && data.success) {
+                        const uploadedUrl = data.data.display_url || data.data.url;
+                        photos[idx].url = uploadedUrl;
+                        photos[idx].isUploading = false;
+                        photos[idx].uploadProgress = 100;
+                        photos[idx].imgbbUrl = uploadedUrl;
+                        if (data.data.delete_url) photos[idx].imgbbDeleteUrl = data.data.delete_url;
+                        await savePhotos();
+                    }
+                } catch (error) {
+                    console.error('ImgBB hatası:', error);
+                    const idx = photos.findIndex(p => p.id === item.photoId);
+                    if (idx !== -1) photos.splice(idx, 1);
+                    showNotification('Bir fotoğraf yüklenemedi, kuyruk devam ediyor');
+                }
+                completed++;
+                updateAlbumDisplay();
+                updatePhotoCount();
+                updateUploadQueueStatus(completed, initialTotal);
+            }
+
+            uploadQueueRunning = false;
+            updateUploadQueueStatus(0, 0);
+            updateAlbumDisplay();
+            updatePhotoCount();
+            showNotification('Fotoğraf kuyruğu tamamlandı');
+        }
+
+        async function handlePhotoUpload(event) {
+            const files = Array.from(event.target.files).filter(file => file.type.startsWith('image/'));
+            if (!files.length) return;
+            ensurePhotoOrder();
+            const startIndex = photos.length;
+            for (const [fileIndex, file] of files.entries()) {
+                const photoId = 'photo_' + Date.now() + '_' + fileIndex + '_' + Math.random().toString(36).substr(2, 9);
+                try {
+                    const previewUrl = await readFileAsDataURL(file);
+                    const newPhoto = {
+                        id: photoId,
+                        url: previewUrl,
+                        caption: 'Anılarımız 💕',
+                        date: new Date().toISOString(),
+                        owner: currentUser,
+                        isMarketPhoto: false,
+                        isUploading: true,
+                        uploadProgress: 0,
+                        order: startIndex + fileIndex
+                    };
+                    photos.push(newPhoto);
+                    uploadQueue.push({ file, photoId });
+                    updateAlbumDisplay();
+                    updatePhotoCount();
+                    updateUploadQueueStatus(0, uploadQueue.length);
+                } catch (error) {
+                    console.error('Önizleme hatası:', error);
+                }
             }
             event.target.value = '';
+            processUploadQueue();
+        }
+
+        // =================== DRAG SORT ===================
+        function canReorderNow() {
+            return !currentFilter && currentSort === 'custom';
+        }
+
+        function movePhotoByIds(sourceId, targetId) {
+            if (!sourceId || !targetId || sourceId === targetId || !canReorderNow()) return false;
+            const orderedIds = getDisplayPhotos().map(photo => photo.id);
+            const sourceIndex = orderedIds.indexOf(sourceId);
+            const targetIndex = orderedIds.indexOf(targetId);
+            if (sourceIndex === -1 || targetIndex === -1) return false;
+            const [movedId] = orderedIds.splice(sourceIndex, 1);
+            const nextTargetIndex = orderedIds.indexOf(targetId);
+            orderedIds.splice(nextTargetIndex, 0, movedId);
+            customAlbumOrder = orderedIds;
+            const orderMap = new Map(customAlbumOrder.map((id, index) => [id, index]));
+            photos.sort((a, b) => (orderMap.get(a.id) ?? 999999) - (orderMap.get(b.id) ?? 999999));
+            photos.forEach((photo, index) => {
+                photo.order = index;
+            });
+            saveAlbumOrder();
+            savePhotos();
+            updateAlbumDisplay();
+            showNotification('Albüm sırası güncellendi');
+            if (window.haptic) window.haptic([15, 25]);
+            return true;
+        }
+
+        function applyAlbumOrderFromGrid(showSavedMessage = true) {
+            const grid = document.getElementById('album-grid');
+            if (!grid || !canReorderNow()) return false;
+            const orderedIds = Array.from(grid.querySelectorAll('.polaroid-card[data-photo-id]'))
+                .map(card => card.dataset.photoId)
+                .filter(Boolean);
+            if (orderedIds.length < 2) return false;
+
+            customAlbumOrder = orderedIds;
+            const orderMap = new Map(customAlbumOrder.map((id, index) => [id, index]));
+            photos.sort((a, b) => (orderMap.get(a.id) ?? 999999) - (orderMap.get(b.id) ?? 999999));
+            photos.forEach((photo, index) => {
+                photo.order = index;
+            });
+            saveAlbumOrder();
+            savePhotos();
+            updateAlbumDisplay();
+            if (showSavedMessage) showNotification('Albüm sırası güncellendi');
+            if (window.haptic) window.haptic([15, 25]);
+            return true;
+        }
+
+        function shouldInsertAfterTarget(targetCard, event) {
+            const rect = targetCard.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const sameRowGesture = Math.abs(event.clientY - centerY) < rect.height * 0.45;
+            return sameRowGesture ? event.clientX > centerX : event.clientY > centerY;
+        }
+
+        function getAlbumCardById(grid, photoId) {
+            return Array.from(grid.querySelectorAll('.polaroid-card[data-photo-id]'))
+                .find(card => card.dataset.photoId === photoId) || null;
+        }
+
+        function moveDraggingCardInGrid(sourceCard, targetCard, event) {
+            if (!sourceCard || !targetCard || sourceCard === targetCard) return false;
+            const grid = document.getElementById('album-grid');
+            if (!grid || sourceCard.parentElement !== grid || targetCard.parentElement !== grid) return false;
+            if (shouldInsertAfterTarget(targetCard, event)) {
+                targetCard.after(sourceCard);
+            } else {
+                targetCard.before(sourceCard);
+            }
+            return true;
+        }
+
+        function clearDragMarks() {
+            document.querySelectorAll('.polaroid-card.is-dragging, .polaroid-card.drag-over').forEach(card => {
+                card.classList.remove('is-dragging', 'drag-over');
+            });
+            document.getElementById('album-grid')?.classList.remove('is-sorting');
+        }
+
+        function setupAlbumDrag() {
+            const grid = document.getElementById('album-grid');
+            if (!grid || grid.dataset.dragReady === 'true') return;
+            grid.dataset.dragReady = 'true';
+
+            grid.addEventListener('pointerdown', event => {
+                const card = event.target.closest('.polaroid-card.is-draggable');
+                if (!card || event.target.closest('.delete-photo') || !canReorderNow()) return;
+                const startX = event.clientX;
+                const startY = event.clientY;
+                const sourceId = card.dataset.photoId;
+                let longPressTimer = null;
+                let didStart = false;
+
+                const startSort = () => {
+                    if (didStart) return;
+                    didStart = true;
+                    dragState = { sourceId, pointer: true, moved: false, pointerId: event.pointerId };
+                    grid.classList.add('is-sorting');
+                    card.classList.add('is-dragging');
+                    card.classList.remove('show-actions');
+                    try { card.setPointerCapture(event.pointerId); } catch (error) {}
+                    suppressNextPhotoOpen = true;
+                    if (window.haptic) window.haptic(12);
+                };
+
+                longPressTimer = setTimeout(startSort, 220);
+
+                const onMove = moveEvent => {
+                    const distance = Math.hypot(moveEvent.clientX - startX, moveEvent.clientY - startY);
+                    if (!didStart && distance > 8) {
+                        clearTimeout(longPressTimer);
+                        startSort();
+                    }
+                    if (!dragState?.pointer) return;
+                    moveEvent.preventDefault();
+                    const sourceCard = getAlbumCardById(grid, sourceId);
+                    if (sourceCard) sourceCard.style.pointerEvents = 'none';
+                    const target = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY)?.closest('.polaroid-card.is-draggable');
+                    if (sourceCard) sourceCard.style.pointerEvents = '';
+                    document.querySelectorAll('.polaroid-card.drag-over').forEach(el => el.classList.remove('drag-over'));
+                    if (target && sourceCard && target.dataset.photoId !== sourceId) {
+                        dragState.moved = moveDraggingCardInGrid(sourceCard, target, moveEvent) || dragState.moved;
+                        target.classList.add('drag-over');
+                    }
+                };
+
+                const onUp = () => {
+                    clearTimeout(longPressTimer);
+                    if (dragState?.pointer && dragState.moved) {
+                        applyAlbumOrderFromGrid(true);
+                        suppressNextPhotoOpen = true;
+                    }
+                    try { card.releasePointerCapture(event.pointerId); } catch (error) {}
+                    dragState = null;
+                    clearDragMarks();
+                    window.removeEventListener('pointermove', onMove);
+                    window.removeEventListener('pointerup', onUp);
+                    window.removeEventListener('pointercancel', onUp);
+                };
+
+                window.addEventListener('pointermove', onMove, { passive: false });
+                window.addEventListener('pointerup', onUp);
+                window.addEventListener('pointercancel', onUp);
+            });
         }
 
         // =================== MODAL + PINCH ZOOM ===================
         function openPhotoModal(index, fromGrid = false) {
+            if (suppressNextPhotoOpen) {
+                suppressNextPhotoOpen = false;
+                return;
+            }
             const list = fromGrid ? getDisplayPhotos() : photos;
             currentModalFromGrid = fromGrid;
             currentPhotoIndex = index;
