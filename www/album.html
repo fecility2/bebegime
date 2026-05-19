@@ -371,7 +371,11 @@
             z-index: 20;
         }
 
-        .polaroid-card.is-draggable { cursor: grab; }
+        .polaroid-card.is-draggable {
+            cursor: grab;
+            touch-action: none;
+            -webkit-user-drag: none;
+        }
         .album-grid.is-sorting .polaroid-card {
             transition: transform 0.16s ease, opacity 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
         }
@@ -401,6 +405,8 @@
             justify-content: center;
             font-size: 0.95rem;
             z-index: 8;
+            touch-action: none;
+            user-select: none;
         }
 
         @media (max-width: 520px) {
@@ -459,6 +465,8 @@
             border-radius: 6px;
             background: #111;
             display: block;
+            -webkit-user-drag: none;
+            user-select: none;
         }
 
         @media (max-width: 520px) {
@@ -1564,7 +1572,7 @@
                     ? `${photo.caption} - ${photo.seller || 'Aşk Marketi'} 💝`
                     : photo.caption;
                 const caption = escapeHtml(captionRaw);
-                const isDraggable = !currentFilter && currentSort === 'custom';
+                const isDraggable = canReorderNow();
                 const ownerBadge = photo.owner && photo.owner !== currentUser
                     ? `<div class="polaroid-owner">${photo.owner === 'Ayşe' ? '🎀' : '💙'}</div>` : '';
                 return `
@@ -1794,12 +1802,21 @@
             return true;
         }
 
+        function getClientPoint(event) {
+            const touch = event.touches?.[0] || event.changedTouches?.[0];
+            return {
+                x: touch ? touch.clientX : event.clientX,
+                y: touch ? touch.clientY : event.clientY
+            };
+        }
+
         function shouldInsertAfterTarget(targetCard, event) {
+            const point = getClientPoint(event);
             const rect = targetCard.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
-            const sameRowGesture = Math.abs(event.clientY - centerY) < rect.height * 0.45;
-            return sameRowGesture ? event.clientX > centerX : event.clientY > centerY;
+            const sameRowGesture = Math.abs(point.y - centerY) < rect.height * 0.45;
+            return sameRowGesture ? point.x > centerX : point.y > centerY;
         }
 
         function getAlbumCardById(grid, photoId) {
@@ -1823,7 +1840,9 @@
             document.querySelectorAll('.polaroid-card.is-dragging, .polaroid-card.drag-over').forEach(card => {
                 card.classList.remove('is-dragging', 'drag-over');
             });
-            document.getElementById('album-grid')?.classList.remove('is-sorting');
+            const grid = document.getElementById('album-grid');
+            grid?.classList.remove('is-sorting');
+            if (grid) grid.style.touchAction = '';
         }
 
         function setupAlbumDrag() {
@@ -1831,23 +1850,28 @@
             if (!grid || grid.dataset.dragReady === 'true') return;
             grid.dataset.dragReady = 'true';
 
-            grid.addEventListener('pointerdown', event => {
+            const startDragGesture = (event, sourceEventName = 'pointer') => {
                 const card = event.target.closest('.polaroid-card.is-draggable');
                 if (!card || event.target.closest('.delete-photo') || !canReorderNow()) return;
-                const startX = event.clientX;
-                const startY = event.clientY;
+                const startPoint = getClientPoint(event);
+                const startX = startPoint.x;
+                const startY = startPoint.y;
                 const sourceId = card.dataset.photoId;
                 let longPressTimer = null;
                 let didStart = false;
+                let pointerId = event.pointerId;
 
                 const startSort = () => {
                     if (didStart) return;
                     didStart = true;
-                    dragState = { sourceId, pointer: true, moved: false, pointerId: event.pointerId };
+                    dragState = { sourceId, pointer: sourceEventName === 'pointer', touch: sourceEventName === 'touch', moved: false, pointerId };
                     grid.classList.add('is-sorting');
+                    grid.style.touchAction = 'none';
                     card.classList.add('is-dragging');
                     card.classList.remove('show-actions');
-                    try { card.setPointerCapture(event.pointerId); } catch (error) {}
+                    if (sourceEventName === 'pointer') {
+                        try { card.setPointerCapture(pointerId); } catch (error) {}
+                    }
                     suppressNextPhotoOpen = true;
                     if (window.haptic) window.haptic(12);
                 };
@@ -1855,16 +1879,17 @@
                 longPressTimer = setTimeout(startSort, 220);
 
                 const onMove = moveEvent => {
-                    const distance = Math.hypot(moveEvent.clientX - startX, moveEvent.clientY - startY);
+                    const point = getClientPoint(moveEvent);
+                    const distance = Math.hypot(point.x - startX, point.y - startY);
                     if (!didStart && distance > 8) {
                         clearTimeout(longPressTimer);
                         startSort();
                     }
-                    if (!dragState?.pointer) return;
+                    if (!dragState) return;
                     moveEvent.preventDefault();
                     const sourceCard = getAlbumCardById(grid, sourceId);
                     if (sourceCard) sourceCard.style.pointerEvents = 'none';
-                    const target = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY)?.closest('.polaroid-card.is-draggable');
+                    const target = document.elementFromPoint(point.x, point.y)?.closest('.polaroid-card.is-draggable');
                     if (sourceCard) sourceCard.style.pointerEvents = '';
                     document.querySelectorAll('.polaroid-card.drag-over').forEach(el => el.classList.remove('drag-over'));
                     if (target && sourceCard && target.dataset.photoId !== sourceId) {
@@ -1875,22 +1900,46 @@
 
                 const onUp = () => {
                     clearTimeout(longPressTimer);
-                    if (dragState?.pointer && dragState.moved) {
+                    if (dragState?.moved) {
                         applyAlbumOrderFromGrid(true);
                         suppressNextPhotoOpen = true;
                     }
-                    try { card.releasePointerCapture(event.pointerId); } catch (error) {}
+                    if (sourceEventName === 'pointer') {
+                        try { card.releasePointerCapture(pointerId); } catch (error) {}
+                    }
                     dragState = null;
                     clearDragMarks();
-                    window.removeEventListener('pointermove', onMove);
-                    window.removeEventListener('pointerup', onUp);
-                    window.removeEventListener('pointercancel', onUp);
+                    if (sourceEventName === 'pointer') {
+                        window.removeEventListener('pointermove', onMove);
+                        window.removeEventListener('pointerup', onUp);
+                        window.removeEventListener('pointercancel', onUp);
+                    } else {
+                        window.removeEventListener('touchmove', onMove);
+                        window.removeEventListener('touchend', onUp);
+                        window.removeEventListener('touchcancel', onUp);
+                    }
                 };
 
-                window.addEventListener('pointermove', onMove, { passive: false });
-                window.addEventListener('pointerup', onUp);
-                window.addEventListener('pointercancel', onUp);
+                if (sourceEventName === 'pointer') {
+                    window.addEventListener('pointermove', onMove, { passive: false });
+                    window.addEventListener('pointerup', onUp);
+                    window.addEventListener('pointercancel', onUp);
+                } else {
+                    window.addEventListener('touchmove', onMove, { passive: false });
+                    window.addEventListener('touchend', onUp);
+                    window.addEventListener('touchcancel', onUp);
+                }
+            };
+
+            grid.addEventListener('pointerdown', event => {
+                if (event.pointerType === 'mouse' && event.button !== 0) return;
+                startDragGesture(event, 'pointer');
             });
+
+            grid.addEventListener('touchstart', event => {
+                if (window.PointerEvent || event.touches.length !== 1) return;
+                startDragGesture(event, 'touch');
+            }, { passive: true });
         }
 
         // =================== MODAL + PINCH ZOOM ===================
