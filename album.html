@@ -533,13 +533,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            opacity: 1;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.86);
             transition: all 0.25s;
             z-index: 30;
             box-shadow: 0 2px 8px rgba(255,75,114,0.5);
         }
 
-        .polaroid-card:hover .delete-photo { opacity: 1; }
+        .polaroid-card:hover .delete-photo,
+        .polaroid-card.show-actions .delete-photo {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
 
         /* Yükleniyor */
         .uploading-indicator {
@@ -792,11 +799,17 @@
             }
 
             .delete-photo {
-                opacity: 1;
+                opacity: 0;
                 top: 6px;
                 right: 6px;
                 width: 26px;
                 height: 26px;
+            }
+
+            .polaroid-card.show-actions .delete-photo {
+                opacity: 1;
+                pointer-events: auto;
+                transform: scale(1);
             }
         }
 
@@ -1555,7 +1568,7 @@
                 const ownerBadge = photo.owner && photo.owner !== currentUser
                     ? `<div class="polaroid-owner">${photo.owner === 'Ayşe' ? '🎀' : '💙'}</div>` : '';
                 return `
-                    <div class="polaroid-card ${isDraggable ? 'is-draggable' : ''}" data-photo-id="${escapeHtml(photo.id)}" data-index="${index}" draggable="${isDraggable ? 'true' : 'false'}" onclick="openPhotoModal(${index}, true)">
+                    <div class="polaroid-card ${isDraggable ? 'is-draggable' : ''}" data-photo-id="${escapeHtml(photo.id)}" data-index="${index}" draggable="false" onclick="openPhotoModal(${index}, true)">
                         ${ownerBadge}
                         <div class="polaroid-date">${formatDate(photo.date)}</div>
                         ${photo.isUploading ? `<div class="uploading-indicator"><div class="spinner"></div>Yükleniyor: %${Math.round(photo.uploadProgress || 0)}</div><div class="upload-progress"><div class="upload-progress-fill" style="width:${Math.max(0, Math.min(100, photo.uploadProgress || 0))}%"></div></div>` : ''}
@@ -1818,64 +1831,34 @@
             if (!grid || grid.dataset.dragReady === 'true') return;
             grid.dataset.dragReady = 'true';
 
-            grid.addEventListener('dragstart', event => {
-                const card = event.target.closest('.polaroid-card.is-draggable');
-                if (!card || !canReorderNow()) return;
-                dragState = { sourceId: card.dataset.photoId, moved: false };
-                grid.classList.add('is-sorting');
-                card.classList.add('is-dragging');
-                event.dataTransfer.effectAllowed = 'move';
-                event.dataTransfer.setData('text/plain', card.dataset.photoId);
-            });
-
-            grid.addEventListener('dragover', event => {
-                if (!dragState) return;
-                const card = event.target.closest('.polaroid-card.is-draggable');
-                const sourceCard = getAlbumCardById(grid, dragState.sourceId);
-                if (!card || !sourceCard || card.dataset.photoId === dragState.sourceId) return;
-                event.preventDefault();
-                document.querySelectorAll('.polaroid-card.drag-over').forEach(el => el.classList.remove('drag-over'));
-                if (moveDraggingCardInGrid(sourceCard, card, event)) {
-                    dragState.moved = true;
-                    card.classList.add('drag-over');
-                }
-            });
-
-            grid.addEventListener('drop', event => {
-                if (!dragState) return;
-                event.preventDefault();
-                applyAlbumOrderFromGrid(dragState.moved);
-                dragState = null;
-                suppressNextPhotoOpen = true;
-                clearDragMarks();
-            });
-
-            grid.addEventListener('dragend', () => {
-                if (dragState?.moved) {
-                    applyAlbumOrderFromGrid(false);
-                    suppressNextPhotoOpen = true;
-                }
-                dragState = null;
-                clearDragMarks();
-            });
-
             grid.addEventListener('pointerdown', event => {
                 const card = event.target.closest('.polaroid-card.is-draggable');
                 if (!card || event.target.closest('.delete-photo') || !canReorderNow()) return;
                 const startX = event.clientX;
                 const startY = event.clientY;
                 const sourceId = card.dataset.photoId;
-                const timer = setTimeout(() => {
-                    dragState = { sourceId, pointer: true, moved: false };
+                let longPressTimer = null;
+                let didStart = false;
+
+                const startSort = () => {
+                    if (didStart) return;
+                    didStart = true;
+                    dragState = { sourceId, pointer: true, moved: false, pointerId: event.pointerId };
                     grid.classList.add('is-sorting');
                     card.classList.add('is-dragging');
+                    card.classList.remove('show-actions');
+                    try { card.setPointerCapture(event.pointerId); } catch (error) {}
                     suppressNextPhotoOpen = true;
                     if (window.haptic) window.haptic(12);
-                }, 180);
+                };
+
+                longPressTimer = setTimeout(startSort, 220);
 
                 const onMove = moveEvent => {
-                    if (!dragState?.pointer && Math.hypot(moveEvent.clientX - startX, moveEvent.clientY - startY) > 12) {
-                        clearTimeout(timer);
+                    const distance = Math.hypot(moveEvent.clientX - startX, moveEvent.clientY - startY);
+                    if (!didStart && distance > 8) {
+                        clearTimeout(longPressTimer);
+                        startSort();
                     }
                     if (!dragState?.pointer) return;
                     moveEvent.preventDefault();
@@ -1891,11 +1874,12 @@
                 };
 
                 const onUp = () => {
-                    clearTimeout(timer);
+                    clearTimeout(longPressTimer);
                     if (dragState?.pointer && dragState.moved) {
                         applyAlbumOrderFromGrid(true);
                         suppressNextPhotoOpen = true;
                     }
+                    try { card.releasePointerCapture(event.pointerId); } catch (error) {}
                     dragState = null;
                     clearDragMarks();
                     window.removeEventListener('pointermove', onMove);
